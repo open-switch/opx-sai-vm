@@ -1,0 +1,6 @@
+opx-sai-vm (1.0.1) main; urgency=medium
+
+  * First version of the opx SAI VM project.
+
+ -- Cliff Wichmann <cwichmann@cliff-dev>  Wed, 15 Jun 2016 19:16:11 -0700
+

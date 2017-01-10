@@ -1,0 +1,13 @@
+Source: opx-sai-vm
+Section: net
+Priority: optional
+Maintainer: Dell <support@dell.com>
+Build-Depends:
+ dh-autoreconf, debhelper (>= 9), autotools-dev, libopx-logging-dev, libopx-common-dev, opx-sai-api-dev, libopx-db-sql-dev, libopx-sai-common-utils-dev
+Standards-Version: 1.0.1
+
+Package: libopx-sai-vm1
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libopx-sai-common-utils1
+Description: OPX SAI VM - shared library
+
