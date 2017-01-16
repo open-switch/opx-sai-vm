@@ -3,13 +3,14 @@
 
 AC_PREREQ([2.69])
 AC_INIT([sai-vm],[1.0])
-AM_INIT_AUTOMAKE([subdir-objects])
+AM_INIT_AUTOMAKE([subdir-objects foreign])
 AC_CONFIG_SRCDIR([src])
 AC_CHECK_HEADERS([libxml/parser.h])
 
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC
+AC_DISABLE_STATIC
 LT_INIT([shared])
 # Checks for libraries.
 
