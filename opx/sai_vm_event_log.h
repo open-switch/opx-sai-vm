@@ -18,16 +18,9 @@
 #ifndef __SAI_VM_EVENT_LOG_H__
 #define __SAI_VM_EVENT_LOG_H__
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
 #include "event_log.h"
 #include "event_log_types.h"
 #include "sai_event_log.h"
-#ifdef __cplusplus
-}
-#endif
 
 /** Logging utility for SAI Scheduler API */
 #define SAI_VM_DB_LOG(level, msg, ...) \

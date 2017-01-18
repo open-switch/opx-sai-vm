@@ -24,6 +24,6 @@ src/qos/sai_vm_queue.c         src/sai-db/sai_db_gen_utils.cpp \
 src/qos/sai_vm_sched_group.c   src/sai-db/sai_db_init.cpp \
 src/sai_vm_npu_api_query.c  src/sai_vm_npu_init_config.c  src/sai_vm_shell.c src/tunnel/sai_vm_tunnel.c
 
-libsai_npu_la_LDFLAGS = -zdefs -lopx_logging -lopx_common -lsai-common-utils -lopx_db_sql
+libsai_npu_la_LDFLAGS = -lopx_logging -lopx_common -lopx_sai_common_utils -lopx_db_sql
 libsai_npu_la_CFLAGS = -I$(top_srcdir)/opx -I$(includedir)/opx
 libsai_npu_la_CXXFLAGS = -I$(top_srcdir)/opx -std=c++11  -I$(includedir)/opx
