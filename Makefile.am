@@ -9,12 +9,6 @@ cfg/sai-db/create_sai_switch_table.sql     cfg/sai-db/drop_sai_switch_table.sql
 #The sai-vm library
 lib_LTLIBRARIES = libsai-npu.la
 
-nobase_include_HEADERS = \
-opx/sai_acl_db_api.h      opx/sai_switch_db_api.h     opx/sai_vm_defs.h       opx/sai_vm_npu_api.h       opx/sai_vm_udf.h \
-opx/sai_acl_db_utils.h    opx/sai_switching_db_api.h  opx/sai_vm_event_log.h  opx/sai_vm_npu_sim_info.h \
-opx/sai_db_gen_utils.h    opx/sai_vm_acl_util.h       opx/sai_vm_l2_util.h    opx/sai_vm_port_util.h \
-opx/sai_routing_db_api.h  opx/sai_vm_db_utils.h       opx/sai_vm_l3_util.h    opx/sai_vm_qos.h
-
 libsai_npu_la_SOURCES = \
 src/acl/sai_vm_acl_counter.c   src/qos/sai_vm_scheduler.c           src/sai-db/sai_routing_db_api.cpp \
 src/acl/sai_vm_acl_rule.c      src/qos/sai_vm_wred.c                src/sai-db/sai_switch_db_api.cpp \
@@ -30,6 +24,6 @@ src/qos/sai_vm_queue.c         src/sai-db/sai_db_gen_utils.cpp \
 src/qos/sai_vm_sched_group.c   src/sai-db/sai_db_init.cpp \
 src/sai_vm_npu_api_query.c  src/sai_vm_npu_init_config.c  src/sai_vm_shell.c src/tunnel/sai_vm_tunnel.c
 
-libsai_npu_la_LDFLAGS = -lopx_logging -lopx_common -lsai-common-utils -lopx_db_sql
+libsai_npu_la_LDFLAGS = -lopx_logging -lopx_common -lopx_sai_common_utils -lopx_db_sql
 libsai_npu_la_CFLAGS = -I$(top_srcdir)/opx -I$(includedir)/opx
 libsai_npu_la_CXXFLAGS = -I$(top_srcdir)/opx -std=c++11  -I$(includedir)/opx
