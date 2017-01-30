@@ -1,10 +1,9 @@
 # opx-sai-vm
 This repository contains the SAI implementation for the OpenSwitch simulator/virtual machine.
 
-##Packages
-Contained within this repository is 
-libopx-sai-vm1\_*version*\_*arch*.deb           - Config files, Utility libraries  
+##Package
+libopx-sai-vm1\_*version*\_*arch*.deb — Configuration files and utility libraries  
 
-See https://github.com/open-switch/opx-docs/wiki/Architecture for information on the SAI VM module.
+See [Architecture](https://github.com/open-switch/opx-docs/wiki/Architecture) for more information on the SAI VM module.
 
 (c) 2017 Dell
