@@ -1,7 +1,7 @@
 Source: opx-sai-vm
 Section: net
 Priority: optional
-Maintainer: Dell <support@dell.com>
+Maintainer: OpenSwitch Developers <ops-dev@lists.openswitch.net>
 Build-Depends:
  dh-autoreconf, debhelper (>= 9), autotools-dev, libopx-logging-dev, libopx-common-dev, opx-sai-api-dev, libopx-db-sql-dev, libopx-sai-common-utils-dev
 Standards-Version: 1.0.1
