@@ -1,6 +1,5 @@
-opx-sai-vm (1.0.1) main; urgency=medium
+opx-sai-vm (1.0.1) unstable; urgency=medium
 
-  * First version of the opx SAI VM project.
+  * Initial release.
 
- -- Cliff Wichmann <cwichmann@cliff-dev>  Wed, 15 Jun 2016 19:16:11 -0700
-
+ -- Dell EMC <ops-dev@lists.openswitch.net>  Wed, 01 Feb 2017 09:46:30 -0800
