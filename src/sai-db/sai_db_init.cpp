@@ -29,7 +29,7 @@
 #include <string>
 #include <sstream>
 
-#define SAI_DB_CONFIG_FILE     "/etc/opt/dell/os10/sai_vm_db.cfg"
+#define SAI_DB_CONFIG_FILE     "/etc/opx/sai_vm_db.cfg"
 #define SAI_DB_PATH_INFO_GRP   "sai_db_path_info"
 #define SAI_DB_PATH            "db_path"
 #define SAI_DB_SQL_SCRIPT_PATH "sql_script_path"
