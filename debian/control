@@ -8,6 +8,6 @@ Standards-Version: 1.0.1
 
 Package: libopx-sai-vm1
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libopx-sai-common-utils1, libopx-db-sql1
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: OPX SAI VM - shared library
 
