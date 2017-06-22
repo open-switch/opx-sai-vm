@@ -31,6 +31,8 @@
 #include "saitypes.h"
 #include "db_sql_ops.h"
 #include "std_type_defs.h"
+#include "sai_vlan_common.h"
+#include "sai_fdb_common.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,16 +41,13 @@ extern "C" {
 /*
  * @brief Create a new entry in the FDB database table
  * @param fdb_entry - SAI FDB entry info which contains MAC address and VLAN.
- * @param port_id   - SAI port object ID for the FDB entry.
+ * @param fdb_entry_node_data - Data related to FDB node such as port, type, action, etc.
  * @param entry_type - Static or dynamic entry type.
  * @param action     - FDB entry packet action.
  * @return sai status code
  */
 sai_status_t sai_fdb_create_db_entry (const sai_fdb_entry_t *fdb_entry,
-                                      sai_object_id_t port_id,
-                                      sai_fdb_entry_type_t entry_type,
-                                      sai_packet_action_t action,
-                                      uint_t metadata);
+                                      sai_fdb_entry_node_t *fdb_entry_node_data);
 
 /*
  * @brief Set attributes of an existing entry in the FDB database table
@@ -109,26 +108,22 @@ sai_status_t sai_vlan_set_db_entry (sai_vlan_id_t vlan_id,
                                     sai_attribute_t *p_attr);
 
 /*
- * @brief Update the list of ports added to the VLAN on the VLAN PORT LIST
+ * @brief Update the port added to the VLAN on the VLAN PORT LIST
  * Database table.
- * @param vlan_id - VLAN ID.
- * @param port_count - number of ports added to the VLAN ID.
- * @param port_list - List of ports added to the VLAN ID.
+ * @param vlan_member_node - VLAN member info.
  * @return sai status code
  */
-sai_status_t sai_vlan_add_port_list_to_db_entry (
-sai_vlan_id_t vlan_id, uint_t port_count, const sai_vlan_port_t *port_list);
+sai_status_t sai_vlan_add_port_list_to_db_entry(
+        sai_vlan_member_node_t vlan_member_node);
 
 /*
- * @brief Update the list of ports deleted from the VLAN on the VLAN PORT LIST
+ * @brief Update the port deleted from the VLAN on the VLAN PORT LIST
  * Database table.
- * @param vlan_id - VLAN ID.
- * @param port_count - number of ports deleted from the VLAN ID.
- * @param port_list - List of ports deleted from the VLAN ID.
+ * @param vlan_member_node - VLAN member info.
  * @return sai status code
  */
-sai_status_t sai_vlan_delete_port_list_from_db_entry (
-sai_vlan_id_t vlan_id, uint_t port_count, const sai_vlan_port_t *port_list);
+sai_status_t sai_vlan_delete_port_list_from_db_entry(
+        sai_vlan_member_node_t vlan_member_node);
 
 #ifdef __cplusplus
 }

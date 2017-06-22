@@ -73,7 +73,7 @@ sai_mirror_direction_t direction)
 }
 
 static sai_status_t sai_npu_mirror_session_set (sai_object_id_t session_id,
-                                                sai_mirror_type_t span_type,
+                                                sai_mirror_session_type_t span_type,
                                                 const sai_attribute_t *attr)
 {
     STD_ASSERT (attr != NULL);
@@ -82,7 +82,7 @@ static sai_status_t sai_npu_mirror_session_set (sai_object_id_t session_id,
 }
 
 static sai_status_t sai_npu_mirror_session_get (sai_object_id_t session_id,
-                                                sai_mirror_type_t span_type,
+                                                sai_mirror_session_type_t span_type,
                                                 uint32_t attr_count,
                                                 sai_attribute_t *attr_list)
 {

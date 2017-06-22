@@ -80,14 +80,10 @@ sai_status_t sai_nexthop_delete_db_entry (sai_object_id_t nh_id);
  * @brief Create a new entry in the nexthop group database table
  * @param nh_grp_id - Next Hop Group id.
    @param type - Next Hop group type.
- * @param nh_count - Number of Next Hops added on creation.
- * @param ap_next_hop - List of Next Hop nodes added on creation.
  * @return sai status code
  */
 sai_status_t sai_nh_group_create_db_entry (sai_object_id_t nh_grp_id,
-                                           sai_next_hop_group_type_t type,
-                                           uint_t nh_count,
-                                           sai_fib_nh_t *ap_next_hop []);
+                                           sai_next_hop_group_type_t type);
 
 /*
  * @brief Delete an existing entry from nexthop group database table

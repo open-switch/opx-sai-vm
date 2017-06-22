@@ -1,3 +1,11 @@
+opx-sai-vm (14.3.0) unstable; urgency=medium
+
+  * Update: OCP SAI 0.9.6 changes for STP
+  * Update: Set promiscuous mode for all interfaces associated to bridge and bond (LAG) Linux devices
+  * Update: Reconfigure ebtables rules for VM environment
+
+ -- Dell EMC <ops-dev@lists.openswitch.net>  Wed, 22 June 2017  15:27:53 -0700
+
 opx-sai-vm (1.0.2) unstable; urgency=medium
 
   [ Atanu Mandal ]

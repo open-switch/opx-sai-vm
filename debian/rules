@@ -3,3 +3,5 @@
 %:
 	dh $@  --with autoreconf --parallel
 
+override_dh_auto_install:
+	dh_auto_install --destdir=debian/tmp

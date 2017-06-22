@@ -132,7 +132,7 @@ static sai_status_t sai_npu_port_set_attribute (sai_object_id_t port_id,
         case SAI_PORT_ATTR_ADMIN_STATE:
             return sai_port_attr_admin_state_set (port_id, attr);
 
-        case SAI_PORT_ATTR_INTERNAL_LOOPBACK:
+        case SAI_PORT_ATTR_INTERNAL_LOOPBACK_MODE:
             return sai_port_attr_internal_loopback_set (port_id, attr);
 
         default:
@@ -189,12 +189,12 @@ static sai_status_t sai_npu_port_get_attribute (sai_object_id_t port_id,
                                                            &attr_list[attr_idx].value);
                 break;
 
-            case SAI_PORT_ATTR_SUPPORTED_BREAKOUT_MODE:
+            case SAI_PORT_ATTR_SUPPORTED_BREAKOUT_MODE_TYPE:
                 ret_code = sai_port_attr_supported_breakout_mode_get (port_id,
                                                                       &attr_list[attr_idx].value);
                 break;
 
-            case SAI_PORT_ATTR_CURRENT_BREAKOUT_MODE:
+            case SAI_PORT_ATTR_CURRENT_BREAKOUT_MODE_TYPE:
                 ret_code = sai_port_attr_current_breakout_mode_get (port_id,
                                                                     &attr_list[attr_idx].value);
                 break;
@@ -227,9 +227,7 @@ static sai_status_t sai_npu_port_get_attribute (sai_object_id_t port_id,
             case SAI_PORT_ATTR_QOS_DSCP_TO_COLOR_MAP:
             case SAI_PORT_ATTR_QOS_DSCP_TO_TC_AND_COLOR_MAP:
             case SAI_PORT_ATTR_QOS_TC_TO_QUEUE_MAP:
-            case SAI_PORT_ATTR_QOS_TC_TO_DOT1P_MAP:
             case SAI_PORT_ATTR_QOS_TC_AND_COLOR_TO_DOT1P_MAP:
-            case SAI_PORT_ATTR_QOS_TC_TO_DSCP_MAP:
             case SAI_PORT_ATTR_QOS_TC_AND_COLOR_TO_DSCP_MAP:
             case SAI_PORT_ATTR_QOS_TC_TO_PRIORITY_GROUP_MAP:
             case SAI_PORT_ATTR_QOS_PFC_PRIORITY_TO_QUEUE_MAP:
@@ -238,13 +236,12 @@ static sai_status_t sai_npu_port_get_attribute (sai_object_id_t port_id,
             case SAI_PORT_ATTR_FLOOD_STORM_CONTROL_POLICER_ID:
             case SAI_PORT_ATTR_BROADCAST_STORM_CONTROL_POLICER_ID:
             case SAI_PORT_ATTR_MULTICAST_STORM_CONTROL_POLICER_ID:
-            case SAI_PORT_ATTR_NUMBER_OF_PRIORITY_GROUPS:
-            case SAI_PORT_ATTR_PRIORITY_GROUP_LIST:
+            case SAI_PORT_ATTR_NUMBER_OF_INGRESS_PRIORITY_GROUPS:
+            case SAI_PORT_ATTR_INGRESS_PRIORITY_GROUP_LIST:
                 ret_code = sai_qos_port_attribute_get (port_id,
                                                        attr_list[attr_idx].id,
                                                        &attr_list[attr_idx].value);
                 break;
-
 
             default:
                 ret_code = sai_port_attr_info_cache_get (port_id, &attr_list[attr_idx]);
@@ -252,7 +249,8 @@ static sai_status_t sai_npu_port_get_attribute (sai_object_id_t port_id,
 
         if (ret_code != SAI_STATUS_SUCCESS) {
             SAI_PORT_LOG_ERR ("Attr get for port id 0x%"PRIx64"'s attr index %d "
-                              "failed with err %d", port_id, attr_idx, ret_code);
+                              "attr id %d failed with err %d", port_id, attr_idx,
+                              attr_list[attr_idx].id, ret_code);
             return sai_get_indexed_ret_val(ret_code, attr_idx);
         }
     }
@@ -327,86 +325,33 @@ static void sai_npu_reg_link_state_cb (
 
 static inline sai_port_speed_t sai_vm_port_default_speed_get (sai_port_breakout_mode_type_t mode)
 {
-    return ((mode == SAI_PORT_BREAKOUT_MODE_1_LANE) ?
+    return ((mode == SAI_PORT_BREAKOUT_MODE_TYPE_1_LANE) ?
             (SAI_PORT_SPEED_FORTY_GIG) : (SAI_PORT_SPEED_TEN_GIG));
 }
 
-static sai_status_t sai_npu_port_breakout_set (const sai_port_breakout_t *portbreakout)
+static sai_port_breakout_mode_type_t sai_vm_get_port_breakout_lane_from_count(uint_t port_count,
+                                                                              uint_t max_lanes)
 {
-    uint_t lane = 0, lane_count  = 0, port_idx = 0;
-    sai_object_id_t port = 0;
-    sai_attribute_t sai_attr_get;
-    sai_attribute_t sai_attr_set;
-    sai_status_t ret = SAI_STATUS_FAILURE;
+    uint_t lanes_per_port = 0;
 
-    STD_ASSERT (portbreakout != NULL);
-    STD_ASSERT (portbreakout->port_list.list != NULL);
-
-    memset (&sai_attr_set, 0, sizeof(sai_attribute_t));
-    memset (&sai_attr_get, 0, sizeof(sai_attribute_t));
-
-    sai_port_breakout_mode_type_t breakout_mode_lanes = portbreakout->breakout_mode;
-    sai_port_speed_t speed = sai_vm_port_default_speed_get(breakout_mode_lanes);
-
-    sai_port_breakout_mode_type_t cur_breakout_mode_lanes =
-        sai_port_current_breakout_mode_get (portbreakout->port_list.list[port_idx]);
-
-    /* Port with maximum number of lanes acts as the control port for breakout mode */
-    for(port_idx = 0; port_idx < portbreakout->port_list.count; port_idx++) {
-
-        port = portbreakout->port_list.list[port_idx];
-        ret = sai_port_max_lanes_get(port, &lane_count);
-        if(ret != SAI_STATUS_SUCCESS) {
-            SAI_SWITCH_LOG_ERR("Max port lane get failed for port 0x%"PRIx64" with err %d",
-                               port, ret);
-            return ret;
-        }
-
-        if(lane_count >= cur_breakout_mode_lanes) {
-            break;
-        }
+    if (port_count > max_lanes) {
+        SAI_PORT_LOG_ERR("Invalid port count %d for create", port_count);
+        return SAI_PORT_BREAKOUT_MODE_TYPE_MAX;
     }
 
-    sai_attr_get.id = SAI_PORT_ATTR_ADMIN_STATE;
-    ret = sai_port_attr_info_cache_get (port, &sai_attr_get);
-    if (ret != SAI_STATUS_SUCCESS) {
-        SAI_PORT_LOG_ERR ("Admin status cache get for port 0x%"PRIx64" failed "
-                          "with err %d", port, ret);
-        return ret;
+    lanes_per_port = max_lanes/port_count;
+
+    switch(lanes_per_port) {
+        case 1:
+            return SAI_PORT_BREAKOUT_MODE_TYPE_1_LANE;
+        case 2:
+             return SAI_PORT_BREAKOUT_MODE_TYPE_2_LANE;
+        case 4:
+             return SAI_PORT_BREAKOUT_MODE_TYPE_4_LANE;
+        default:
+              SAI_PORT_LOG_ERR("Unknown count %d for breakout", port_count);
     }
-
-    /* Admin state UP results in breakout mode set */
-    if (sai_attr_get.value.booldata) {
-        return SAI_STATUS_OBJECT_IN_USE;
-    }
-
-    ret = sai_port_breakout_mode_update (port, speed,
-                                         breakout_mode_lanes, cur_breakout_mode_lanes);
-    if (ret != SAI_STATUS_SUCCESS) {
-        SAI_PORT_LOG_ERR ("Breakout mode update failed for port 0x%"PRIx64" with err %d",
-                          port, ret);
-        return ret;
-    }
-
-    /* Set the port speed based on the breakout mode */
-    sai_attr_set.id = SAI_PORT_ATTR_SPEED;
-    sai_attr_set.value.u32 = (speed * 1000); // in Mbps
-
-    sai_port_info_t *port_info = sai_port_info_get(port);
-
-    /* @todo re-look at the usage of enum for arith. operations */
-    for(lane = 0; lane < breakout_mode_lanes; lane++) {
-
-        ret = sai_port_attr_info_cache_set (port_info->sai_port_id, &sai_attr_set);
-        if (ret != SAI_STATUS_SUCCESS) {
-            SAI_PORT_LOG_ERR ("Speed %d cache set for port 0x%"PRIx64" failed with err %d",
-                              sai_attr_set.value.u32, port_info->sai_port_id, ret);
-            return ret;
-        }
-        port_info = sai_port_info_getnext(port_info);
-    }
-
-    return ret;
+    return SAI_PORT_BREAKOUT_MODE_TYPE_MAX;
 }
 
 /* Update switching mode based on the port event type and current port speed */
@@ -417,15 +362,119 @@ static sai_status_t sai_npu_port_switching_mode_update (uint32_t count,
     return SAI_STATUS_SUCCESS;
 }
 
+
+static sai_status_t sai_npu_port_create (sai_object_id_t *port_id,uint32_t attr_count,
+                                         const sai_attribute_t *attr_list)
+{
+    sai_status_t sai_rc = SAI_STATUS_SUCCESS;
+    sai_port_speed_t breakout_speed = 0;
+    uint_t attr_idx = 0;
+    uint_t npu_id_idx = 0;
+    sai_port_info_t *port_info = NULL;
+    sai_npu_port_id_t npu_port_id = 0;
+    bool npu_port_found = false;
+    bool port_speed_found = false;
+    sai_port_breakout_mode_type_t breakout_mode = SAI_PORT_BREAKOUT_MODE_TYPE_MAX;
+    sai_port_breakout_mode_type_t prev_breakout_mode = SAI_PORT_BREAKOUT_MODE_TYPE_MAX;
+    uint_t port_count = 0;
+    uint_t max_lanes = 0;
+    sai_port_breakout_config_t breakout_cfg;
+
+    memset(&breakout_cfg, 0, sizeof(breakout_cfg));
+    STD_ASSERT (port_id != NULL);
+    STD_ASSERT (attr_list != NULL);
+    for (attr_idx = 0; attr_idx < attr_count; attr_idx++) {
+        if (attr_list[attr_idx].id == SAI_PORT_ATTR_SPEED) {
+            breakout_speed = attr_list[attr_idx].value.u32;
+            port_speed_found = true;
+        } else if(attr_list[attr_idx].id == SAI_PORT_ATTR_HW_LANE_LIST) {
+            npu_port_found = true;
+            npu_port_id = attr_list[attr_idx].value.u32list.list[0];
+            npu_id_idx = attr_idx;
+            port_count = attr_list[attr_idx].value.u32list.count;
+        }
+    }
+
+    if (!port_speed_found || !npu_port_found) {
+        SAI_PORT_LOG_ERR ("Error mandatory attribute speed is missing in port create");
+        return SAI_STATUS_MANDATORY_ATTRIBUTE_MISSING;
+    }
+    port_info = sai_port_info_get_from_npu_phy_port(npu_port_id);
+
+    if(port_info == NULL) {
+        SAI_PORT_LOG_ERR ("Error unknow npu port %d", npu_port_id);
+        return SAI_STATUS_INVALID_ATTR_VALUE_0 + npu_id_idx;
+    }
+    if (port_info->port_valid) {
+        SAI_PORT_LOG_ERR ("Error npu port %d exists", npu_port_id);
+        return SAI_STATUS_ITEM_ALREADY_EXISTS;
+    }
+    max_lanes = port_info->max_lanes_per_port;
+
+
+    breakout_mode = sai_vm_get_port_breakout_lane_from_count (port_count, max_lanes);
+    if(breakout_mode == SAI_PORT_BREAKOUT_MODE_TYPE_MAX) {
+        SAI_PORT_LOG_ERR ("Error unknown breakout mode for count %d",
+                          attr_list[attr_idx].value.u32list.count);
+        return SAI_STATUS_INVALID_ATTR_VALUE_0 + npu_id_idx;
+    }
+
+    if(!sai_port_is_breakout_mode_supported(port_info->sai_port_id, breakout_mode)) {
+        SAI_PORT_LOG_ERR("Breakout mode %d is not supported", breakout_mode);
+        return SAI_STATUS_INVALID_ATTR_VALUE_0 + npu_id_idx;
+    }
+
+    port_info->port_valid = true;
+    prev_breakout_mode = sai_port_current_breakout_mode_get(port_info->sai_port_id);
+
+    if (prev_breakout_mode == breakout_mode) {
+        *port_id = port_info->sai_port_id;
+        return SAI_STATUS_SUCCESS;
+    }
+
+    breakout_cfg.new_speed = breakout_speed;
+    breakout_cfg.new_mode = breakout_mode;
+    breakout_cfg.curr_mode = prev_breakout_mode;
+    sai_rc = sai_port_breakout_mode_update (port_info->sai_port_id, &breakout_cfg);
+    if (sai_rc != SAI_STATUS_SUCCESS) {
+        SAI_PORT_LOG_ERR ("Breakout mode update failed for port 0x%"PRIx64" with err %d",
+                          port_info->sai_port_id, sai_rc);
+    } else {
+        sai_port_update_valdity_on_create (port_info->sai_port_id, port_info->sai_port_id, breakout_mode);
+        *port_id = port_info->sai_port_id;
+    }
+    return sai_rc;
+}
+
+static sai_status_t sai_npu_port_remove (sai_object_id_t port_id)
+{
+    /* Nothing to be done */
+    return SAI_STATUS_SUCCESS;
+}
+
+static sai_status_t sai_npu_linkscan_mode_set (sai_object_id_t port_id, bool enable)
+{
+    /* Nothing to be done */
+    return SAI_STATUS_SUCCESS;
+}
+
+static sai_status_t sai_npu_port_dump(sai_object_id_t port_id,sai_port_debug_function_t fn_name)
+{
+    return SAI_STATUS_SUCCESS;
+}
+
 static sai_npu_port_api_t sai_vm_port_api_table = {
+    sai_npu_port_create,
+    sai_npu_port_remove,
     sai_npu_port_set_attribute,
     sai_npu_port_get_attribute,
     sai_npu_port_get_stats,
     sai_npu_port_clear_stats,
     sai_npu_port_clear_all_stats,
     sai_npu_reg_link_state_cb,
-    sai_npu_port_breakout_set,
     sai_npu_port_switching_mode_update,
+    sai_npu_linkscan_mode_set,
+    sai_npu_port_dump,
 };
 
 sai_npu_port_api_t* sai_vm_port_api_query (void)

@@ -40,13 +40,14 @@
  * values and properties for create,set and get functionality.
  */
 static const dn_sai_attribute_entry_t sai_qos_sched_group_attr[] =  {
-    /*            ID                         MC     VC     VS    VG    IMP    SUP */
-    { SAI_SCHEDULER_GROUP_ATTR_CHILD_COUNT, false, false, false, true, true, true },
-    { SAI_SCHEDULER_GROUP_ATTR_CHILD_LIST,  false, false, false, true, true, true },
-    { SAI_SCHEDULER_GROUP_ATTR_PORT_ID,     true,  true,  false, true, true, true },
-    { SAI_SCHEDULER_GROUP_ATTR_LEVEL,       true,  true,  false, true, true, true},
-    { SAI_SCHEDULER_GROUP_ATTR_MAX_CHILDS,  true,  true,  false, true, true, true},
-    { SAI_SCHEDULER_GROUP_ATTR_SCHEDULER_PROFILE_ID, false,  false, true, true, true, true},
+    /*            ID                                   MC     VC     VS    VG    IMP    SUP */
+    { SAI_SCHEDULER_GROUP_ATTR_CHILD_COUNT,           false, false, false, true, true, true },
+    { SAI_SCHEDULER_GROUP_ATTR_CHILD_LIST,            false, false, false, true, true, true },
+    { SAI_SCHEDULER_GROUP_ATTR_PORT_ID,               true,  true,  false, true, true, true },
+    { SAI_SCHEDULER_GROUP_ATTR_LEVEL,                 true,  true,  false, true, true, true },
+    { SAI_SCHEDULER_GROUP_ATTR_MAX_CHILDS,            true,  true,  false, true, true, true },
+    { SAI_SCHEDULER_GROUP_ATTR_SCHEDULER_PROFILE_ID,  false, true,  true,  true, true, true },
+    { SAI_SCHEDULER_GROUP_ATTR_PARENT_NODE,           true,  true,  true,  true, true, true },
 };
 
 /**
@@ -61,12 +62,6 @@ static void sai_vm_sched_group_attr_table_get (const dn_sai_attribute_entry_t **
     *p_max_attr_count = sizeof(sai_qos_sched_group_attr)/sizeof(dn_sai_attribute_entry_t);
 
     return;
-}
-
-static sai_status_t sai_vm_root_sched_group_init (sai_object_id_t port_id)
-{
-     /* TODO */
-    return SAI_STATUS_SUCCESS;
 }
 
 static sai_status_t sai_vm_sched_group_create (dn_sai_qos_sched_group_t *p_sg_node,
@@ -162,9 +157,14 @@ static sai_status_t sai_vm_sched_group_attribute_get (dn_sai_qos_sched_group_t *
 
             case SAI_SCHEDULER_GROUP_ATTR_MAX_CHILDS:
                 p_attr->value.u32 = p_sg_node->max_childs;
+                break;
 
             case SAI_SCHEDULER_GROUP_ATTR_SCHEDULER_PROFILE_ID:
                 p_attr->value.oid = p_sg_node->scheduler_id;
+                break;
+
+            case SAI_SCHEDULER_GROUP_ATTR_PARENT_NODE:
+                p_attr->value.oid = p_sg_node->parent_id;
                 break;
 
             default:
@@ -185,120 +185,176 @@ static sai_status_t sai_vm_sched_group_attribute_get (dn_sai_qos_sched_group_t *
     return sai_rc;
 }
 
-
-static sai_status_t sai_vm_add_child_object_to_group (sai_object_id_t sg_id,
-                                                       uint_t child_count,
-                                                       const sai_object_id_t *p_child_objects,
-                                                       uint_t *added_child_count)
+static sai_status_t sai_vm_sched_group_attach_to_parent(sai_object_id_t child_id,
+                                                        sai_object_id_t parent_id)
 {
-    sai_status_t       sai_rc = SAI_STATUS_SUCCESS;
-    size_t             child_idx = 0;
-    sai_object_id_t    child_id = SAI_NULL_OBJECT_ID;
-    uint_t             child_npu_index = 0;
-    dn_sai_qos_sched_group_t  *p_sg_node = NULL;
+    sai_status_t              sai_rc = SAI_STATUS_SUCCESS;
+    dn_sai_qos_sched_group_t  *p_child_node = NULL;
+    dn_sai_qos_sched_group_t  *p_parent_node = NULL;
+    uint_t                    child_index = 0;
 
-    STD_ASSERT (p_child_objects != NULL);
+    SAI_SCHED_GRP_LOG_TRACE ("SAI Attach child SG 0x%"PRIx64" to parent 0x%"PRIx64"",
+                             child_id, parent_id);
 
-    SAI_SCHED_GRP_LOG_TRACE ("SAI Add childs to SG 0x%"PRIx64", child_count %d.",
-                             sg_id, child_count);
-
-    p_sg_node = sai_qos_sched_group_node_get (sg_id);
-
-    if(p_sg_node == NULL){
+    p_child_node = sai_qos_sched_group_node_get (child_id);
+    if (p_child_node == NULL) {
         SAI_SCHED_GRP_LOG_ERR ("Scheduler group 0x%"PRIx64" "
                                "does not exist in tree.",
-                               sg_id);
+                               child_id);
+
         return SAI_STATUS_INVALID_OBJECT_ID;
     }
 
-    if(child_count > p_sg_node->max_childs){
-        SAI_SCHED_GRP_LOG_ERR ("Child count %d exceeds max_child_count %d"
-                               "of parent sgid 0x%"PRIx64"", child_count,
-                               p_sg_node->max_childs, sg_id);
-        return SAI_STATUS_INVALID_PARAMETER;
+    p_parent_node = sai_qos_sched_group_node_get (parent_id);
+    if (p_parent_node == NULL) {
+        SAI_SCHED_GRP_LOG_ERR ("Scheduler group 0x%"PRIx64" "
+                               "does not exist in tree.",
+                               parent_id);
+
+        return SAI_STATUS_INVALID_OBJECT_ID;
     }
-    for (child_idx = 0; child_idx < child_count; child_idx++)
+
+    sai_rc = sai_qos_sched_group_validate_child_parent(
+                                                       p_child_node, p_parent_node);
+    if (sai_rc != SAI_STATUS_SUCCESS)
     {
-        child_id = p_child_objects[child_idx];
-
-        sai_rc = sai_qos_sched_group_first_free_child_index_get (sg_id,
-                                                     &child_npu_index);
-        if (sai_rc != SAI_STATUS_SUCCESS) {
-            SAI_SCHED_GRP_LOG_ERR ("Failed to get free child index "
-                                   "for SG oid 0x%"PRIx64"", sg_id);
-
-            break;
-        }
-
-        sai_rc = sai_qos_child_index_update (child_id, child_npu_index);
-        if (sai_rc != SAI_STATUS_SUCCESS) {
-            SAI_SCHED_GRP_LOG_ERR ("Failed to update child index in node.");
-
-            break;
-        }
+        SAI_SCHED_GRP_LOG_ERR ("Parent SG 0x%"PRIx64""
+                               "and child SG  0x%"PRIx64" validation failed.",
+                               parent_id, child_id);
+        return sai_rc;
     }
 
-    *added_child_count = child_idx;
+    sai_rc = sai_qos_sched_group_first_free_child_index_get (parent_id,
+                                                     &child_index);
+    if (sai_rc != SAI_STATUS_SUCCESS) {
+        SAI_SCHED_GRP_LOG_ERR ("Failed to get free child index "
+                               "for SG oid 0x%"PRIx64"", parent_id);
+        return sai_rc;
 
+    }
+
+    sai_rc = sai_qos_child_index_update (child_id, child_index);
+    if (sai_rc != SAI_STATUS_SUCCESS) {
+        SAI_SCHED_GRP_LOG_ERR ("Failed to update child index %d in node 0x%"PRIx64".",
+                               child_index, child_id);
+    }
     return sai_rc;
 }
 
-
-static sai_status_t sai_vm_remove_child_object_from_group (sai_object_id_t sg_id,
-                                                      uint_t child_count,
-                                                      const sai_object_id_t *p_child_objects,
-                                                      uint_t *removed_child_count)
+static sai_status_t sai_vm_sched_group_detach_from_parent (
+                                            sai_object_id_t child_id)
 {
     sai_status_t       sai_rc = SAI_STATUS_SUCCESS;
-    size_t             child_idx = 0;
-    sai_object_id_t    child_id = SAI_NULL_OBJECT_ID;
-    uint_t             child_npu_index = 0;
+    dn_sai_qos_sched_group_t  *p_child_node = NULL;
+    uint_t             child_index = 0;
 
-    STD_ASSERT (p_child_objects != NULL);
+    SAI_SCHED_GRP_LOG_TRACE ("SAI Remove child SG 0x%"PRIx64" from parent",
+                             child_id);
+    p_child_node = sai_qos_sched_group_node_get (child_id);
 
-    SAI_SCHED_GRP_LOG_TRACE ("SAI Remove childs from SG 0x%"PRIx64", "
-                             "child_count %d.", sg_id, child_count);
-
-    for (child_idx = 0; child_idx < child_count; child_idx++)
-    {
-        child_id = p_child_objects[child_idx];
-
-        sai_rc = sai_qos_child_index_get (child_id, &child_npu_index);
-        if (sai_rc != SAI_STATUS_SUCCESS) {
-            SAI_SCHED_GRP_LOG_ERR ("Failed to get child index "
-                                   "of SG oid 0x%"PRIx64" "
-                                   "and child oid 0x%"PRIx64"", sg_id,
-                                   child_id);
-            break;
-        }
-
-        sai_rc = sai_qos_child_index_update (child_id, SAI_QOS_CHILD_INDEX_INVALID);
-        if (sai_rc != SAI_STATUS_SUCCESS) {
-            SAI_SCHED_GRP_LOG_ERR ("Failed to update child index in node.");
-
-            break;
-        }
-
-        sai_rc = sai_qos_sched_group_child_index_free (sg_id, child_npu_index);
-        if (sai_rc != SAI_STATUS_SUCCESS) {
-            SAI_SCHED_GRP_LOG_ERR ("Failed to update child index in node.");
-
-            break;
-        }
+    if (p_child_node == NULL) {
+        SAI_SCHED_GRP_LOG_ERR ("Scheduler group 0x%"PRIx64" "
+                               "does not exist in tree.",
+                               child_id);
+        return SAI_STATUS_INVALID_OBJECT_ID;
     }
 
-    *removed_child_count = child_idx;
+    sai_rc = sai_qos_child_index_get (child_id, &child_index);
+    if (sai_rc != SAI_STATUS_SUCCESS) {
+        SAI_SCHED_GRP_LOG_ERR ("Failed to get child index "
+                               "for child oid 0x%"PRIx64"",
+                               child_id);
+        return sai_rc;
+    }
+
+    sai_rc = sai_qos_child_index_update (child_id, SAI_QOS_CHILD_INDEX_INVALID);
+    if (sai_rc != SAI_STATUS_SUCCESS) {
+        SAI_SCHED_GRP_LOG_ERR ("Failed to update child index %d in node 0x%"PRIx64".",
+                               SAI_QOS_CHILD_INDEX_INVALID, child_id);
+        return sai_rc;
+    }
+
+    sai_rc = sai_qos_sched_group_child_index_free (p_child_node->parent_id,
+                                                   child_index);
+    if (sai_rc != SAI_STATUS_SUCCESS) {
+        SAI_SCHED_GRP_LOG_ERR ("Failed to free child index in node.");
+    }
+    return sai_rc;
+}
+
+static sai_status_t sai_vm_sched_group_modify_parent (
+                                             sai_object_id_t child_id,
+                                             sai_object_id_t new_parent_id)
+{
+    sai_status_t              sai_rc = SAI_STATUS_SUCCESS;
+    dn_sai_qos_sched_group_t  *p_child_node = NULL;
+    dn_sai_qos_sched_group_t  *p_new_parent_node = NULL;
+    uint_t                    child_index = 0;
+
+    SAI_SCHED_GRP_LOG_TRACE ("SAI Attach child SG 0x%"PRIx64" to "
+                             "new parent 0x%"PRIx64"",
+                             child_id, new_parent_id);
+
+    p_child_node = sai_qos_sched_group_node_get (child_id);
+    if (p_child_node == NULL) {
+        SAI_SCHED_GRP_LOG_ERR ("Scheduler group 0x%"PRIx64" "
+                               "does not exist in tree.",
+                               child_id);
+
+        return SAI_STATUS_INVALID_OBJECT_ID;
+    }
+
+    p_new_parent_node = sai_qos_sched_group_node_get (new_parent_id);
+    if (p_new_parent_node == NULL) {
+        SAI_SCHED_GRP_LOG_ERR ("Scheduler group 0x%"PRIx64" "
+                               "does not exist in tree.",
+                               new_parent_id);
+
+        return SAI_STATUS_INVALID_OBJECT_ID;
+    }
+
+    sai_rc = sai_qos_sched_group_validate_child_parent(
+                                                       p_child_node, p_new_parent_node);
+    if (sai_rc != SAI_STATUS_SUCCESS)
+    {
+        SAI_SCHED_GRP_LOG_ERR ("Parent SG 0x%"PRIx64""
+                               "and child SG  0x%"PRIx64" validation failed.",
+                               new_parent_id, child_id);
+        return sai_rc;
+    }
+
+    sai_rc = sai_vm_sched_group_detach_from_parent(child_id);
+    if (sai_rc != SAI_STATUS_SUCCESS)
+    {
+        SAI_SCHED_GRP_LOG_ERR ("Unable to detach child SG from Old parent SG");
+        return sai_rc;
+    }
+
+    sai_rc = sai_qos_sched_group_first_free_child_index_get (new_parent_id,
+                                                     &child_index);
+    if (sai_rc != SAI_STATUS_SUCCESS) {
+        SAI_SCHED_GRP_LOG_ERR ("Failed to get free child index "
+                               "for SG oid 0x%"PRIx64"", new_parent_id);
+        return sai_rc;
+
+    }
+
+    sai_rc = sai_qos_child_index_update (child_id, child_index);
+    if (sai_rc != SAI_STATUS_SUCCESS) {
+        SAI_SCHED_GRP_LOG_ERR ("Failed to update child index %d in node 0x%"PRIx64".",
+                               child_index, child_id);
+    }
     return sai_rc;
 }
 
 static sai_npu_sched_group_api_t sai_vm_sched_group_api_table = {
-    sai_vm_root_sched_group_init,
     sai_vm_sched_group_create,
     sai_vm_sched_group_remove,
     sai_vm_sched_group_attribute_set,
     sai_vm_sched_group_attribute_get,
-    sai_vm_add_child_object_to_group,
-    sai_vm_remove_child_object_from_group,
+    sai_vm_sched_group_attach_to_parent,
+    sai_vm_sched_group_detach_from_parent,
+    sai_vm_sched_group_modify_parent,
     sai_vm_sched_group_attr_table_get,
 };
 

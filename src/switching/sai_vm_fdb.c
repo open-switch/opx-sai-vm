@@ -60,7 +60,7 @@ sai_status_t sai_npu_flush_all_fdb_entries (sai_object_id_t port_id,
     return sai_rc;
 }
 
-static sai_status_t sai_npu_flush_fdb_entry (const sai_fdb_entry_t* fdb_entry)
+static sai_status_t sai_npu_flush_fdb_entry (const sai_fdb_entry_t* fdb_entry, bool validate_port)
 {
     sai_status_t sai_rc = SAI_STATUS_SUCCESS;
     char         mac_str [SAI_MAC_STR_LEN] = {0};
@@ -88,27 +88,25 @@ static sai_status_t sai_npu_flush_fdb_entry (const sai_fdb_entry_t* fdb_entry)
 }
 
 static sai_status_t sai_npu_create_fdb_entry (const sai_fdb_entry_t *fdb_entry,
-                                              sai_object_id_t port_id,
-                                              sai_fdb_entry_type_t entry_type,
-                                              sai_packet_action_t action,
-                                              uint_t metadata)
+                                              sai_fdb_entry_node_t *fdb_entry_node_data)
 {
     sai_status_t sai_rc = SAI_STATUS_SUCCESS;
     char         mac_str [SAI_MAC_STR_LEN] = {0};
 
     STD_ASSERT(fdb_entry != NULL);
+    STD_ASSERT(fdb_entry_node_data != NULL);
 
     SAI_FDB_LOG_TRACE ("FDB Entry create for MAC: %s vlan: %d on port: "
                           "0x%"PRIx64", entry_type: %d, packet action: %d.",
                           "FDB Meta Data: %d",
                           std_mac_to_string (&(fdb_entry->mac_address),
                                              mac_str, sizeof (mac_str)),
-                          fdb_entry->vlan_id, port_id, entry_type, action,
-                          metadata);
+                          fdb_entry->vlan_id, fdb_entry_node_data->port_id,
+                          fdb_entry_node_data->entry_type, fdb_entry_node_data->action,
+                          fdb_entry_node_data->metadata);
 
     /* Insert FDB record to DB. */
-    sai_rc = sai_fdb_create_db_entry (fdb_entry, port_id, entry_type, action,
-                                      metadata);
+    sai_rc = sai_fdb_create_db_entry (fdb_entry,fdb_entry_node_data);
 
     if (sai_rc != SAI_STATUS_SUCCESS) {
         SAI_FDB_LOG_ERR ("Error inserting FDB entry to DB for MAC: %s, "
@@ -347,7 +345,7 @@ static sai_status_t sai_npu_get_aging_time (uint32_t *value)
 }
 
 static sai_status_t sai_npu_register_fdb_callback (
-sai_fdb_event_notification_fn fdb_notification_fn)
+sai_fdb_npu_event_notification_fn fdb_notification_fn)
 {
     STD_ASSERT(fdb_notification_fn != NULL);
 
@@ -468,10 +466,7 @@ sai_status_t sai_get_port_for_fdb_entry (const sai_fdb_entry_t *fdb_entry,
         *port_id = fdb_entry_node.port_id;
 
         /* Adding to cache to be used for future calls */
-        ret_val = sai_insert_fdb_entry_node (fdb_entry,fdb_entry_node.port_id,
-                                             fdb_entry_node.entry_type,
-                                             fdb_entry_node.action,
-                                             fdb_entry_node.metadata);
+        ret_val = sai_insert_fdb_entry_node (fdb_entry,&fdb_entry_node);
 
         if (ret_val != SAI_STATUS_SUCCESS) {
             SAI_FDB_LOG_WARN ("Unable to cache FDB entry MAC: %s, vlan: %d",

@@ -26,6 +26,7 @@
 
 #include "saitypes.h"
 #include "sai_acl_type_defs.h"
+#include "sai_common_utils.h"
 #include "saiacl.h"
 
 sai_status_t sai_npu_create_acl_rule(sai_acl_table_t *acl_table,
@@ -55,6 +56,13 @@ sai_status_t sai_npu_get_acl_attribute(sai_attribute_t *attr);
 void sai_npu_acl_dump_table(const sai_acl_table_t *acl_table);
 void sai_npu_acl_dump_rule(const sai_acl_rule_t *acl_rule);
 void sai_npu_acl_dump_counter(const sai_acl_counter_t *acl_counter);
-
-
+void sai_npu_range_attribute_table_get(const dn_sai_attribute_entry_t
+                                       **vendor,
+                                       uint_t *max_attr_count);
+sai_status_t sai_npu_create_acl_range(sai_acl_range_t *acl_range);
+sai_status_t sai_npu_delete_acl_range(sai_acl_range_t *acl_range);
+sai_status_t sai_npu_set_acl_range(sai_acl_range_t *acl_range, uint_t attr_count,
+                                   const sai_attribute_t *p_attr);
+sai_status_t sai_npu_get_acl_range(sai_acl_range_t *acl_range, uint_t attr_count,
+                                   sai_attribute_t *p_attr_list);
 #endif /* __SAI_VM_ACL_UTIL_H__ */

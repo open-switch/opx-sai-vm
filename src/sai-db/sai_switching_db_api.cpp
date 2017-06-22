@@ -40,6 +40,9 @@
 #include "std_assert.h"
 #include "std_type_defs.h"
 #include "sai_vlan_common.h"
+extern "C" {
+#include "sai_vlan_api.h"
+}
 
 #include <map>
 #include <string>
@@ -80,13 +83,13 @@ static string sai_vlan_port_tagging_mode_str_get (sai_vlan_tagging_mode_t mode)
 }
 
 sai_status_t sai_fdb_create_db_entry (const sai_fdb_entry_t *fdb_entry,
-                                      sai_object_id_t port_id,
-                                      sai_fdb_entry_type_t entry_type,
-                                      sai_packet_action_t action,
-                                      uint_t metadata)
+                                      sai_fdb_entry_node_t *fdb_entry_node_data)
 {
+    STD_ASSERT (fdb_entry != NULL);
+    STD_ASSERT (fdb_entry_node_data != NULL);
+
     char   mac_addr [SAI_VM_MAX_BUFSZ];
-    uint_t npu_port_id = (uint_t) sai_uoid_npu_obj_id_get (port_id);
+    uint_t npu_port_id = (uint_t) sai_uoid_npu_obj_id_get (fdb_entry_node_data->port_id);
 
     std_mac_to_string ((const hal_mac_addr_t *)fdb_entry->mac_address,
                        mac_addr, sizeof (mac_addr));
@@ -94,9 +97,9 @@ sai_status_t sai_fdb_create_db_entry (const sai_fdb_entry_t *fdb_entry,
     string mac_addr_str = "\"" + string (mac_addr) + "\"";
     string vlan_id_str = std::to_string (fdb_entry->vlan_id);
     string port_id_str = std::to_string (npu_port_id);
-    string is_static_str = (entry_type == SAI_FDB_ENTRY_TYPE_STATIC)? "1" : "0";
-    string pkt_action_str = sai_fdb_pkt_action_str_get (action);
-    string metadata_str = std::to_string (metadata);
+    string is_static_str = (fdb_entry_node_data->entry_type == SAI_FDB_ENTRY_TYPE_STATIC)? "1" : "0";
+    string pkt_action_str = sai_fdb_pkt_action_str_get (fdb_entry_node_data->action);
+    string metadata_str = std::to_string (fdb_entry_node_data->metadata);
 
     string insert_str = string ("( ") + mac_addr_str + ", " + vlan_id_str +
         ", " + is_static_str + ", " + port_id_str + ", " + pkt_action_str +
@@ -350,73 +353,65 @@ sai_status_t sai_vlan_set_db_entry (sai_vlan_id_t vlan_id,
     return SAI_STATUS_SUCCESS;
 }
 
-sai_status_t sai_vlan_add_port_list_to_db_entry (
-sai_vlan_id_t vlan_id, uint_t port_count, const sai_vlan_port_t *port_list)
+sai_status_t sai_vlan_add_port_list_to_db_entry(
+        sai_vlan_member_node_t vlan_member_node)
 {
-    uint_t idx = 0;
     uint_t npu_port_id = 0;
     string port_id_str;
     string tag_mode_str;
     string insert_str;
 
-    STD_ASSERT (port_list != NULL);
+    string vlan_id_str = std::to_string(
+            sai_vlan_obj_id_to_vlan_id(vlan_member_node.vlan_id));
 
-    string vlan_id_str = std::to_string (vlan_id);
+    npu_port_id =
+        (uint_t) sai_uoid_npu_obj_id_get(vlan_member_node.port_id);
 
-    for (idx = 0; idx < port_count; idx++) {
-        npu_port_id =
-            (uint_t) sai_uoid_npu_obj_id_get (port_list [idx].port_id);
+    port_id_str = std::to_string(npu_port_id);
 
-        port_id_str = std::to_string (npu_port_id);
+    tag_mode_str =
+        sai_vlan_port_tagging_mode_str_get(vlan_member_node.tagging_mode);
 
-        tag_mode_str =
-            sai_vlan_port_tagging_mode_str_get (port_list [idx].tagging_mode);
+    insert_str = string("( ") + vlan_id_str + ", " + port_id_str + ", " +
+        tag_mode_str + string(")");
 
-        insert_str = string ("( ") + vlan_id_str + ", " + port_id_str + ", " +
-            tag_mode_str + string(")");
+    if(db_sql_insert(sai_vm_get_db_handle(), "SAI_VLAN_PORT_LIST",
+                insert_str.c_str()) != STD_ERR_OK) {
+        SAI_VM_DB_LOG_ERR ("Error inserting VLAN_PORT_LIST entry with "
+                "vlan: %s and port: %s.",
+                vlan_id_str.c_str(), port_id_str.c_str());
 
-        if (db_sql_insert (sai_vm_get_db_handle(), "SAI_VLAN_PORT_LIST",
-                           insert_str.c_str()) != STD_ERR_OK) {
-            SAI_VM_DB_LOG_ERR ("Error inserting VLAN_PORT_LIST entry with "
-                               "vlan: %s and port: %s.",
-                               vlan_id_str.c_str(), port_id_str.c_str());
-
-            return SAI_STATUS_FAILURE;
-        }
+        return SAI_STATUS_FAILURE;
     }
 
     return SAI_STATUS_SUCCESS;
 }
 
-sai_status_t sai_vlan_delete_port_list_from_db_entry (
-sai_vlan_id_t vlan_id, uint_t port_count, const sai_vlan_port_t *port_list)
+sai_status_t sai_vlan_delete_port_list_from_db_entry(
+        sai_vlan_member_node_t vlan_member_node)
 {
-    uint_t idx = 0;
     uint_t npu_port_id = 0;
     string port_id_str;
     string delete_str;
 
-    STD_ASSERT (port_list != NULL);
+    string vlan_id_str = std::to_string(
+            sai_vlan_obj_id_to_vlan_id(vlan_member_node.vlan_id));
 
-    string vlan_id_str = std::to_string (vlan_id);
+    npu_port_id =
+        (uint_t) sai_uoid_npu_obj_id_get(vlan_member_node.port_id);
 
-    for (idx = 0; idx < port_count; idx++) {
-        npu_port_id =
-            (uint_t) sai_uoid_npu_obj_id_get (port_list [idx].port_id);
+    port_id_str = std::to_string(npu_port_id);
 
-        port_id_str = std::to_string (npu_port_id);
+    delete_str = string("( vlan_id=") + vlan_id_str + " AND PORT_ID =" +
+        port_id_str + string(")");
 
-        delete_str = string ("( vlan_id=") + vlan_id_str + " AND PORT_ID =" +
-            port_id_str + string(")");
+    if(db_sql_delete(sai_vm_get_db_handle(), "SAI_VLAN_PORT_LIST",
+                delete_str.c_str()) != STD_ERR_OK) {
+        SAI_VM_DB_LOG_ERR ("Error deleting VLAN_PORT_LIST entry with "
+                "vlan: %s and port: %s.",
+                vlan_id_str.c_str(), port_id_str.c_str());
 
-        if (db_sql_delete (sai_vm_get_db_handle(), "SAI_VLAN_PORT_LIST",
-                           delete_str.c_str()) != STD_ERR_OK) {
-            SAI_VM_DB_LOG_ERR ("Error deleting VLAN_PORT_LIST entry with "
-                               "vlan: %s and port: %s.",
-                               vlan_id_str.c_str(), port_id_str.c_str());
-
-            return SAI_STATUS_FAILURE;
-        }
+        return SAI_STATUS_FAILURE;
     }
 
     return SAI_STATUS_SUCCESS;

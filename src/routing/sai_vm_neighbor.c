@@ -98,7 +98,7 @@ static sai_status_t sai_npu_neighbor_create (sai_fib_nh_t *p_next_hop)
     if (p_rif->type == SAI_ROUTER_INTERFACE_TYPE_VLAN) {
         memset (&fdb_entry, 0, sizeof (fdb_entry));
 
-        memcpy (&fdb_entry.mac_address, p_next_hop->mac_addr,
+        memcpy (fdb_entry.mac_address, p_next_hop->mac_addr,
                 sizeof (sai_mac_t));
 
         fdb_entry.vlan_id = p_rif->attachment.vlan_id;

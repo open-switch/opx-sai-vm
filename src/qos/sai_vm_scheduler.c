@@ -39,9 +39,9 @@
  */
 static const dn_sai_attribute_entry_t sai_qos_scheduler_attr[] =  {
     /*            ID                                  MC     VC     VS    VG  IMP    SUP */
-    { SAI_SCHEDULER_ATTR_SCHEDULING_ALGORITHM,       false, true, true, true, true,  true },
+    { SAI_SCHEDULER_ATTR_SCHEDULING_TYPE,       false, true, true, true, true,  true },
     { SAI_SCHEDULER_ATTR_SCHEDULING_WEIGHT,          false, true, true, true, true,  true },
-    { SAI_SCHEDULER_ATTR_SHAPER_TYPE,                false, true, true, true, true,  true },
+    { SAI_SCHEDULER_ATTR_METER_TYPE,                false, true, true, true, true,  true },
     { SAI_SCHEDULER_ATTR_MIN_BANDWIDTH_RATE,         false, true, true, true, true,  true },
     { SAI_SCHEDULER_ATTR_MIN_BANDWIDTH_BURST_RATE,   false, true, true, true, true,  true },
     { SAI_SCHEDULER_ATTR_MAX_BANDWIDTH_RATE,         false, true, true, true, true,  true },
@@ -137,7 +137,7 @@ static sai_status_t sai_vm_scheduler_attribute_get (dn_sai_qos_scheduler_t *p_sc
 
         switch (p_attr->id)
         {
-            case SAI_SCHEDULER_ATTR_SCHEDULING_ALGORITHM:
+            case SAI_SCHEDULER_ATTR_SCHEDULING_TYPE:
                 p_attr->value.s32 = p_sched_node->sched_algo;
                 break;
 
@@ -145,7 +145,7 @@ static sai_status_t sai_vm_scheduler_attribute_get (dn_sai_qos_scheduler_t *p_sc
                 p_attr->value.u8 = p_sched_node->weight;
                 break;
 
-            case SAI_SCHEDULER_ATTR_SHAPER_TYPE:
+            case SAI_SCHEDULER_ATTR_METER_TYPE:
                  p_attr->value.s32 = p_sched_node->shape_type;
                 break;
 

@@ -73,7 +73,7 @@ typedef struct _sai_vm_port_init_info_t {
 /**
  * VM vendor specific switch init config handler
  */
-sai_status_t sai_npu_switch_init_config (sai_switch_id_t switch_id,
+sai_status_t sai_npu_switch_init_config (sai_switch_info_t *sai_switch_info,
                                          std_config_node_t vm_node);
 
 #endif /* __SAI_VM_PORT_UTIL_H__ */

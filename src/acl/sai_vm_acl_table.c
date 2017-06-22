@@ -101,6 +101,16 @@ void sai_npu_acl_dump_table(const sai_acl_table_t *acl_table)
     return;
 }
 
+void sai_npu_acl_dump_all_counters()
+{
+    return;
+}
+
+void sai_npu_acl_dump_counter_per_entry(int eid)
+{
+    return;
+}
+
 sai_status_t sai_npu_get_acl_attribute(sai_attribute_t *attr)
 {
     sai_status_t sai_rc = SAI_STATUS_SUCCESS;
@@ -172,7 +182,14 @@ static sai_npu_acl_api_t sai_vm_acl_api_table = {
     sai_npu_get_acl_attribute,
     sai_npu_acl_dump_table,
     sai_npu_acl_dump_rule,
-    sai_npu_acl_dump_counter
+    sai_npu_acl_dump_counter,
+    sai_npu_create_acl_range,
+    sai_npu_delete_acl_range,
+    sai_npu_set_acl_range,
+    sai_npu_get_acl_range,
+    sai_npu_range_attribute_table_get,
+    sai_npu_acl_dump_all_counters,
+    sai_npu_acl_dump_counter_per_entry,
 };
 
 sai_npu_acl_api_t* sai_vm_acl_api_query (void)

@@ -26,6 +26,7 @@
 #include "sai_vm_npu_sim_info.h"
 #include "sai_switch_db_api.h"
 #include "sai_vm_port_util.h"
+#include "sai_vm_netlink.h"
 #include "saiswitch.h"
 #include "sai_npu_switch.h"
 #include "sai_switch_common.h"
@@ -133,10 +134,12 @@ static sai_status_t sai_vm_tables_init (void)
     return ret_code;
 }
 
-static sai_status_t sai_npu_switch_init (sai_switch_id_t switch_id)
+static sai_status_t sai_npu_switch_init (sai_switch_info_t *sai_switch_info)
 {
     sai_status_t ret_code = SAI_STATUS_UNINITIALIZED;
+    sai_status_t rc = SAI_STATUS_UNINITIALIZED;
     sai_attribute_t attr;
+    sai_switch_id_t switch_id = sai_switch_info->switch_id;
 
     SAI_SWITCH_LOG_TRACE ("VM specific Switch and Port initializations.");
 
@@ -178,12 +181,14 @@ static sai_status_t sai_npu_switch_init (sai_switch_id_t switch_id)
         sai_vm_switch_id_set (switch_id);
     }
 
-    ret_code = sai_switch_attribute_set_db_entry (switch_id, &attr);
+    rc = sai_switch_attribute_set_db_entry (switch_id, &attr);
 
-    if (ret_code != SAI_STATUS_SUCCESS) {
+    if (rc != SAI_STATUS_SUCCESS) {
         SAI_SWITCH_LOG_ERR ("Failed to update the Switch attribute %d in "
                             "DB table.", attr.id);
     }
+
+    sai_vm_netlink_thread_start();
 
     return ret_code;
 }
@@ -198,7 +203,7 @@ static sai_status_t sai_npu_switching_mode_set (const sai_switch_switching_mode_
     sai_switch_lock ();
 
     do {
-        if (mode == SAI_SWITCHING_MODE_CUT_THROUGH) {
+        if (mode == SAI_SWITCH_SWITCHING_MODE_CUT_THROUGH) {
             if (sai_switch_cut_through_supported ()) {
                 sai_switch_capablility_enable
                     (false, SAI_SWITCH_CAP_STORE_AND_FORWARD_MODE);
@@ -213,7 +218,7 @@ static sai_status_t sai_npu_switching_mode_set (const sai_switch_switching_mode_
                 ret = SAI_STATUS_NOT_SUPPORTED;
                 break;
             }
-        } else if (mode == SAI_SWITCHING_MODE_STORE_AND_FORWARD) {
+        } else if (mode == SAI_SWITCH_SWITCHING_MODE_STORE_AND_FORWARD) {
             if (sai_switch_store_and_forward_supported()) {
                 sai_switch_capablility_enable
                     (false, SAI_SWITCH_CAP_CUT_THROUGH_MODE);
@@ -414,11 +419,11 @@ sai_status_t sai_npu_switching_mode_get (sai_switch_switching_mode_t *mode)
 
     if (sai_switch_cut_through_enabled ())
     {
-        *mode = SAI_SWITCHING_MODE_CUT_THROUGH;
+        *mode = SAI_SWITCH_SWITCHING_MODE_CUT_THROUGH;
     }
     else if (sai_switch_store_and_forward_enabled ())
     {
-        *mode = SAI_SWITCHING_MODE_STORE_AND_FORWARD;
+        *mode = SAI_SWITCH_SWITCHING_MODE_STORE_AND_FORWARD;
     }
 
     sai_switch_unlock ();

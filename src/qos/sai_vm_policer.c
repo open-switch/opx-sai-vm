@@ -44,7 +44,7 @@ static const dn_sai_attribute_entry_t sai_qos_policer_attr[] = {
     {SAI_POLICER_ATTR_GREEN_PACKET_ACTION, false, true, true, true, true, true},
     {SAI_POLICER_ATTR_RED_PACKET_ACTION, false, true, true, true, true, true},
     {SAI_POLICER_ATTR_YELLOW_PACKET_ACTION, false, true, true, true, true, true},
-    {SAI_POLICER_ATTR_ENABLE_COUNTER_LIST, false, true, true, true, false, false},
+    {SAI_POLICER_ATTR_ENABLE_COUNTER_PACKET_ACTION_LIST, false, true, true, true, false, false},
 };
 
 static sai_status_t sai_vm_qos_policer_create(dn_sai_qos_policer_t *p_policer,
@@ -161,7 +161,7 @@ static sai_status_t sai_vm_qos_policer_attribute_get (dn_sai_qos_policer_t *p_po
                 sai_vm_qos_policer_action_fill(p_attr, p_policer);
                 break;
 
-            case SAI_POLICER_ATTR_ENABLE_COUNTER_LIST:
+            case SAI_POLICER_ATTR_ENABLE_COUNTER_PACKET_ACTION_LIST:
                 break;
 
             default:

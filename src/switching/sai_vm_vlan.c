@@ -39,25 +39,80 @@
 #include "std_assert.h"
 #include <string.h>
 #include <inttypes.h>
+#include "sai_gen_utils.h"
 
-static sai_status_t sai_npu_add_ports_to_vlan (sai_vlan_id_t vlan_id,
-                                               unsigned int port_count,
-                                               const sai_vlan_port_t *port_list)
+static dn_sai_id_gen_info_t vlan_obj_gen_info;
+
+bool sai_vm_is_vlan_member_id_in_use(uint64_t obj_id)
+{
+    sai_object_id_t vlan_member_id =
+        sai_uoid_create(SAI_OBJECT_TYPE_VLAN_MEMBER,obj_id);
+
+    if(sai_find_vlan_member_node(vlan_member_id) != NULL) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+static sai_object_id_t sai_vm_vlan_member_id_create(void)
+{
+    if(SAI_STATUS_SUCCESS ==
+            dn_sai_get_next_free_id(&vlan_obj_gen_info)) {
+        return (sai_uoid_create(SAI_OBJECT_TYPE_VLAN_MEMBER,
+                    vlan_obj_gen_info.cur_id));
+    }
+    return SAI_NULL_OBJECT_ID;
+}
+
+static sai_status_t sai_npu_vlan_member_remove(sai_vlan_member_node_t vlan_member_node)
 {
     sai_status_t sai_rc = SAI_STATUS_SUCCESS;
 
-    STD_ASSERT(port_list != NULL);
+    SAI_VLAN_LOG_TRACE("Removing port 0x%"PRIx64" to vlan %d.",
+            vlan_member_node.port_id,
+            sai_vlan_obj_id_to_vlan_id(vlan_member_node.vlan_id));
 
-    SAI_VLAN_LOG_TRACE ("Adding %d ports to vlan %d.", port_count, vlan_id);
+    /* Update the port removed from the VLAN in the DB. */
+    sai_rc = sai_vlan_delete_port_list_from_db_entry(vlan_member_node);
+
+    if (sai_rc != SAI_STATUS_SUCCESS) {
+        SAI_VLAN_LOG_ERR ("Error removing port list from DB entry for "
+                "VLAN ID: %d.",
+                sai_vlan_obj_id_to_vlan_id(vlan_member_node.vlan_id));
+
+        return SAI_STATUS_FAILURE;
+    }
+
+    return SAI_STATUS_SUCCESS;
+}
+
+static sai_status_t sai_npu_vlan_member_create(sai_vlan_member_node_t *vlan_member_node)
+{
+    sai_status_t sai_rc = SAI_STATUS_SUCCESS;
+
+    STD_ASSERT(vlan_member_node != NULL);
+
+    SAI_VLAN_LOG_TRACE("Adding port 0x%"PRIx64" to vlan %d.",
+            vlan_member_node->port_id,
+            sai_vlan_obj_id_to_vlan_id(vlan_member_node->vlan_id));
 
     /* Update list of ports added to the VLAN in the DB. */
     sai_rc =
-        sai_vlan_add_port_list_to_db_entry (vlan_id, port_count, port_list);
+        sai_vlan_add_port_list_to_db_entry(*vlan_member_node);
 
     if (sai_rc != SAI_STATUS_SUCCESS) {
-        SAI_VLAN_LOG_ERR ("Error adding port list to DB entry for "
-                             "VLAN ID: %d.", vlan_id);
+        SAI_VLAN_LOG_ERR("Error adding port list to DB entry for "
+                "VLAN ID: %d.",
+                sai_vlan_obj_id_to_vlan_id(vlan_member_node->vlan_id));
 
+        return SAI_STATUS_FAILURE;
+    }
+
+    vlan_member_node->vlan_member_id = sai_vm_vlan_member_id_create();
+    if(SAI_NULL_OBJECT_ID ==
+            vlan_member_node->vlan_member_id) {
+        sai_npu_vlan_member_remove(*vlan_member_node);
         return SAI_STATUS_FAILURE;
     }
 
@@ -126,6 +181,11 @@ static sai_status_t sai_npu_vlan_init (void)
     /* Internal vlan id related programming */
     ret = sai_npu_internal_vlan_init (SAI_VM_DFLT_L3_VLAN_ID);
 
+    vlan_obj_gen_info.cur_id = 0;
+    vlan_obj_gen_info.is_wrappped = false;
+    vlan_obj_gen_info.mask = SAI_UOID_NPU_OBJ_ID_MASK;
+    vlan_obj_gen_info.is_id_in_use = sai_vm_is_vlan_member_id_in_use;
+
     if (ret != SAI_STATUS_SUCCESS) {
         SAI_VLAN_LOG_WARN ("Internal Vlan id init failed with err %d", ret);
     }
@@ -144,31 +204,6 @@ static sai_status_t sai_npu_vlan_delete (sai_vlan_id_t vlan_id)
     if (sai_rc != SAI_STATUS_SUCCESS) {
         SAI_VLAN_LOG_ERR ("Error removing VLAN entry from DB for vlan ID: "
                              "%d.", vlan_id);
-
-        return SAI_STATUS_FAILURE;
-    }
-
-    return SAI_STATUS_SUCCESS;
-}
-
-static sai_status_t sai_npu_remove_ports_from_vlan (sai_vlan_id_t vlan_id,
-                                                    unsigned int port_count,
-                                                    const sai_vlan_port_t *port_list)
-{
-    sai_status_t sai_rc = SAI_STATUS_SUCCESS;
-
-    STD_ASSERT(port_list != NULL);
-
-    SAI_VLAN_LOG_TRACE ("Removing %d ports from vlan %d.", port_count,
-                           vlan_id);
-
-    /* Update list of ports removed from the VLAN in the DB. */
-    sai_rc = sai_vlan_delete_port_list_from_db_entry (vlan_id, port_count,
-                                                      port_list);
-
-    if (sai_rc != SAI_STATUS_SUCCESS) {
-        SAI_VLAN_LOG_ERR ("Error removing port list from DB entry for "
-                             "VLAN ID: %d.", vlan_id);
 
         return SAI_STATUS_FAILURE;
     }
@@ -308,12 +343,24 @@ static sai_status_t sai_npu_vlan_meta_data_get(sai_vlan_id_t vlan_id, uint_t *va
     return SAI_STATUS_SUCCESS;
 }
 
+static sai_status_t sai_npu_set_vlan_member_tagging_mode(
+        sai_vlan_member_node_t vlan_member_node)
+{
+    sai_status_t rc = SAI_STATUS_SUCCESS;
+
+    if((rc = sai_npu_vlan_member_remove(vlan_member_node)) ==
+        SAI_STATUS_SUCCESS) {
+        rc = sai_npu_vlan_member_create(&vlan_member_node);
+    }
+    return rc;
+}
+
 static sai_npu_vlan_api_t sai_vm_vlan_api_table = {
     sai_npu_vlan_init,
     sai_npu_vlan_create,
     sai_npu_vlan_delete,
-    sai_npu_add_ports_to_vlan,
-    sai_npu_remove_ports_from_vlan,
+    sai_npu_vlan_member_create,
+    sai_npu_vlan_member_remove,
     sai_npu_set_vlan_max_learned_address,
     sai_npu_get_vlan_max_learned_address,
     sai_npu_get_vlan_stats,
@@ -321,12 +368,11 @@ static sai_npu_vlan_api_t sai_vm_vlan_api_table = {
     sai_npu_vlan_learn_disable_set,
     sai_npu_vlan_learn_disable_get,
     sai_npu_vlan_meta_data_set,
-    sai_npu_vlan_meta_data_get
+    sai_npu_vlan_meta_data_get,
+    sai_npu_set_vlan_member_tagging_mode,
 };
 
 sai_npu_vlan_api_t* sai_vm_vlan_api_query (void)
 {
     return &sai_vm_vlan_api_table;
 }
-
-

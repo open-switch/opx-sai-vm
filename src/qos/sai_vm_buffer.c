@@ -44,14 +44,14 @@ static const dn_sai_attribute_entry_t sai_qos_buffer_pool_attr[] =  {
     { SAI_BUFFER_POOL_ATTR_SHARED_SIZE , false, false, false, true , true , true },
     { SAI_BUFFER_POOL_ATTR_TYPE        , true , true , false, true , true , true },
     { SAI_BUFFER_POOL_ATTR_SIZE        , true , true , true , true , true , true },
-    { SAI_BUFFER_POOL_ATTR_TH_MODE     , false, true , true , true , true , true},
+    { SAI_BUFFER_POOL_ATTR_THRESHOLD_MODE, false, true , true , true , true , true},
 };
 
 static const dn_sai_attribute_entry_t sai_qos_buffer_profile_attr[] =  {
     /*            ID                              MC     VC     VS    VG     IMP    SUP */
     { SAI_BUFFER_PROFILE_ATTR_POOL_ID           , true , true , true , true , true , true },
     { SAI_BUFFER_PROFILE_ATTR_BUFFER_SIZE       , true , true , true , true , true , true },
-    { SAI_BUFFER_PROFILE_ATTR_TH_MODE           , false, true , true , true , true , true },
+    { SAI_BUFFER_PROFILE_ATTR_THRESHOLD_MODE    , false, true , true , true , true , true },
     { SAI_BUFFER_PROFILE_ATTR_SHARED_DYNAMIC_TH , false, true , true , true , true , true },
     { SAI_BUFFER_PROFILE_ATTR_SHARED_STATIC_TH  , false, true , true , true , true , true },
     { SAI_BUFFER_PROFILE_ATTR_XOFF_TH           , false, true , true , true , true , true },
@@ -87,19 +87,19 @@ static void sai_vm_buffer_profile_attr_table_get (const dn_sai_attribute_entry_t
     return;
 }
 
-static sai_status_t sai_vm_buffer_init (const sai_qos_npu_buffer_info_t *buffer_info)
+static sai_status_t sai_vm_buffer_init ()
 {
     dn_sai_vm_qos_tcb_t *vm_qos_tcb = sai_vm_qos_access_tcb();
     uint_t num_bytes_per_kb = 1024;
 
-    vm_qos_tcb->ing_max_buf_pools = buffer_info->ing_max_buf_pools;
-    vm_qos_tcb->egr_max_buf_pools = buffer_info->egr_max_buf_pools;
+    vm_qos_tcb->ing_max_buf_pools = sai_switch_ing_max_buf_pools_get();
+    vm_qos_tcb->egr_max_buf_pools = sai_switch_egr_max_buf_pools_get();
     vm_qos_tcb->ing_num_sp = 0;
     vm_qos_tcb->egr_num_sp = 0;
-    vm_qos_tcb->cell_size = buffer_info->cell_size;
-    vm_qos_tcb->num_pg = buffer_info->num_pg;
-    vm_qos_tcb->ing_buffer_size = (buffer_info->max_buffer_size)*num_bytes_per_kb;
-    vm_qos_tcb->egr_buffer_size = (buffer_info->max_buffer_size)*num_bytes_per_kb;
+    vm_qos_tcb->cell_size = sai_switch_cell_size_get();
+    vm_qos_tcb->num_pg = sai_switch_num_pg_get();
+    vm_qos_tcb->ing_buffer_size = (sai_switch_max_buffer_size_get() * num_bytes_per_kb);
+    vm_qos_tcb->egr_buffer_size = vm_qos_tcb->ing_buffer_size;
 
     vm_qos_tcb->ing_sp_bitmap =
         std_bitmap_create_array (vm_qos_tcb->ing_max_buf_pools);
@@ -258,7 +258,7 @@ static sai_status_t sai_vm_buffer_pool_attr_set (dn_sai_qos_buffer_pool_t *p_buf
         case SAI_BUFFER_POOL_ATTR_SIZE:
             ret_val = sai_vm_buffer_pool_update(p_buf_pool_node, attr->value.u32);
             break;
-        case SAI_BUFFER_POOL_ATTR_TH_MODE:
+        case SAI_BUFFER_POOL_ATTR_THRESHOLD_MODE:
             ret_val = SAI_STATUS_SUCCESS;
             break;
         default:
@@ -306,14 +306,17 @@ static sai_status_t sai_vm_buffer_profile_remove (dn_sai_qos_buffer_profile_t
 static sai_status_t sai_vm_buffer_profile_attr_set (sai_object_id_t obj_id,
                                                      dn_sai_qos_buffer_profile_t
                                                      *p_buf_profile_node,
+                                                     const sai_attribute_t *old_attr,
                                                      const sai_attribute_t *attr)
 {
     return SAI_STATUS_SUCCESS;
 }
 
 static sai_status_t sai_vm_apply_buffer_profile (sai_object_id_t obj_id,
+                                                 dn_sai_qos_buffer_profile_t
+                                                 *p_old_buf_profile_node,
                                                   dn_sai_qos_buffer_profile_t
-                                                  *p_buf_profile_node)
+                                                  *p_buf_profile_node,  bool is_retry)
 {
 
     /* TODO */

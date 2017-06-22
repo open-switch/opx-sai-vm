@@ -812,17 +812,13 @@ sai_fib_nh_t *ap_next_hop [], uint_t total_nh_count)
 }
 
 sai_status_t sai_nh_group_create_db_entry (sai_object_id_t nh_grp_id,
-                                           sai_next_hop_group_type_t type,
-                                           uint_t nh_count,
-                                           sai_fib_nh_t *ap_next_hop [])
+                                           sai_next_hop_group_type_t type)
 {
-    string nh_count_str = std::to_string (nh_count);
+    string nh_count_str = std::to_string (0);
     string nh_grp_type_str = std::to_string (type);
     uint_t npu_nh_grp_id = (uint_t) sai_uoid_npu_obj_id_get (nh_grp_id);
 
     string nh_grp_id_str = std::to_string (npu_nh_grp_id);
-
-    STD_ASSERT (ap_next_hop != NULL);
 
     string insert_str =
         string ("( ") + nh_grp_id_str + ", " + nh_count_str + ", " +
@@ -832,14 +828,6 @@ sai_status_t sai_nh_group_create_db_entry (sai_object_id_t nh_grp_id,
                        insert_str.c_str()) != STD_ERR_OK) {
         SAI_VM_DB_LOG_ERR ("Error inserting NH group entry with nh_grp_id: %s.",
                            nh_grp_id_str.c_str());
-
-        return SAI_STATUS_FAILURE;
-    }
-
-    if (sai_nh_group_list_db_populate (nh_grp_id, nh_count, ap_next_hop) !=
-        SAI_STATUS_SUCCESS) {
-        SAI_VM_DB_LOG_ERR ("Error adding Next-hops to the NEXT_HOP_GROUP_LIST "
-                           "for nh_grp_id: %s.", nh_grp_id_str.c_str());
 
         return SAI_STATUS_FAILURE;
     }

@@ -130,34 +130,44 @@ sai_status_t sai_qos_port_attribute_get(sai_npu_object_id_t port_id,
         /*Fall through */
         case SAI_PORT_ATTR_POLICER_ID:
         case SAI_PORT_ATTR_QOS_DEFAULT_TC:
-        case SAI_PORT_ATTR_QOS_DOT1P_TO_TC_MAP:
-        case SAI_PORT_ATTR_QOS_DOT1P_TO_COLOR_MAP:
-        case SAI_PORT_ATTR_QOS_DSCP_TO_TC_MAP:
-        case SAI_PORT_ATTR_QOS_DSCP_TO_COLOR_MAP:
-        case SAI_PORT_ATTR_QOS_TC_TO_DOT1P_MAP:
-        case SAI_PORT_ATTR_QOS_TC_TO_DSCP_MAP:
         case SAI_PORT_ATTR_QOS_TC_AND_COLOR_TO_DOT1P_MAP:
         case SAI_PORT_ATTR_QOS_TC_AND_COLOR_TO_DSCP_MAP:
             return SAI_STATUS_ATTR_NOT_SUPPORTED_0;
 
+        case SAI_PORT_ATTR_QOS_DOT1P_TO_TC_MAP:
+            value->oid =  p_port->maps_id[SAI_QOS_MAP_TYPE_DOT1P_TO_TC];
+            break;
+
+        case SAI_PORT_ATTR_QOS_DOT1P_TO_COLOR_MAP:
+            value->oid =  p_port->maps_id[SAI_QOS_MAP_TYPE_DOT1P_TO_COLOR];
+            break;
+
+        case SAI_PORT_ATTR_QOS_DSCP_TO_TC_MAP:
+            value->oid =  p_port->maps_id[SAI_QOS_MAP_TYPE_DSCP_TO_TC];
+            break;
+
+        case SAI_PORT_ATTR_QOS_DSCP_TO_COLOR_MAP:
+            value->oid =  p_port->maps_id[SAI_QOS_MAP_TYPE_DSCP_TO_COLOR];
+            break;
+
         case SAI_PORT_ATTR_QOS_DOT1P_TO_TC_AND_COLOR_MAP:
-            value->oid =  p_port->maps_id[SAI_QOS_MAP_DOT1P_TO_TC_AND_COLOR];
+            value->oid =  p_port->maps_id[SAI_QOS_MAP_TYPE_DOT1P_TO_TC_AND_COLOR];
             break;
 
         case SAI_PORT_ATTR_QOS_DSCP_TO_TC_AND_COLOR_MAP:
-            value->oid =  p_port->maps_id[SAI_QOS_MAP_DSCP_TO_TC_AND_COLOR];
+            value->oid =  p_port->maps_id[SAI_QOS_MAP_TYPE_DSCP_TO_TC_AND_COLOR];
             break;
 
         case SAI_PORT_ATTR_QOS_TC_TO_QUEUE_MAP:
-            value->oid =  p_port->maps_id[SAI_QOS_MAP_TC_TO_QUEUE];
+            value->oid =  p_port->maps_id[SAI_QOS_MAP_TYPE_TC_TO_QUEUE];
             break;
 
         case SAI_PORT_ATTR_QOS_TC_TO_PRIORITY_GROUP_MAP:
-            value->oid =  p_port->maps_id[SAI_QOS_MAP_TC_TO_PRIORITY_GROUP];
+            value->oid =  p_port->maps_id[SAI_QOS_MAP_TYPE_TC_TO_PRIORITY_GROUP];
             break;
 
         case SAI_PORT_ATTR_QOS_PFC_PRIORITY_TO_QUEUE_MAP:
-            value->oid =  p_port->maps_id[SAI_QOS_MAP_PFC_PRIORITY_TO_QUEUE];
+            value->oid =  p_port->maps_id[SAI_QOS_MAP_TYPE_PFC_PRIORITY_TO_QUEUE];
             break;
 
         case SAI_PORT_ATTR_QOS_WRED_PROFILE_ID:
@@ -180,11 +190,11 @@ sai_status_t sai_qos_port_attribute_get(sai_npu_object_id_t port_id,
             value->oid = p_port->policer_id[SAI_QOS_POLICER_TYPE_STORM_MCAST];
             break;
 
-        case SAI_PORT_ATTR_NUMBER_OF_PRIORITY_GROUPS:
+        case SAI_PORT_ATTR_NUMBER_OF_INGRESS_PRIORITY_GROUPS:
             value->u32 = p_port->num_pg;
             break;
 
-        case SAI_PORT_ATTR_PRIORITY_GROUP_LIST:
+        case SAI_PORT_ATTR_INGRESS_PRIORITY_GROUP_LIST:
             return sai_qos_port_get_pg_list(p_port->port_id, &value->objlist);
 
         default:

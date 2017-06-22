@@ -217,13 +217,14 @@ static void sai_vm_switch_info_handler (std_config_node_t switch_node)
     sai_switch_supported_capability_set((uint_t) switch_capb);
 }
 
-sai_status_t sai_npu_switch_init_config (sai_switch_id_t switch_id,
+sai_status_t sai_npu_switch_init_config (sai_switch_info_t *sai_switch_info,
                                          std_config_node_t vm_node)
 {
     std_config_node_t sai_node = NULL;
     sai_status_t ret_code = SAI_STATUS_FAILURE;
     uint_t max_port_instance = 0, switch_instance = UINT_MAX;
     sai_vm_port_init_info_t *port_init_config = NULL;
+    sai_switch_id_t switch_id = sai_switch_info->switch_id;
 
     STD_ASSERT (vm_node != NULL);
     SAI_SWITCH_LOG_TRACE ("Init config: vendor VM init config handler");

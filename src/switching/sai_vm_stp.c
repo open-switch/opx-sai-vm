@@ -100,7 +100,7 @@ static sai_status_t sai_npu_stp_init(sai_npu_object_id_t *p_default_stp_instance
 }
 static sai_status_t sai_npu_stp_port_state_set (sai_object_id_t stp_inst_id,
                                                 sai_object_id_t port_id,
-                                                sai_port_stp_state_t port_state)
+                                                sai_stp_port_state_t port_state)
 {
 
     return SAI_STATUS_SUCCESS;
@@ -108,7 +108,7 @@ static sai_status_t sai_npu_stp_port_state_set (sai_object_id_t stp_inst_id,
 
 static sai_status_t sai_npu_stp_port_state_get (sai_object_id_t stp_inst_id,
                                                 sai_object_id_t port_id,
-                                                sai_port_stp_state_t *port_state)
+                                                sai_stp_port_state_t *port_state)
 {
     STD_ASSERT (port_state != NULL);
 

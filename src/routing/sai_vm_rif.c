@@ -271,7 +271,7 @@ sai_fib_router_interface_t *p_rif, uint_t attr_cnt, sai_attribute_t *attr_list)
                 break;
 
             case SAI_ROUTER_INTERFACE_ATTR_SRC_MAC_ADDRESS:
-                memcpy (&p_attr->value.mac, p_rif->src_mac, sizeof (sai_mac_t));
+                memcpy (p_attr->value.mac, p_rif->src_mac, sizeof (sai_mac_t));
                 break;
 
             case SAI_ROUTER_INTERFACE_ATTR_MTU:
@@ -286,6 +286,13 @@ sai_fib_router_interface_t *p_rif, uint_t attr_cnt, sai_attribute_t *attr_list)
                     p_attr->value.u32 = p_rif->mtu;
                 }
 
+                break;
+
+            case SAI_ROUTER_INTERFACE_ATTR_INGRESS_ACL:
+            case SAI_ROUTER_INTERFACE_ATTR_EGRESS_ACL:
+            case SAI_ROUTER_INTERFACE_ATTR_V4_MCAST_ENABLE:
+            case SAI_ROUTER_INTERFACE_ATTR_V6_MCAST_ENABLE:
+                sai_rc = SAI_STATUS_ATTR_NOT_IMPLEMENTED_0;
                 break;
 
             default:

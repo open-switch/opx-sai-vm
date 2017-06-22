@@ -182,7 +182,7 @@ static sai_status_t sai_npu_vr_attribute_get (sai_fib_vrf_t *p_vrf_node,
 
         switch (p_attr->id) {
             case SAI_VIRTUAL_ROUTER_ATTR_SRC_MAC_ADDRESS:
-                memcpy (&p_attr->value.mac, p_vrf_node->src_mac,
+                memcpy (p_attr->value.mac, p_vrf_node->src_mac,
                         sizeof (sai_mac_t));
 
                 SAI_ROUTER_LOG_TRACE ("VRF MAC: %s.", std_mac_to_string
@@ -210,7 +210,7 @@ static sai_status_t sai_npu_vr_attribute_get (sai_fib_vrf_t *p_vrf_node,
 
                 break;
 
-            case SAI_VIRTUAL_ROUTER_ATTR_VIOLATION_TTL1_ACTION:
+            case SAI_VIRTUAL_ROUTER_ATTR_VIOLATION_TTL1_PACKET_ACTION:
                  p_attr->value.s32 = p_vrf_node->ttl0_1_pkt_action;
 
                  SAI_ROUTER_LOG_TRACE ("TTL1 Violation pkt action: %d "
@@ -220,7 +220,7 @@ static sai_status_t sai_npu_vr_attribute_get (sai_fib_vrf_t *p_vrf_node,
 
                 break;
 
-            case SAI_VIRTUAL_ROUTER_ATTR_VIOLATION_IP_OPTIONS:
+            case SAI_VIRTUAL_ROUTER_ATTR_VIOLATION_IP_OPTIONS_PACKET_ACTION:
                 p_attr->value.s32 = p_vrf_node->ip_options_pkt_action;
 
                 SAI_ROUTER_LOG_TRACE ("IP Options pkt action: %d (%s).",
@@ -228,6 +228,10 @@ static sai_status_t sai_npu_vr_attribute_get (sai_fib_vrf_t *p_vrf_node,
                                       sai_packet_action_str
                                       (p_attr->value.s32));
 
+                break;
+
+            case SAI_VIRTUAL_ROUTER_ATTR_UNKNOWN_L3_MULTICAST_PACKET_ACTION:
+                sai_rc = SAI_STATUS_ATTR_NOT_IMPLEMENTED_0;
                 break;
 
             default:
@@ -275,7 +279,7 @@ static sai_status_t sai_npu_fib_router_mac_set (const sai_mac_t *p_router_mac)
 
     /* Update the Switch DB entry with this attribute info. */
     attr.id = SAI_SWITCH_ATTR_SRC_MAC_ADDRESS;
-    memcpy (&attr.value.mac, p_router_mac, sizeof (sai_mac_t));
+    memcpy (attr.value.mac, p_router_mac, sizeof (sai_mac_t));
 
     sai_rc = sai_switch_attribute_set_db_entry (sai_vm_switch_id_get(), &attr);
 

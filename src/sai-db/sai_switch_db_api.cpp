@@ -73,10 +73,10 @@ static std::map<uint_t, std::string> switch_attr_db_str_map =
     {SAI_SWITCH_ATTR_SRC_MAC_ADDRESS, "\"src_mac\""},
     {SAI_SWITCH_ATTR_MAX_LEARNED_ADDRESSES, "\"max_learn_limit\""},
     {SAI_SWITCH_ATTR_FDB_AGING_TIME, "\"aging_time\""},
-    {SAI_SWITCH_ATTR_FDB_UNICAST_MISS_ACTION, "\"ucast_miss_pkt_action\""},
-    {SAI_SWITCH_ATTR_FDB_BROADCAST_MISS_ACTION,
+    {SAI_SWITCH_ATTR_FDB_UNICAST_MISS_PACKET_ACTION, "\"ucast_miss_pkt_action\""},
+    {SAI_SWITCH_ATTR_FDB_BROADCAST_MISS_PACKET_ACTION,
         "\"bcast_miss_pkt_action\""},
-    {SAI_SWITCH_ATTR_FDB_MULTICAST_MISS_ACTION,
+    {SAI_SWITCH_ATTR_FDB_MULTICAST_MISS_PACKET_ACTION,
         "\"mcast_miss_pkt_action\""},
     {SAI_SWITCH_ATTR_LAG_DEFAULT_HASH_ALGORITHM, "\"algorithm\""},
     {SAI_SWITCH_ATTR_LAG_DEFAULT_HASH_SEED, "\"seed\""},
@@ -98,8 +98,8 @@ switch_oper_status_str_map =
 static std::map<sai_switch_switching_mode_t, std::string>
 switching_mode_str_map =
 {
-    {SAI_SWITCHING_MODE_CUT_THROUGH, "\"CUT_THROUGH\""},
-    {SAI_SWITCHING_MODE_STORE_AND_FORWARD, "\"STORE_AND_FORWARD\""}
+    {SAI_SWITCH_SWITCHING_MODE_CUT_THROUGH, "\"CUT_THROUGH\""},
+    {SAI_SWITCH_SWITCHING_MODE_STORE_AND_FORWARD, "\"STORE_AND_FORWARD\""}
 };
 
 static std::string sai_switch_oper_status_str_get (
@@ -167,9 +167,9 @@ static sai_status_t sai_switch_attr_db_table_str_get (uint_t attr_id,
             break;
 
         case SAI_SWITCH_ATTR_FDB_AGING_TIME:
-        case SAI_SWITCH_ATTR_FDB_UNICAST_MISS_ACTION:
-        case SAI_SWITCH_ATTR_FDB_BROADCAST_MISS_ACTION:
-        case SAI_SWITCH_ATTR_FDB_MULTICAST_MISS_ACTION:
+        case SAI_SWITCH_ATTR_FDB_UNICAST_MISS_PACKET_ACTION:
+        case SAI_SWITCH_ATTR_FDB_BROADCAST_MISS_PACKET_ACTION:
+        case SAI_SWITCH_ATTR_FDB_MULTICAST_MISS_PACKET_ACTION:
             *p_table_str = "SAI_SWITCH_FDB_PARAMS_TABLE";
             break;
 
@@ -240,9 +240,9 @@ const sai_attribute_t *p_attr, std::string *p_value_str)
                 ((sai_switch_switching_mode_t)p_attr->value.s32);
             break;
 
-        case SAI_SWITCH_ATTR_FDB_UNICAST_MISS_ACTION:
-        case SAI_SWITCH_ATTR_FDB_BROADCAST_MISS_ACTION:
-        case SAI_SWITCH_ATTR_FDB_MULTICAST_MISS_ACTION:
+        case SAI_SWITCH_ATTR_FDB_UNICAST_MISS_PACKET_ACTION:
+        case SAI_SWITCH_ATTR_FDB_BROADCAST_MISS_PACKET_ACTION:
+        case SAI_SWITCH_ATTR_FDB_MULTICAST_MISS_PACKET_ACTION:
             *p_value_str =
                 sai_packet_action_str ((sai_packet_action_t)p_attr->value.s32);
 
@@ -419,7 +419,7 @@ sai_switch_id_t switch_id)
 {
     sai_status_t                sai_rc = SAI_STATUS_SUCCESS;
     sai_switch_oper_status_t    oper_state = SAI_SWITCH_OPER_STATUS_UNKNOWN;
-    sai_switch_switching_mode_t mode = SAI_SWITCHING_MODE_STORE_AND_FORWARD;
+    sai_switch_switching_mode_t mode = SAI_SWITCH_SWITCHING_MODE_STORE_AND_FORWARD;
 
     std::string switch_id_str = std::to_string(switch_id);
     std::string table_str = "SAI_SWITCH_MISC_INFO_TABLE";

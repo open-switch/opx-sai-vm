@@ -77,8 +77,6 @@ static std::map<sai_acl_stage_t, std::string> acl_stage_str_map =
 {
     {SAI_ACL_STAGE_INGRESS, "\"INGRESS\""},
     {SAI_ACL_STAGE_EGRESS, "\"EGRESS\""},
-    {SAI_ACL_STAGE_SUBSTAGE_INGRESS_PRE_L2, "\"PRE-INGRESS\""},
-    {SAI_ACL_STAGE_SUBSTAGE_INGRESS_POST_L3, "\"POST-INGRESS\""}
 };
 
 static std::map<sai_acl_table_attr_t, std::string> acl_table_field_str_map =
@@ -110,13 +108,13 @@ static std::map<sai_acl_table_attr_t, std::string> acl_table_field_str_map =
     {SAI_ACL_TABLE_ATTR_FIELD_TOS, "\"TOS\""},
     {SAI_ACL_TABLE_ATTR_FIELD_IP_FLAGS, "\"IP_FLAGS\""},
     {SAI_ACL_TABLE_ATTR_FIELD_TCP_FLAGS, "\"TCP_FLAGS\""},
-    {SAI_ACL_TABLE_ATTR_FIELD_IP_TYPE, "\"IP_TYPE\""},
-    {SAI_ACL_TABLE_ATTR_FIELD_IP_FRAG, "\"IP_FRAG\""},
+    {SAI_ACL_TABLE_ATTR_FIELD_ACL_IP_TYPE, "\"IP_TYPE\""},
+    {SAI_ACL_TABLE_ATTR_FIELD_ACL_IP_FRAG, "\"IP_FRAG\""},
     {SAI_ACL_TABLE_ATTR_FIELD_IPv6_FLOW_LABEL, "\"IPv6_FLOW_LABEL\""},
     {SAI_ACL_TABLE_ATTR_FIELD_TC, "\"TC\""},
     {SAI_ACL_TABLE_ATTR_FIELD_ICMP_TYPE, "\"ICMPType\""},
     {SAI_ACL_TABLE_ATTR_FIELD_ICMP_CODE, "\"ICMPCode\""},
-    {SAI_ACL_TABLE_ATTR_FIELD_VLAN_TAGS, "\"VlanTags\""},
+    {SAI_ACL_TABLE_ATTR_FIELD_PACKET_VLAN, "\"VlanTags\""},
     {SAI_ACL_TABLE_ATTR_FIELD_FDB_DST_USER_META, "\"FDB_USER_META_DATA\""},
     {SAI_ACL_TABLE_ATTR_FIELD_ROUTE_DST_USER_META, "\"L3_ROUTE_USER_META_DATA\""},
     {SAI_ACL_TABLE_ATTR_FIELD_NEIGHBOR_DST_USER_META, "\"L3_NEIGHBOR_USER_META_DATA\""},
@@ -125,6 +123,10 @@ static std::map<sai_acl_table_attr_t, std::string> acl_table_field_str_map =
     {SAI_ACL_TABLE_ATTR_FIELD_ACL_USER_META, "\"ACL_META_DATA\""},
     {SAI_ACL_TABLE_ATTR_FIELD_FDB_NPU_META_DST_HIT, "\"FDB_NPU_META_DATA\""},
     {SAI_ACL_TABLE_ATTR_FIELD_NEIGHBOR_NPU_META_DST_HIT, "\"L3_NEIGHBOR_NPU_META_DATA\""},
+    {SAI_ACL_TABLE_ATTR_FIELD_ROUTE_NPU_META_DST_HIT, "\"L3_ROUTE_NPU_META_DATA\""},
+    {SAI_ACL_TABLE_ATTR_FIELD_ACL_RANGE_TYPE, "\"RANGE_TYPE\""},
+    {SAI_ACL_TABLE_ATTR_ACTION_LIST, "\"ACTION_LIST\""},
+    {SAI_ACL_TABLE_ATTR_FIELD_IPV6_NEXT_HEADER, "\"IPv6_NEXT_HEADER\""},
 };
 
 static std::map<sai_acl_entry_attr_t, std::string> rule_filter_str_map =
@@ -156,13 +158,13 @@ static std::map<sai_acl_entry_attr_t, std::string> rule_filter_str_map =
     {SAI_ACL_ENTRY_ATTR_FIELD_TOS, "\"TOS\""},
     {SAI_ACL_ENTRY_ATTR_FIELD_IP_FLAGS, "\"IP_FLAGS\""},
     {SAI_ACL_ENTRY_ATTR_FIELD_TCP_FLAGS, "\"TCP_FLAGS\""},
-    {SAI_ACL_ENTRY_ATTR_FIELD_IP_TYPE, "\"IP_TYPE\""},
-    {SAI_ACL_ENTRY_ATTR_FIELD_IP_FRAG, "\"IP_FRAG\""},
+    {SAI_ACL_ENTRY_ATTR_FIELD_ACL_IP_TYPE, "\"IP_TYPE\""},
+    {SAI_ACL_ENTRY_ATTR_FIELD_ACL_IP_FRAG, "\"IP_FRAG\""},
     {SAI_ACL_ENTRY_ATTR_FIELD_IPv6_FLOW_LABEL, "\"IPv6_FLOW_LABEL\""},
     {SAI_ACL_ENTRY_ATTR_FIELD_TC, "\"TC\""},
     {SAI_ACL_ENTRY_ATTR_FIELD_ICMP_TYPE, "\"ICMPType\""},
     {SAI_ACL_ENTRY_ATTR_FIELD_ICMP_CODE, "\"ICMPCode\""},
-    {SAI_ACL_ENTRY_ATTR_FIELD_VLAN_TAGS, "\"VlanTags\""},
+    {SAI_ACL_ENTRY_ATTR_FIELD_PACKET_VLAN, "\"VlanTags\""},
     {SAI_ACL_ENTRY_ATTR_FIELD_FDB_DST_USER_META, "\"FDB_USER_META_DATA\""},
     {SAI_ACL_ENTRY_ATTR_FIELD_ROUTE_DST_USER_META, "\"L3_ROUTE_USER_META_DATA\""},
     {SAI_ACL_ENTRY_ATTR_FIELD_NEIGHBOR_DST_USER_META, "\"L3_NEIGHBOR_USER_META_DATA\""},
@@ -171,6 +173,9 @@ static std::map<sai_acl_entry_attr_t, std::string> rule_filter_str_map =
     {SAI_ACL_ENTRY_ATTR_FIELD_ACL_USER_META, "\"ACL_META_DATA\""},
     {SAI_ACL_ENTRY_ATTR_FIELD_FDB_NPU_META_DST_HIT, "\"FDB_NPU_META_DATA\""},
     {SAI_ACL_ENTRY_ATTR_FIELD_NEIGHBOR_NPU_META_DST_HIT, "\"L3_NEIGHBOR_NPU_META_DATA\""},
+    {SAI_ACL_ENTRY_ATTR_FIELD_ROUTE_NPU_META_DST_HIT, "\"L3_ROUTE_NPU_META_DATA\""},
+    {SAI_ACL_ENTRY_ATTR_FIELD_ACL_RANGE_TYPE, "\"RANGE_TYPE\""},
+    {SAI_ACL_ENTRY_ATTR_FIELD_IPV6_NEXT_HEADER, "\"IPv6_NEXT_HEADER\""},
 };
 
 static std::map<sai_acl_entry_attr_t, std::string> rule_action_str_map =
@@ -323,11 +328,11 @@ void sai_acl_rule_filter_match_info_str_get (sai_acl_filter_t *p_filter,
             break;
 
         case SAI_ACL_ENTRY_ATTR_ENUM:
-            if (p_filter->field == SAI_ACL_ENTRY_ATTR_FIELD_IP_TYPE) {
+            if (p_filter->field == SAI_ACL_ENTRY_ATTR_FIELD_ACL_IP_TYPE) {
                 *match_data_str =
                     sai_acl_ip_type_str_get (p_filter->match_data.s32);
                 *match_mask_str = "\"NA\"";
-            } else if (p_filter->field == SAI_ACL_ENTRY_ATTR_FIELD_IP_FRAG) {
+            } else if (p_filter->field == SAI_ACL_ENTRY_ATTR_FIELD_ACL_IP_FRAG) {
                 *match_data_str =
                     sai_acl_ip_frag_str_get (p_filter->match_data.s32);
                 *match_mask_str = "\"NA\"";
