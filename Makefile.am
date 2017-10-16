@@ -22,7 +22,14 @@ src/qos/sai_vm_qos.c           src/sai-db/sai_acl_db_api.cpp        src/switch/s
 src/qos/sai_vm_qos_maps.c      src/sai-db/sai_acl_db_utils.cpp      src/switch/sai_vm_netlink.c src/udf/sai_vm_udf.c \
 src/qos/sai_vm_queue.c         src/sai-db/sai_db_gen_utils.cpp \
 src/qos/sai_vm_sched_group.c   src/sai-db/sai_db_init.cpp \
-src/sai_vm_npu_api_query.c  src/sai_vm_npu_init_config.c  src/sai_vm_shell.c src/tunnel/sai_vm_tunnel.c
+src/sai_vm_npu_api_query.c  src/sai_vm_npu_init_config.c  src/sai_vm_shell.c src/tunnel/sai_vm_tunnel.c \
+	src/bridge/sai_vm_bridge.c \
+	src/fc/sai_vm_fc_port.c \
+	src/fc/sai_vm_fc_switch.c \
+	src/switch/sai_vm_cfg.c \
+	src/switching/sai_vm_l2mc.c \
+	src/switching/sai_vm_mcast.c
+
 
 libsai_npu_la_LDFLAGS = -lopx_logging -lopx_common -lopx_sai_common_utils -lopx_db_sql
 libsai_npu_la_CFLAGS = -I$(top_srcdir)/opx -I$(includedir)/opx

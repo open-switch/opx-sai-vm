@@ -45,6 +45,7 @@ static const dn_sai_attribute_entry_t sai_qos_buffer_pool_attr[] =  {
     { SAI_BUFFER_POOL_ATTR_TYPE        , true , true , false, true , true , true },
     { SAI_BUFFER_POOL_ATTR_SIZE        , true , true , true , true , true , true },
     { SAI_BUFFER_POOL_ATTR_THRESHOLD_MODE, false, true , true , true , true , true},
+    { SAI_BUFFER_POOL_ATTR_XOFF_SIZE   , false, true , true , true , true , true},
 };
 
 static const dn_sai_attribute_entry_t sai_qos_buffer_profile_attr[] =  {
@@ -56,6 +57,7 @@ static const dn_sai_attribute_entry_t sai_qos_buffer_profile_attr[] =  {
     { SAI_BUFFER_PROFILE_ATTR_SHARED_STATIC_TH  , false, true , true , true , true , true },
     { SAI_BUFFER_PROFILE_ATTR_XOFF_TH           , false, true , true , true , true , true },
     { SAI_BUFFER_PROFILE_ATTR_XON_TH            , false, true , true , true , true , true },
+    { SAI_BUFFER_PROFILE_ATTR_XON_OFFSET_TH     , false, true , true , true , true , true },
 };
 
 /**
@@ -259,6 +261,7 @@ static sai_status_t sai_vm_buffer_pool_attr_set (dn_sai_qos_buffer_pool_t *p_buf
             ret_val = sai_vm_buffer_pool_update(p_buf_pool_node, attr->value.u32);
             break;
         case SAI_BUFFER_POOL_ATTR_THRESHOLD_MODE:
+        case SAI_BUFFER_POOL_ATTR_XOFF_SIZE:
             ret_val = SAI_STATUS_SUCCESS;
             break;
         default:
@@ -268,6 +271,43 @@ static sai_status_t sai_vm_buffer_pool_attr_set (dn_sai_qos_buffer_pool_t *p_buf
     return ret_val;
 }
 
+static sai_status_t sai_vm_buffer_pool_attr_get (const dn_sai_qos_buffer_pool_t  *p_buf_pool_node,
+                                                 uint32_t attr_count,
+                                                 sai_attribute_t *attr_list)
+{
+    uint_t attr_idx;
+
+    STD_ASSERT(p_buf_pool_node != NULL);
+    STD_ASSERT(attr_list != NULL);
+
+    for(attr_idx = 0; attr_idx < attr_count; attr_idx++) {
+        switch(attr_list[attr_idx].id) {
+            case SAI_BUFFER_POOL_ATTR_TYPE:
+                attr_list[attr_idx].value.s32 = p_buf_pool_node->pool_type;
+                break;
+
+            case SAI_BUFFER_POOL_ATTR_SIZE:
+                attr_list[attr_idx].value.u32 = p_buf_pool_node->size;
+                break;
+
+            case SAI_BUFFER_POOL_ATTR_XOFF_SIZE:
+                attr_list[attr_idx].value.u32 = p_buf_pool_node->xoff_size;
+                break;
+
+            case SAI_BUFFER_POOL_ATTR_THRESHOLD_MODE:
+                attr_list[attr_idx].value.s32 = p_buf_pool_node->threshold_mode;
+                break;
+
+            case SAI_BUFFER_POOL_ATTR_SHARED_SIZE:
+                attr_list[attr_idx].value.u32 = p_buf_pool_node->shared_size;
+                break;
+
+            default:
+                return sai_get_indexed_ret_val(SAI_STATUS_UNKNOWN_ATTRIBUTE_0, attr_idx);
+        }
+    }
+    return SAI_STATUS_SUCCESS;
+}
 static sai_status_t sai_vm_buffer_profile_create (dn_sai_qos_buffer_profile_t
                                                    *p_buffer_profile_node,
                                                    sai_object_id_t *buffer_profile_id)
@@ -378,11 +418,18 @@ sai_status_t sai_vm_pg_destroy (dn_sai_qos_pg_t *p_pg_node)
     return SAI_STATUS_SUCCESS;
 }
 
+sai_status_t sai_vm_qos_check_buffer_size (sai_object_id_t pool_id,
+                 const dn_sai_qos_buffer_profile_t *p_buf_profile_node, uint_t add_size)
+{
+    return SAI_STATUS_SUCCESS;
+}
+
 static sai_npu_buffer_api_t sai_vm_buffer_api_table = {
     sai_vm_buffer_init,
     sai_vm_buffer_pool_create,
     sai_vm_buffer_pool_remove,
     sai_vm_buffer_pool_attr_set,
+    sai_vm_buffer_pool_attr_get,
     sai_vm_buffer_pool_stats_get,
     sai_vm_buffer_profile_create,
     sai_vm_buffer_profile_remove,
@@ -393,7 +440,8 @@ static sai_npu_buffer_api_t sai_vm_buffer_api_table = {
     sai_vm_pg_stats_get,
     sai_vm_buffer_pg_stats_clear,
     sai_vm_buffer_pool_attr_table_get,
-    sai_vm_buffer_profile_attr_table_get
+    sai_vm_buffer_profile_attr_table_get,
+    sai_vm_qos_check_buffer_size,
 };
 
 sai_npu_buffer_api_t* sai_vm_buffer_api_query (void)

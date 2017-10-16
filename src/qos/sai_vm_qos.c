@@ -170,10 +170,6 @@ sai_status_t sai_qos_port_attribute_get(sai_npu_object_id_t port_id,
             value->oid =  p_port->maps_id[SAI_QOS_MAP_TYPE_PFC_PRIORITY_TO_QUEUE];
             break;
 
-        case SAI_PORT_ATTR_QOS_WRED_PROFILE_ID:
-            value->oid = p_port->wred_id;
-            break;
-
         case SAI_PORT_ATTR_QOS_SCHEDULER_PROFILE_ID:
             value->oid = p_port->scheduler_id;
             break;

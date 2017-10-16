@@ -43,10 +43,12 @@ static const dn_sai_attribute_entry_t sai_wred_attr[] = {
     {SAI_WRED_ATTR_RED_MAX_THRESHOLD, false, true, true, true, true, true},
     {SAI_WRED_ATTR_RED_DROP_PROBABILITY, false, true, true, true, true, true},
     {SAI_WRED_ATTR_WEIGHT, false, true, true, true, true, true},
-    {SAI_WRED_ATTR_ECN_MARK_ENABLE, false, true, true, true, true, true},
+    {SAI_WRED_ATTR_ECN_MARK_MODE, false, true, true, true, true, true},
 };
 
 static sai_status_t sai_vm_wred_create(dn_sai_qos_wred_t *p_wred_node,
+                                       uint_t attr_count,
+                                       const sai_attribute_t *p_attr,
                                         sai_npu_object_id_t *p_wred_id)
 {
     uint_t  wred_profile_idx = 0;
@@ -85,22 +87,18 @@ static sai_status_t sai_vm_wred_remove(dn_sai_qos_wred_t *p_wred_node)
     return SAI_STATUS_SUCCESS;
 }
 
-static sai_status_t sai_vm_wred_set(dn_sai_qos_wred_t *p_wred_node,
+static sai_status_t sai_vm_wred_set_attr(dn_sai_qos_wred_t *p_wred_node,
                                      uint32_t attr_count,
                                      const sai_attribute_t *p_attr)
 {
     return SAI_STATUS_SUCCESS;
 }
 
-static sai_status_t sai_vm_wred_get(dn_sai_qos_wred_t *p_wred_node,
+static sai_status_t sai_vm_wred_get_attr(dn_sai_qos_wred_t *p_wred_node,
                                      uint32_t attr_count,
                                      sai_attribute_t *p_attr_list)
 {
     return SAI_STATUS_SUCCESS;
-}
-static bool sai_vm_wred_supported_on_port()
-{
-    return false;
 }
 
 static bool sai_vm_wred_is_hw_object()
@@ -108,9 +106,17 @@ static bool sai_vm_wred_is_hw_object()
     return true;
 }
 
-static sai_status_t sai_vm_wred_apply_or_remove_on_queue(sai_npu_object_id_t queue_id,
+static sai_status_t sai_vm_wred_set(
+        sai_object_id_t wred_link_id,
                                                           dn_sai_qos_wred_t *p_wred_node,
-                                                          bool wred_set)
+        dn_sai_qos_wred_link_t wred_link_type)
+{
+    return SAI_STATUS_SUCCESS;
+}
+
+static sai_status_t sai_vm_wred_reset(
+        sai_object_id_t wred_link_id,
+        dn_sai_qos_wred_link_t wred_link_type)
 {
     return SAI_STATUS_SUCCESS;
 }
@@ -133,10 +139,10 @@ static uint_t sai_vm_wred_max_buf_size_get()
 static sai_npu_wred_api_t sai_vm_wred_api_table = {
     sai_vm_wred_create,
     sai_vm_wred_remove,
+    sai_vm_wred_set_attr,
+    sai_vm_wred_get_attr,
     sai_vm_wred_set,
-    sai_vm_wred_get,
-    sai_vm_wred_apply_or_remove_on_queue,
-    sai_vm_wred_supported_on_port,
+    sai_vm_wred_reset,
     sai_vm_wred_is_hw_object,
     sai_vm_wred_max_buf_size_get,
     sai_vm_wred_attr_table_get

@@ -35,6 +35,7 @@
 #include <string.h>
 #include "sai_qos_util.h"
 #include "sai_vm_qos.h"
+#include "sai_vm_port.h"
 
 /*
  * VM internal link state change notification handler, which calls back
@@ -46,55 +47,89 @@ static void sai_vm_port_state_change_ntfn (uint32_t count,
                                            sai_port_oper_status_notification_t *data)
 {
 
+    if(data == NULL) {
+        SAI_PORT_LOG_TRACE("NULL data in vm port state change notif");
+        return;
+    }
     if (sai_vm_link_state_callback != NULL) {
         sai_vm_link_state_callback (count, data);
     }
 }
 
-/* Admin state should be reflected in the port Operational state */
-static sai_status_t sai_port_attr_admin_state_set (sai_object_id_t port_id,
-                                                   const sai_attribute_t *attr)
+sai_status_t sai_port_attr_oper_status_set(const sai_npu_port_id_t      npu_port_id, 
+                                           const sai_port_oper_status_t oper_status)
 {
-    sai_status_t ret = SAI_STATUS_FAILURE;
-    sai_attribute_t sai_attr_set;
+    sai_status_t      sai_status = SAI_STATUS_FAILURE;
+    sai_object_id_t   port_id;
+    sai_port_info_t  *port_info;
+    sai_attribute_t   port_attr;
     sai_port_oper_status_notification_t port_oper_state_change;
 
-    memset(&sai_attr_set, 0, sizeof(sai_attribute_t));
-    memset(&port_oper_state_change, 0, sizeof(sai_port_oper_status_notification_t));
+    /* extract port information for the given NPU port number*/
+    port_info = sai_port_info_get_from_npu_phy_port(npu_port_id);
+    if(port_info == NULL) {
+        SAI_PORT_LOG_ERR ("failed retrieving port information from npu port (%d)", npu_port_id);
+        return sai_status;
+    }
 
-    STD_ASSERT(attr != NULL);
+    port_id = port_info->sai_port_id;
 
-    sai_attr_set.id = SAI_PORT_ATTR_OPER_STATUS;
-    sai_attr_set.value.s32 = ((attr->value.booldata) ?
-                              SAI_PORT_OPER_STATUS_UP : SAI_PORT_OPER_STATUS_DOWN);
+    /* 
+     * Retrieve the current state of the interface. 
+     * Compare the newly reported state change with the existing state and only
+     * report if there is a known change.  Avoids unecessary reporting.
+     */
+    memset(&port_attr, 0, sizeof(port_attr));
+    port_attr.id = SAI_PORT_ATTR_OPER_STATUS;
 
+    sai_status = sai_port_attr_info_cache_get( port_id, port_info, &port_attr);
+    if (sai_status != SAI_STATUS_SUCCESS) {
+        SAI_PORT_LOG_ERR ("failed retrieving cached status for port-id (%d), error (%d)", 
+                port_id, sai_status);
+        return sai_status;
+    }
 
-    ret = sai_port_attr_info_cache_set (port_id, &sai_attr_set);
-    if (ret != SAI_STATUS_SUCCESS) {
-        SAI_PORT_LOG_ERR ("Oper status %d cache set for port 0x%"PRIx64" failed "
-                          "with err %d", sai_attr_set.value.s32, port_id, ret);
-        return ret;
+    /* ignore any changes that have already been recorded (in cache) */
+    if (port_attr.value.s32 == oper_status) {
+        return sai_status;
+    }
+
+    memset(&port_attr, 0, sizeof(sai_attribute_t));
+    port_attr.id = SAI_PORT_ATTR_OPER_STATUS;
+    port_attr.value.s32 = oper_status; 
+
+    /* set the changed attributes in cache */
+    sai_status = sai_port_attr_info_cache_set(port_id, port_info, &port_attr);
+    if (sai_status != SAI_STATUS_SUCCESS) {
+        SAI_PORT_LOG_ERR ("Oper status %d cache set for port 0x%"PRIx64" failed with err %d", 
+                port_attr.value.s32, port_id, sai_status);
+        return sai_status;
     }
 
     port_oper_state_change.port_id = port_id;
-    port_oper_state_change.port_state = sai_attr_set.value.s32;
+    port_oper_state_change.port_state = oper_status;
     sai_vm_port_state_change_ntfn(1, &port_oper_state_change);
 
-    return ret;
+    return sai_status;
 }
 
 /* LOOPBACK mode should be reflected in the port Operational state */
 static sai_status_t sai_port_attr_internal_loopback_set (sai_object_id_t port_id,
+                                                         sai_port_info_t *sai_port_info,
                                                          const sai_attribute_t *attr)
 {
     sai_status_t ret = SAI_STATUS_FAILURE;
     sai_attribute_t sai_attr_set;
     sai_port_oper_status_notification_t port_oper_state_change;
 
+    if((attr == NULL ) || (sai_port_info == NULL)) {
+        SAI_PORT_LOG_TRACE("Internal loop back set port_id 0x%"PRIx64" attr is %p"
+                           " sai_port_info is %p", port_id,attr,sai_port_info);
+        return SAI_STATUS_INVALID_PARAMETER;
+    }
     memset (&sai_attr_set, 0, sizeof(sai_attribute_t));
     memset(&port_oper_state_change, 0, sizeof(sai_port_oper_status_notification_t));
 
-    STD_ASSERT(attr != NULL);
 
     sai_attr_set.id = SAI_PORT_ATTR_OPER_STATUS;
     sai_attr_set.value.s32 = (( (attr->value.s32 == SAI_PORT_INTERNAL_LOOPBACK_MODE_PHY) ||
@@ -102,7 +137,7 @@ static sai_status_t sai_port_attr_internal_loopback_set (sai_object_id_t port_id
                               SAI_PORT_OPER_STATUS_UP : SAI_PORT_OPER_STATUS_DOWN);
 
 
-    ret = sai_port_attr_info_cache_set (port_id, &sai_attr_set);
+    ret = sai_port_attr_info_cache_set (port_id, sai_port_info, &sai_attr_set);
     if (ret != SAI_STATUS_SUCCESS) {
         SAI_PORT_LOG_ERR ("Oper status %d cache set for port 0x%"PRIx64" failed "
                           "with err %d", sai_attr_set.value.s32, port_id, ret);
@@ -117,23 +152,21 @@ static sai_status_t sai_port_attr_internal_loopback_set (sai_object_id_t port_id
 }
 
 static sai_status_t sai_npu_port_set_attribute (sai_object_id_t port_id,
+                                                sai_port_info_t *sai_port_info,
                                                 const sai_attribute_t *attr)
 {
-    STD_ASSERT(attr != NULL);
-
-    if (!sai_is_port_valid (port_id)) {
-        SAI_PORT_LOG_ERR ("Port id 0x%"PRIx64" is not valid", port_id);
-
-        return SAI_STATUS_INVALID_PORT_NUMBER;
+    /*NULL check is not required for sai_port_info as cpu port will not have port info structure*/
+    if(attr == NULL ) {
+        SAI_PORT_LOG_TRACE("VM Npu set attribute 0x%"PRIx64" attr is %p sai_port_info is %p",
+                           port_id, attr,sai_port_info);
+        return SAI_STATUS_INVALID_PARAMETER;
     }
 
     switch(attr->id)
     {
-        case SAI_PORT_ATTR_ADMIN_STATE:
-            return sai_port_attr_admin_state_set (port_id, attr);
 
         case SAI_PORT_ATTR_INTERNAL_LOOPBACK_MODE:
-            return sai_port_attr_internal_loopback_set (port_id, attr);
+            return sai_port_attr_internal_loopback_set (port_id, sai_port_info, attr);
 
         default:
             return SAI_STATUS_SUCCESS;
@@ -143,11 +176,18 @@ static sai_status_t sai_npu_port_set_attribute (sai_object_id_t port_id,
 }
 
 static sai_status_t sai_port_attr_current_breakout_mode_get (sai_object_id_t port_id,
+                                                             const sai_port_info_t *sai_port_info,
                                                              sai_attribute_value_t *value)
 {
-    STD_ASSERT (value != NULL);
 
-    value->s32 = sai_port_current_breakout_mode_get (port_id);
+    if((value == NULL) || (sai_port_info == NULL)) {
+        SAI_PORT_LOG_TRACE("Current breakout mode get Port Id is 0x%"PRIx64""
+                           "value is %p sai_port_info is %p",
+                           port_id, value,sai_port_info);
+        return SAI_STATUS_INVALID_PARAMETER;
+    }
+
+    value->s32 = sai_port_current_breakout_mode_get (sai_port_info);
 
     SAI_PORT_LOG_TRACE("Port 0x%"PRIx64" current breakout mode is %d",
                        port_id, value->s32);
@@ -156,46 +196,41 @@ static sai_status_t sai_port_attr_current_breakout_mode_get (sai_object_id_t por
 }
 
 static sai_status_t sai_npu_port_get_attribute (sai_object_id_t port_id,
+                                                const sai_port_info_t *sai_port_info,
                                                 uint_t attr_count,
                                                 sai_attribute_t *attr_list)
 {
     uint_t attr_idx = 0;
     sai_status_t ret_code = SAI_STATUS_FAILURE;
 
-    if (!sai_is_port_valid (port_id)) {
-        SAI_PORT_LOG_ERR ("Port id 0x%"PRIx64" is not valid", port_id);
-
-        return SAI_STATUS_INVALID_PORT_NUMBER;
-    }
-
-    if (!attr_count) {
-        SAI_PORT_LOG_ERR ("Attr get for port 0x%"PRIx64": number of "
-                          "attributes is zero", port_id);
+    /*NULL check is not required for sai_port_info as cpu port will not have port info structure*/
+    if ((attr_count == 0) || (attr_list == NULL)) {
+        SAI_PORT_LOG_TRACE("Get attribute Port Id 0x%"PRIx64" attr_list is %p attr_count is %d"
+                           " sai_port_info is %p",  port_id, attr_list,sai_port_info);
 
         return SAI_STATUS_INVALID_PARAMETER;
     }
 
-    STD_ASSERT(attr_list != NULL);
 
     for(attr_idx = 0; attr_idx < attr_count; attr_idx++) {
 
         switch(attr_list->id) {
             case SAI_PORT_ATTR_TYPE:
-                ret_code = sai_port_attr_type_get (port_id, &attr_list[attr_idx].value);
+                ret_code = sai_port_attr_type_get (port_id, sai_port_info, &attr_list[attr_idx].value);
                 break;
 
             case SAI_PORT_ATTR_HW_LANE_LIST:
-                ret_code = sai_port_attr_hw_lane_list_get (port_id,
+                ret_code = sai_port_attr_hw_lane_list_get (port_id, sai_port_info,
                                                            &attr_list[attr_idx].value);
                 break;
 
             case SAI_PORT_ATTR_SUPPORTED_BREAKOUT_MODE_TYPE:
-                ret_code = sai_port_attr_supported_breakout_mode_get (port_id,
+                ret_code = sai_port_attr_supported_breakout_mode_get (port_id, sai_port_info,
                                                                       &attr_list[attr_idx].value);
                 break;
 
             case SAI_PORT_ATTR_CURRENT_BREAKOUT_MODE_TYPE:
-                ret_code = sai_port_attr_current_breakout_mode_get (port_id,
+                ret_code = sai_port_attr_current_breakout_mode_get (port_id, sai_port_info,
                                                                     &attr_list[attr_idx].value);
                 break;
 
@@ -231,7 +266,6 @@ static sai_status_t sai_npu_port_get_attribute (sai_object_id_t port_id,
             case SAI_PORT_ATTR_QOS_TC_AND_COLOR_TO_DSCP_MAP:
             case SAI_PORT_ATTR_QOS_TC_TO_PRIORITY_GROUP_MAP:
             case SAI_PORT_ATTR_QOS_PFC_PRIORITY_TO_QUEUE_MAP:
-            case SAI_PORT_ATTR_QOS_WRED_PROFILE_ID:
             case SAI_PORT_ATTR_QOS_SCHEDULER_PROFILE_ID:
             case SAI_PORT_ATTR_FLOOD_STORM_CONTROL_POLICER_ID:
             case SAI_PORT_ATTR_BROADCAST_STORM_CONTROL_POLICER_ID:
@@ -244,7 +278,7 @@ static sai_status_t sai_npu_port_get_attribute (sai_object_id_t port_id,
                 break;
 
             default:
-                ret_code = sai_port_attr_info_cache_get (port_id, &attr_list[attr_idx]);
+                ret_code = sai_port_attr_info_cache_get (port_id, sai_port_info, &attr_list[attr_idx]);
         }
 
         if (ret_code != SAI_STATUS_SUCCESS) {
@@ -259,40 +293,31 @@ static sai_status_t sai_npu_port_get_attribute (sai_object_id_t port_id,
 }
 
 static sai_status_t sai_npu_port_get_stats (sai_object_id_t port_id,
+                                            const sai_port_info_t *sai_port_info,
                                             const sai_port_stat_t *counter_ids,
                                             uint32_t number_of_counters,
                                             uint64_t* counters)
 {
-    if (!sai_is_port_valid (port_id)) {
-        SAI_PORT_LOG_ERR ("Port id 0x%"PRIx64" is not valid", port_id);
-
-        return SAI_STATUS_INVALID_PORT_NUMBER;
-    }
-
-    if (!number_of_counters) {
-        SAI_PORT_LOG_ERR ("Stat get for port 0x%"PRIx64": number of "
-                          "counters is zero", port_id);
+    /*NULL check is not required for sai_port_info as cpu port will not have port info structure*/
+    if ((number_of_counters == 0 ) || (counter_ids == NULL) || (counters == NULL)) {
+        SAI_PORT_LOG_TRACE("Get stats port 0x%"PRIx64" counter_ids is %p counters is %p"
+                           " sai_port_info is %p number_of_counters is %d", port_id,
+                           counter_ids, counters,sai_port_info,number_of_counters);
 
         return SAI_STATUS_INVALID_PARAMETER;
     }
 
-    STD_ASSERT(!(counter_ids == NULL));
-    STD_ASSERT(!(counters == NULL));
 
     return SAI_STATUS_SUCCESS;
 }
 
 static sai_status_t sai_npu_port_clear_stats(sai_object_id_t port_id,
+                                             const sai_port_info_t *sai_port_info,
                                              const sai_port_stat_t *counter_ids,
                                              uint32_t number_of_counters)
 {
-    if (!sai_is_port_valid (port_id)) {
-        SAI_PORT_LOG_ERR ("Port id 0x%"PRIx64" is not valid", port_id);
-
-        return SAI_STATUS_INVALID_PORT_NUMBER;
-    }
-
-    if (number_of_counters == 0) {
+    /*NULL check is not required for sai_port_info as cpu port will not have port info structure*/
+    if ((number_of_counters == 0) || (counter_ids == 0)) {
         SAI_PORT_LOG_ERR ("Stat clear for port 0x%"PRIx64": number of "
                           "counters is zero", port_id);
 
@@ -304,13 +329,9 @@ static sai_status_t sai_npu_port_clear_stats(sai_object_id_t port_id,
     return SAI_STATUS_SUCCESS;
 }
 
-static sai_status_t sai_npu_port_clear_all_stats(sai_object_id_t port_id)
+static sai_status_t sai_npu_port_clear_all_stats(sai_object_id_t port_id,
+                                                 const sai_port_info_t *sai_port_info)
 {
-    if (!sai_is_port_valid (port_id)) {
-        SAI_PORT_LOG_ERR ("Port id 0x%"PRIx64" is not valid", port_id);
-
-        return SAI_STATUS_INVALID_PORT_NUMBER;
-    }
 
     return SAI_STATUS_SUCCESS;
 }
@@ -381,8 +402,10 @@ static sai_status_t sai_npu_port_create (sai_object_id_t *port_id,uint32_t attr_
     sai_port_breakout_config_t breakout_cfg;
 
     memset(&breakout_cfg, 0, sizeof(breakout_cfg));
-    STD_ASSERT (port_id != NULL);
-    STD_ASSERT (attr_list != NULL);
+    if((attr_list == NULL) || (port_id == NULL)) {
+        SAI_PORT_LOG_TRACE("VM Npu port create attr_list is %p port_id is %p",attr_list, port_id);
+        return SAI_STATUS_INVALID_PARAMETER;
+    }
     for (attr_idx = 0; attr_idx < attr_count; attr_idx++) {
         if (attr_list[attr_idx].id == SAI_PORT_ATTR_SPEED) {
             breakout_speed = attr_list[attr_idx].value.u32;
@@ -419,13 +442,13 @@ static sai_status_t sai_npu_port_create (sai_object_id_t *port_id,uint32_t attr_
         return SAI_STATUS_INVALID_ATTR_VALUE_0 + npu_id_idx;
     }
 
-    if(!sai_port_is_breakout_mode_supported(port_info->sai_port_id, breakout_mode)) {
+    if(!sai_port_is_breakout_mode_supported(port_info, breakout_mode)) {
         SAI_PORT_LOG_ERR("Breakout mode %d is not supported", breakout_mode);
         return SAI_STATUS_INVALID_ATTR_VALUE_0 + npu_id_idx;
     }
 
     port_info->port_valid = true;
-    prev_breakout_mode = sai_port_current_breakout_mode_get(port_info->sai_port_id);
+    prev_breakout_mode = sai_port_current_breakout_mode_get(port_info);
 
     if (prev_breakout_mode == breakout_mode) {
         *port_id = port_info->sai_port_id;
@@ -435,12 +458,12 @@ static sai_status_t sai_npu_port_create (sai_object_id_t *port_id,uint32_t attr_
     breakout_cfg.new_speed = breakout_speed;
     breakout_cfg.new_mode = breakout_mode;
     breakout_cfg.curr_mode = prev_breakout_mode;
-    sai_rc = sai_port_breakout_mode_update (port_info->sai_port_id, &breakout_cfg);
+    sai_rc = sai_port_breakout_mode_update (port_info, &breakout_cfg);
     if (sai_rc != SAI_STATUS_SUCCESS) {
         SAI_PORT_LOG_ERR ("Breakout mode update failed for port 0x%"PRIx64" with err %d",
                           port_info->sai_port_id, sai_rc);
     } else {
-        sai_port_update_valdity_on_create (port_info->sai_port_id, port_info->sai_port_id, breakout_mode);
+        sai_port_update_valdity_on_create (port_info->sai_port_id, port_info, breakout_mode);
         *port_id = port_info->sai_port_id;
     }
     return sai_rc;
@@ -452,7 +475,8 @@ static sai_status_t sai_npu_port_remove (sai_object_id_t port_id)
     return SAI_STATUS_SUCCESS;
 }
 
-static sai_status_t sai_npu_linkscan_mode_set (sai_object_id_t port_id, bool enable)
+static sai_status_t sai_npu_linkscan_mode_set (sai_object_id_t port_id,
+                                               const sai_port_info_t *sai_port_info, bool enable)
 {
     /* Nothing to be done */
     return SAI_STATUS_SUCCESS;

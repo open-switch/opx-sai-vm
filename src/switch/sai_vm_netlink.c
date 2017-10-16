@@ -30,6 +30,9 @@
 #include "std_socket_tools.h"
 #include "sai_switch_utils.h"
 #include "std_file_utils.h"
+#include "sai_vm_port.h"
+#include "sai_vm_cfg.h"
+#include "sai_port_utils.h"
 
 
 /* Set buffer size to 64K */
@@ -114,9 +117,31 @@ static inline void set_link_promisc (struct ifinfomsg *ifi, const char *name)
                             (name != NULL) ? name : "na", strerror (errno), errno);
     reset_socket();
     }
-
 }
 
+static void sai_vm_state_handler(const char *iface_name, struct ifinfomsg *ifi)
+{
+    sai_npu_port_id_t      npu_port_id;
+    sai_port_oper_status_t port_status = SAI_PORT_OPER_STATUS_UNKNOWN;
+    sai_status_t           status = SAI_STATUS_FAILURE;
+
+    /* determine the nature of the change */
+    if (ifi->ifi_flags & IFF_RUNNING) {
+        port_status = SAI_PORT_OPER_STATUS_UP;
+    } else {
+        port_status = SAI_PORT_OPER_STATUS_DOWN;
+}
+
+    SAI_SWITCH_LOG_TRACE("interface %s is %s", iface_name,
+            port_status == SAI_PORT_OPER_STATUS_UP ? "up" : "down");
+
+    /* find NPU port ID for interface name */
+    status = sai_vm_cfg_find_interface(iface_name, &npu_port_id);
+    if ( status == SAI_STATUS_SUCCESS ) {
+        /* notify SAI state change for port */
+        sai_port_attr_oper_status_set(npu_port_id, port_status);
+    }
+}
 
 static void event_handler (struct sockaddr_nl *nladdr, struct nlmsghdr *n)
 {
@@ -151,6 +176,8 @@ static void event_handler (struct sockaddr_nl *nladdr, struct nlmsghdr *n)
         set_link_promisc (ifi, name);
     }
 
+    /* determine and report any change to the port status */
+    sai_vm_state_handler(name, ifi);
 }
 
 
@@ -227,6 +254,8 @@ void sai_vm_netlink_thread_start (void)
 {
     std_thread_create_param_t thread_param;
     t_std_error rc = STD_ERR_OK;
+    /* Initialize Port Mapping table */
+    sai_vm_cfg_load_interface_cfg();
 
     /* Allocate socket for receiving NetLink Events */
     nl_socket = sock_open ();

@@ -55,9 +55,9 @@ static const dn_sai_attribute_entry_t dn_sai_tunnel_attr[] = {
     { SAI_TUNNEL_ATTR_ENCAP_GRE_KEY_VALID,       false, true, false, true, false, false },
     { SAI_TUNNEL_ATTR_ENCAP_GRE_KEY,             false, true, false, true, false, false },
     { SAI_TUNNEL_ATTR_ENCAP_ECN_MODE,            false, true, false, true, false, false },
-    { SAI_TUNNEL_ATTR_ENCAP_MAPPERS,             false, true, false, true, false, true },
+    { SAI_TUNNEL_ATTR_ENCAP_MAPPERS,             false, true, false, true, true, true },
     { SAI_TUNNEL_ATTR_DECAP_ECN_MODE,            false, true, false, true, false, false },
-    { SAI_TUNNEL_ATTR_DECAP_MAPPERS,             false, true, false, true, false, true },
+    { SAI_TUNNEL_ATTR_DECAP_MAPPERS,             false, true, false, true, true, true },
     { SAI_TUNNEL_ATTR_DECAP_TTL_MODE,            false, true, false, true, true, true },
     { SAI_TUNNEL_ATTR_DECAP_DSCP_MODE,           false, true, false, true, true, true },
 };
@@ -69,6 +69,28 @@ static const dn_sai_attribute_entry_t dn_sai_tunnel_term_attr [] = {
     { SAI_TUNNEL_TERM_TABLE_ENTRY_ATTR_SRC_IP,             true, true, false, true, true, true },
     { SAI_TUNNEL_TERM_TABLE_ENTRY_ATTR_TUNNEL_TYPE,        true, true, false, true, true, true },
     { SAI_TUNNEL_TERM_TABLE_ENTRY_ATTR_ACTION_TUNNEL_ID,   true, true, false, true, true, true },
+};
+
+static const dn_sai_attribute_entry_t dn_tunnel_map_attrs[] = {
+   /*ID                              MC     VC     VS     VG     IMP    SUP*/
+   {SAI_TUNNEL_MAP_ATTR_TYPE,        true,  true,  false, true,  true,  true},
+   {SAI_TUNNEL_MAP_ATTR_ENTRY_LIST,  false, false, false, true,  false, true},
+};
+
+static const dn_sai_attribute_entry_t dn_tunnel_map_entry_attrs[] = {
+    /*ID                                         MC     VC     VS     VG     IMP    SUP*/
+    {SAI_TUNNEL_MAP_ENTRY_ATTR_TUNNEL_MAP_TYPE,  true,  true, false, true,  true,  true },
+    {SAI_TUNNEL_MAP_ENTRY_ATTR_TUNNEL_MAP,       true,  true, false, true,  true,  true },
+    {SAI_TUNNEL_MAP_ENTRY_ATTR_VNI_ID_KEY,       false, true, false, true,  true,  true },
+    {SAI_TUNNEL_MAP_ENTRY_ATTR_VNI_ID_VALUE,     false, true, false, true,  true,  true },
+    {SAI_TUNNEL_MAP_ENTRY_ATTR_BRIDGE_ID_KEY,    false, true, false, true,  true,  true },
+    {SAI_TUNNEL_MAP_ENTRY_ATTR_BRIDGE_ID_VALUE,  false, true, false, true,  true,  true },
+    {SAI_TUNNEL_MAP_ENTRY_ATTR_OECN_KEY,         false, true, false, true,  false, false},
+    {SAI_TUNNEL_MAP_ENTRY_ATTR_OECN_VALUE,       false, true, false, true,  false, false},
+    {SAI_TUNNEL_MAP_ENTRY_ATTR_UECN_KEY,         false, true, false, true,  false, false},
+    {SAI_TUNNEL_MAP_ENTRY_ATTR_UECN_VALUE,       false, true, false, true,  false, false},
+    {SAI_TUNNEL_MAP_ENTRY_ATTR_VLAN_ID_KEY,      false, true, false, true,  false, false},
+    {SAI_TUNNEL_MAP_ENTRY_ATTR_VLAN_ID_VALUE,    false, true, false, true,  false, false},
 };
 
 static void sai_vm_tunnel_obj_attr_table_get (
@@ -90,6 +112,25 @@ static void sai_vm_tunnel_term_obj_attr_table_get (
                     (sizeof(dn_sai_tunnel_term_attr[0]));
 }
 
+static void sai_vm_tunnel_map_attr_table_get(
+                              const dn_sai_attribute_entry_t **p_attr_table,
+                              uint_t *p_attr_count)
+{
+    *p_attr_table = &dn_tunnel_map_attrs[0];
+
+    *p_attr_count = (sizeof(dn_tunnel_map_attrs)) /
+                    (sizeof(dn_tunnel_map_attrs[0]));
+}
+
+static void sai_vm_tunnel_map_entry_attr_table_get(
+                              const dn_sai_attribute_entry_t **p_attr_table,
+                              uint_t *p_attr_count)
+{
+    *p_attr_table = &dn_tunnel_map_entry_attrs[0];
+
+    *p_attr_count = (sizeof(dn_tunnel_map_entry_attrs)) /
+                    (sizeof(dn_tunnel_map_entry_attrs[0]));
+}
 static void sai_vm_tunnel_attr_id_table_get (
                           sai_object_type_t obj_type,
                           const dn_sai_attribute_entry_t **p_attr_table,
@@ -100,6 +141,11 @@ static void sai_vm_tunnel_attr_id_table_get (
 
     } else if (obj_type == SAI_OBJECT_TYPE_TUNNEL_TERM_TABLE_ENTRY) {
         sai_vm_tunnel_term_obj_attr_table_get (p_attr_table, p_attr_count);
+    } else if (obj_type == SAI_OBJECT_TYPE_TUNNEL_MAP) {
+        sai_vm_tunnel_map_attr_table_get (p_attr_table, p_attr_count);
+
+    } else if (obj_type == SAI_OBJECT_TYPE_TUNNEL_MAP_ENTRY) {
+        sai_vm_tunnel_map_entry_attr_table_get (p_attr_table, p_attr_count);
     }
 }
 
@@ -133,6 +179,34 @@ static sai_status_t sai_vm_tunnel_term_entry_remove (
     return SAI_STATUS_SUCCESS;
 }
 
+static sai_status_t sai_vm_tunnel_map_entry_create(dn_sai_tunnel_map_entry_t *p_tunnel_map_entry)
+{
+    STD_ASSERT (p_tunnel_map_entry != NULL);
+
+    return SAI_STATUS_SUCCESS;
+}
+
+static sai_status_t sai_vm_tunnel_map_entry_remove(dn_sai_tunnel_map_entry_t *p_tunnel_map_entry)
+{
+    STD_ASSERT (p_tunnel_map_entry != NULL);
+
+    return SAI_STATUS_SUCCESS;
+}
+
+static sai_status_t sai_vm_tunnel_stats_get (sai_object_id_t tunnel_id, uint32_t num_counters,
+                                              const sai_tunnel_stat_t *counter_ids,
+                                              uint64_t *counters)
+{
+    return SAI_STATUS_SUCCESS;
+}
+
+static sai_status_t sai_vm_tunnel_stats_clear (sai_object_id_t tunnel_id,
+                                                uint32_t num_counters,
+                                                const sai_tunnel_stat_t *counter_ids)
+{
+    return SAI_STATUS_SUCCESS;
+}
+
 static sai_status_t sai_vm_tunnel_obj_attr_validate (const sai_attribute_t *attr)
 {
     return SAI_STATUS_SUCCESS;
@@ -151,6 +225,10 @@ static void sai_vm_tunnel_api_table_fill (sai_npu_tunnel_api_t *tunnel_api_table
     tunnel_api_table->tunnel_obj_attr_validate = sai_vm_tunnel_obj_attr_validate;
     tunnel_api_table->tunnel_term_entry_create = sai_vm_tunnel_term_entry_create;
     tunnel_api_table->tunnel_term_entry_remove = sai_vm_tunnel_term_entry_remove;
+    tunnel_api_table->tunnel_map_entry_create  = sai_vm_tunnel_map_entry_create;
+    tunnel_api_table->tunnel_map_entry_remove  = sai_vm_tunnel_map_entry_remove;
+    tunnel_api_table->tunnel_stats_get         = sai_vm_tunnel_stats_get;
+    tunnel_api_table->tunnel_stats_clear       = sai_vm_tunnel_stats_clear;
 }
 
 sai_npu_tunnel_api_t* sai_vm_tunnel_api_query (void)
