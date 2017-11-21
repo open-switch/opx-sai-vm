@@ -25,6 +25,7 @@
 #include "sai_npu_port.h"
 #include "sai_port_utils.h"
 #include "sai_common_utils.h"
+#include "sai_vm_port_util.h"
 #include "saiport.h"
 #include "saitypes.h"
 #include "saistatus.h"
@@ -195,6 +196,71 @@ static sai_status_t sai_port_attr_current_breakout_mode_get (sai_object_id_t por
     return SAI_STATUS_SUCCESS;
 }
 
+const speed_desc_t* get_speed_map(size_t *sz)
+{
+    const static speed_desc_t speed_map[] = {
+
+        { SAI_PORT_CAP_SPEED_TEN_MEG, SAI_PORT_SPEED_TEN_MEG, SAI_ATTR_VAL_SPEED_10M },
+
+        { SAI_PORT_CAP_SPEED_HUNDRED_MEG, SAI_PORT_SPEED_HUNDRED_MEG, SAI_ATTR_VAL_SPEED_100M },
+
+        { SAI_PORT_CAP_SPEED_GIG, SAI_PORT_SPEED_GIG, SAI_ATTR_VAL_SPEED_1G },
+
+        { SAI_PORT_CAP_SPEED_TEN_GIG, SAI_PORT_SPEED_TEN_GIG, SAI_ATTR_VAL_SPEED_10G },
+
+        { SAI_PORT_CAP_SPEED_TWENTY_FIVE_GIG, SAI_PORT_SPEED_TWENTY_FIVE_GIG, SAI_ATTR_VAL_SPEED_25G },
+
+        { SAI_PORT_CAP_SPEED_FORTY_GIG, SAI_PORT_SPEED_FORTY_GIG, SAI_ATTR_VAL_SPEED_40G }
+    };
+
+    *sz = sizeof(speed_map)/sizeof(speed_desc_t);
+    return speed_map;
+}
+
+static sai_status_t sai_port_attr_supported_speed_get(sai_object_id_t port,
+                                                      const sai_port_info_t *sai_port_info,
+                                                      sai_attribute_value_t *value)
+{
+    uint32_t count = 0;
+    uint32_t index;
+
+    size_t speed_map_sz;
+    speed_desc_t* speed_map= get_speed_map(&speed_map_sz);
+
+    sai_status_t ret_code = SAI_STATUS_SUCCESS;
+    sai_uint32_t sai_port_supported_speed_list[SAI_MAX_SUPPORTED_SPEEDS] = {0};
+
+    if(!sai_is_port_valid(port)) {
+        SAI_PORT_LOG_ERR("Port 0x%"PRIx64" is not a valid logical port", port);
+        return SAI_STATUS_INVALID_OBJECT_ID;
+    }
+
+    sai_port_info = sai_port_info_get(port);
+
+    if (sai_port_info == NULL) {
+        SAI_PORT_LOG_ERR("Port 0x%"PRIx64" is not a valid logical port", port);
+        return SAI_STATUS_INVALID_OBJECT_ID;
+    }
+
+    speed_desc_t *map_entry = NULL;
+
+    for (map_entry=speed_map, index=0; index < speed_map_sz; ++index) {
+
+        if ((map_entry->speed_cap_bit & sai_port_info->port_speed_capb) != 0) {
+            sai_port_supported_speed_list[count++] = map_entry->speed_value;
+        }
+
+        ++map_entry;
+    }
+
+    memcpy(value->u32list.list, sai_port_supported_speed_list, count * sizeof(sai_uint32_t));
+    value->u32list.count = count;
+
+    SAI_PORT_LOG_TRACE("Supported speed get successful for port 0x%"PRIx64" count %d",port, value->s32list.count);
+
+    return ret_code;
+}
+
 static sai_status_t sai_npu_port_get_attribute (sai_object_id_t port_id,
                                                 const sai_port_info_t *sai_port_info,
                                                 uint_t attr_count,
@@ -211,12 +277,28 @@ static sai_status_t sai_npu_port_get_attribute (sai_object_id_t port_id,
         return SAI_STATUS_INVALID_PARAMETER;
     }
 
+    const sai_port_attr_info_t *port_attr_info = sai_port_attr_info_read_only_get(port_id, sai_port_info);
+
+    if (port_attr_info == NULL) {
+          SAI_PORT_LOG_ERR ("Port attr info not found for port 0x%"PRIx64"",port_id);
+    }
 
     for(attr_idx = 0; attr_idx < attr_count; attr_idx++) {
 
         switch(attr_list->id) {
+            case SAI_PORT_ATTR_SUPPORTED_SPEED:
+                ret_code= sai_port_attr_supported_speed_get(port_id, sai_port_info,
+                                                            &attr_list[attr_idx].value);
+                break;
+
+            case SAI_PORT_ATTR_SPEED:
+                attr_list[attr_idx].value.u32=port_attr_info->speed;
+                ret_code = SAI_STATUS_SUCCESS;
+                break;
+
             case SAI_PORT_ATTR_TYPE:
-                ret_code = sai_port_attr_type_get (port_id, sai_port_info, &attr_list[attr_idx].value);
+                ret_code = sai_port_attr_type_get (port_id, sai_port_info, 
+                                                   &attr_list[attr_idx].value);
                 break;
 
             case SAI_PORT_ATTR_HW_LANE_LIST:
