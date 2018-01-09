@@ -88,13 +88,13 @@ static sai_status_t sai_npu_next_hop_remove (sai_fib_nh_t *p_next_hop)
 
     nh_id = sai_uoid_npu_obj_id_get (p_next_hop->next_hop_id);
 
-    SAI_NEXTHOP_LOG_TRACE ("Next Hop Deletion, Next Hop ID: %d.", nh_id);
+    SAI_NEXTHOP_LOG_TRACE ("Next Hop Deletion, Next Hop ID: 0x%"PRIx64".", nh_id);
 
     /* Remove Next Hop record from DB. */
     sai_rc = sai_nexthop_delete_db_entry (p_next_hop->next_hop_id);
 
     if (sai_rc != SAI_STATUS_SUCCESS) {
-        SAI_NEXTHOP_LOG_ERR ("Error removing entry from DB for NH ID %d, "
+        SAI_NEXTHOP_LOG_ERR ("Error removing entry from DB for NH ID 0x%"PRIx64", "
                              "OBJ ID: 0x%"PRIx64".", nh_id,
                              p_next_hop->next_hop_id);
 
@@ -103,7 +103,7 @@ static sai_status_t sai_npu_next_hop_remove (sai_fib_nh_t *p_next_hop)
 
     STD_BIT_ARRAY_SET (sai_vm_access_nh_bitmap (), nh_id);
 
-    SAI_NEXTHOP_LOG_TRACE ("Next Hop ID %d moved to free pool.", nh_id);
+    SAI_NEXTHOP_LOG_TRACE ("Next Hop ID 0x%"PRIx64" moved to free pool.", nh_id);
 
     return SAI_STATUS_SUCCESS;
 }
@@ -120,7 +120,7 @@ static sai_status_t sai_npu_next_hop_attribute_get (sai_fib_nh_t *p_next_hop,
     STD_ASSERT (p_next_hop != NULL);
     STD_ASSERT (p_attr_list != NULL);
 
-    SAI_NEXTHOP_LOG_TRACE ("Next Hop attribute get request for NH ID: %d, "
+    SAI_NEXTHOP_LOG_TRACE ("Next Hop attribute get request for NH ID: 0x%"PRIx64", "
                            "attr_count: %d.", p_next_hop->next_hop_id,
                            attr_count);
 
@@ -171,14 +171,14 @@ static sai_status_t sai_npu_next_hop_attribute_get (sai_fib_nh_t *p_next_hop,
 
         if (status != SAI_STATUS_SUCCESS) {
             SAI_NEXTHOP_LOG_ERR ("Failure in filling Next Hop attr list at "
-                                 "index: %d for Next Hop Id: %d.",
+                                 "index: %d for Next Hop Id: 0x%"PRIx64".",
                                  attr_index, p_next_hop->next_hop_id);
 
             return (sai_fib_attr_status_code_get (status, attr_index));
         }
     }
 
-    SAI_NEXTHOP_LOG_TRACE ("Next Hop attribute get for NH ID: %d is "
+    SAI_NEXTHOP_LOG_TRACE ("Next Hop attribute get for NH ID: 0x%"PRIx64" is "
                            "successful.", p_next_hop->next_hop_id);
 
     return SAI_STATUS_SUCCESS;

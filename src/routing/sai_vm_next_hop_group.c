@@ -92,14 +92,14 @@ static sai_status_t sai_npu_next_hop_group_remove (sai_fib_nh_group_t *p_group)
 
     nh_grp_id = (uint_t) sai_uoid_npu_obj_id_get (p_group->key.group_id);
 
-    SAI_NH_GROUP_LOG_TRACE ("NH Group Deletion, ID: %d.", nh_grp_id);
+    SAI_NH_GROUP_LOG_TRACE ("NH Group Deletion, ID: 0x%"PRIx64".", nh_grp_id);
 
     /* Remove Next Hop Group record from DB. */
     sai_rc = sai_nh_group_delete_db_entry (p_group->key.group_id);
 
     if (sai_rc != SAI_STATUS_SUCCESS) {
         SAI_NH_GROUP_LOG_ERR ("Error removing entry from DB for NH GRP ID: "
-                              "%d, OBJ ID: 0x%"PRIx64".", nh_grp_id,
+                              "0x%"PRIx64", OBJ ID: 0x%"PRIx64".", nh_grp_id,
                               p_group->key.group_id);
 
         return SAI_STATUS_FAILURE;
@@ -107,7 +107,7 @@ static sai_status_t sai_npu_next_hop_group_remove (sai_fib_nh_group_t *p_group)
 
     STD_BIT_ARRAY_SET (sai_vm_access_nh_grp_bitmap (), nh_grp_id);
 
-    SAI_NH_GROUP_LOG_TRACE ("NH Group ID %d moved to free pool.", nh_grp_id);
+    SAI_NH_GROUP_LOG_TRACE ("NH Group ID 0x%"PRIx64" moved to free pool.", nh_grp_id);
 
     return SAI_STATUS_SUCCESS;
 }

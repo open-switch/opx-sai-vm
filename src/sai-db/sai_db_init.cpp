@@ -77,6 +77,13 @@ sai_status_t sai_vm_db_init (void)
         return SAI_STATUS_FAILURE;
     }
 
+    if (db_sql_open ((void **)&db, std::string(db_path).c_str())
+        != STD_ERR_OK) {
+        SAI_VM_DB_LOG_ERR ("Error getting database handle.");
+
+        return SAI_STATUS_FAILURE;
+    }
+
     for (grp_idx = 0; grp_idx < num_obj_grp; grp_idx++) {
         const char *delete_script =
             std_config_file_get (cfg_file_handle, obj_grp_name [grp_idx],
@@ -115,13 +122,6 @@ sai_status_t sai_vm_db_init (void)
     }
 
     std_config_file_close (cfg_file_handle);
-
-    if (db_sql_open ((void **)&db, std::string(db_path).c_str())
-        != STD_ERR_OK) {
-        SAI_VM_DB_LOG_ERR ("Error getting database handle.");
-
-        return SAI_STATUS_FAILURE;
-    }
 
     return SAI_STATUS_SUCCESS;
 }

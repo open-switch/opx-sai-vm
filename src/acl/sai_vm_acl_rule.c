@@ -182,15 +182,15 @@ sai_status_t sai_npu_create_acl_rule (sai_acl_table_t *acl_table,
     sai_rc = sai_acl_rule_create_db_entry (acl_rule);
 
     if (sai_rc != SAI_STATUS_SUCCESS) {
-        SAI_ACL_LOG_ERR ("Error inserting entry to DB for ACL Entry: %d, "
+        SAI_ACL_LOG_ERR ("Error inserting entry to DB for ACL Entry: 0x%"PRIx64", "
                          "OBJ ID: %"PRIx64".", sai_uoid_npu_obj_id_get(acl_rule->rule_key.acl_id)
                          , acl_rule->rule_key.acl_id);
 
         return sai_rc;
     }
 
-    SAI_ACL_LOG_TRACE ("ACL Entry Creation success, Entry ID: %d, Obj Id: "
-                       " 0x%"PRIx64" on Table Id: %d, Obj Id: 0x%"PRIx64".",
+    SAI_ACL_LOG_TRACE ("ACL Entry Creation success, Entry ID: 0x%"PRIx64", Obj Id: "
+                       " 0x%"PRIx64" on Table Id: 0x%"PRIx64", Obj Id: 0x%"PRIx64".",
                        sai_uoid_npu_obj_id_get(acl_rule->rule_key.acl_id),
                        acl_rule->rule_key.acl_id, table_id,
                        acl_table->table_key.acl_table_id);
@@ -217,15 +217,15 @@ sai_status_t sai_npu_delete_acl_rule (sai_acl_table_t *acl_table,
     sai_rc = sai_acl_rule_delete_db_entry (acl_rule);
 
     if (sai_rc != SAI_STATUS_SUCCESS) {
-        SAI_ACL_LOG_ERR ("Error removing entry from DB for ACL entry %d, "
+        SAI_ACL_LOG_ERR ("Error removing entry from DB for ACL entry 0x%"PRIx64", "
                          "Object ID: 0x%" PRIx64 ".", entry_id,
                          acl_rule->rule_key.acl_id);
 
         return sai_rc;
     }
 
-    SAI_ACL_LOG_TRACE ("ACL Entry deletion success, Entry ID: %d, Obj Id: "
-                       " 0x%"PRIx64" from Table Id: %d Obj Id: 0x%"PRIx64".",
+    SAI_ACL_LOG_TRACE ("ACL Entry deletion success, Entry ID: 0x%"PRIx64", Obj Id: "
+                       " 0x%"PRIx64" from Table Id: 0x%"PRIx64" Obj Id: 0x%"PRIx64".",
                        entry_id, acl_rule->rule_key.acl_id, table_id,
                        acl_table->table_key.acl_table_id);
 

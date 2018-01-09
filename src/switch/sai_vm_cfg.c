@@ -18,7 +18,6 @@
 #include "std_llist.h"
 #include "std_utils.h"
 #include "sai_switch_utils.h"
-#include "sai_vm_cfg.h"
 #include <stdlib.h>
 
 /* Configuration XML file describing the interface to port mapping */

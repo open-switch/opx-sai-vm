@@ -27,8 +27,8 @@
 #include "saitypes.h"
 #include "saifdb.h"
 
-sai_status_t sai_get_port_for_fdb_entry (const sai_fdb_entry_t *fdb_entry,
-                                         sai_object_id_t *port_id);
+sai_status_t sai_get_bridge_port_for_fdb_entry (const sai_fdb_entry_t *fdb_entry,
+                                                sai_object_id_t *bridge_port_id);
 
 
 #endif /* __SAI_VM_L2_UTIL_H__ */

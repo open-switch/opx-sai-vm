@@ -26,14 +26,13 @@
 #include "sai_vm_npu_sim_info.h"
 #include "sai_switch_db_api.h"
 #include "sai_vm_port_util.h"
-#include "sai_vm_netlink.h"
 #include "saiswitch.h"
 #include "sai_npu_switch.h"
 #include "sai_switch_common.h"
 #include "sai_switch_utils.h"
-#include "sai_port_utils.h"
 #include "sai_l3_util.h"
 #include "sai_acl_type_defs.h"
+#include "sai_vm_vport_event.h"
 #include "saitypes.h"
 #include "saistatus.h"
 #include "std_bit_masks.h"
@@ -188,7 +187,7 @@ static sai_status_t sai_npu_switch_init (sai_switch_info_t *sai_switch_info)
                             "DB table.", attr.id);
     }
 
-    sai_vm_netlink_thread_start();
+    sai_vm_vport_event_init();
 
     return ret_code;
 }
@@ -234,7 +233,7 @@ static sai_status_t sai_npu_switching_mode_set (const sai_switch_switching_mode_
                 break;
             }
         } else {
-            SAI_SWITCH_LOG_ERR ("Mode %d is not a valid mode");
+            SAI_SWITCH_LOG_ERR ("Mode %d is not a valid mode", mode);
 
             ret = SAI_STATUS_INVALID_ATTR_VALUE_0;
             break;

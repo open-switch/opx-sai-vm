@@ -27,6 +27,7 @@
 #include "sai_npu_fdb.h"
 #include "sai_fdb_common.h"
 #include "sai_fdb_api.h"
+#include "sai_vlan_api.h"
 #include "sai_switch_common.h"
 #include "sai_switch_utils.h"
 #include "saifdb.h"
@@ -34,26 +35,55 @@
 #include "saitypes.h"
 #include "saistatus.h"
 #include "std_mac_utils.h"
-#include "std_type_defs.h"
 #include "std_assert.h"
 #include <string.h>
 #include <inttypes.h>
+#include <stdio.h>
 
-sai_status_t sai_npu_fdb_init (void)
+#define BR_PATH_NAME_SZ (256)
+#define BR_FLUSH_PATH "/sys/devices/virtual/net/br%u/bridge/flush"
+
+static void bridge_flush(sai_object_id_t bv_id)
+{
+    // Only for dynamic FDB types, no means to deal with STATIC MAC address entries
+    if (bv_id != SAI_NULL_OBJECT_ID) {
+        sai_vlan_id_t vlan_id = sai_vlan_obj_id_to_vlan_id(bv_id);
+        if(sai_is_valid_vlan_id(vlan_id)) {
+
+            // TODO get_bridge_name using a configurable parameter for bridge names, rather than br<VLANID>
+            char name[BR_PATH_NAME_SZ];
+            snprintf(name, sizeof(name), BR_FLUSH_PATH, (unsigned int)vlan_id);
+            FILE *f=fopen(name, "w");
+            if (f != NULL) {
+                fprintf(f, "1\n\r");
+                fclose(f);
+            }
+            else {
+                SAI_FDB_LOG_ERR ("Cannot open %s errno=%s(%d)", name, strerror(errno), errno);
+            }
+        }
+        else {
+            SAI_FDB_LOG_ERR ("Not a valid VLAN, vlan_id = %u",(unsigned int)vlan_id);
+        }
+    }
+}
+
+static sai_status_t sai_npu_fdb_init (void)
 {
     return SAI_STATUS_SUCCESS;
 }
 
-sai_status_t sai_npu_flush_all_fdb_entries (sai_object_id_t port_id,
-                                            sai_vlan_id_t vlan_id, bool delete_all,
+static sai_status_t sai_npu_flush_all_fdb_entries (sai_object_id_t bridge_port_id,
+                                            sai_object_id_t bv_id, bool delete_all,
                                             sai_fdb_flush_entry_type_t flush_type)
 {
     sai_status_t sai_rc = SAI_STATUS_SUCCESS;
-    SAI_FDB_LOG_TRACE ("FDB bulk flush operation, port: "
-                       "0x%"PRIx64", vlan: %d delete all:%d flush type:%d. ",
-                       port_id, vlan_id, delete_all, flush_type);
 
-    sai_rc = sai_fdb_delete_all_db_entries (port_id, vlan_id, delete_all, flush_type);
+    SAI_FDB_LOG_TRACE ("FDB bulk flush operation, port: "
+                       "0x%"PRIx64", vlan/bridge: 0x%"PRIx64" delete all:%d flush type:%d. ",
+                       bridge_port_id, bv_id, delete_all, flush_type);
+    bridge_flush(bv_id);
+    sai_rc = sai_fdb_delete_all_db_entries (bridge_port_id, bv_id, delete_all, flush_type);
     if (sai_rc != SAI_STATUS_SUCCESS) {
         SAI_FDB_LOG_ERR ("NPU Flush all failed with error %d. ",sai_rc);
     }
@@ -64,24 +94,30 @@ static sai_status_t sai_npu_flush_fdb_entry (const sai_fdb_entry_t* fdb_entry, b
 {
     sai_status_t sai_rc = SAI_STATUS_SUCCESS;
     char         mac_str [SAI_MAC_STR_LEN] = {0};
+    static sai_mac_t null_mac_addr = {0,0,0,0,0,0};
 
     STD_ASSERT(fdb_entry != NULL);
 
-    SAI_FDB_LOG_TRACE ("FDB Entry flush for MAC: %s vlan: %d",
+    SAI_FDB_LOG_TRACE ("FDB Entry flush for MAC: %s vlan/bridge: 0x%"PRIx64"",
                           std_mac_to_string (&(fdb_entry->mac_address),
                                              mac_str, sizeof (mac_str)),
-                          fdb_entry->vlan_id);
+                          fdb_entry->bv_id);
 
-    /* Remove FDB record from DB. */
-    sai_rc = sai_fdb_delete_db_entry (fdb_entry);
+    if (memcmp(fdb_entry->mac_address, null_mac_addr, sizeof(sai_mac_t)) != 0) {
+        /* Remove FDB record from DB. */
+        sai_rc = sai_fdb_delete_db_entry (fdb_entry);
 
-    if (sai_rc != SAI_STATUS_SUCCESS) {
-        SAI_FDB_LOG_ERR ("Error removing FDB entry from DB for MAC: %s, "
-                            "vlan: %d.", std_mac_to_string
+        if (sai_rc != SAI_STATUS_SUCCESS) {
+            SAI_FDB_LOG_ERR ("Error removing FDB entry from DB for MAC: %s, "
+                            "vlan/bridge: 0x%"PRIx64".", std_mac_to_string
                             (&(fdb_entry->mac_address), mac_str,
-                             sizeof (mac_str)), fdb_entry->vlan_id);
+                             sizeof (mac_str)), fdb_entry->bv_id);
 
-        return SAI_STATUS_FAILURE;
+            return SAI_STATUS_FAILURE;
+        }
+    }
+    else {
+        bridge_flush(fdb_entry->bv_id);
     }
 
     return SAI_STATUS_SUCCESS;
@@ -96,12 +132,11 @@ static sai_status_t sai_npu_create_fdb_entry (const sai_fdb_entry_t *fdb_entry,
     STD_ASSERT(fdb_entry != NULL);
     STD_ASSERT(fdb_entry_node_data != NULL);
 
-    SAI_FDB_LOG_TRACE ("FDB Entry create for MAC: %s vlan: %d on port: "
-                          "0x%"PRIx64", entry_type: %d, packet action: %d.",
-                          "FDB Meta Data: %d",
+    SAI_FDB_LOG_TRACE ("FDB Entry create for MAC: %s vlan/bridge: 0x%"PRIx64" on bridge port: "
+                          "0x%"PRIx64", entry_type: %d, packet action: %d. FDB Meta Data: %d",
                           std_mac_to_string (&(fdb_entry->mac_address),
                                              mac_str, sizeof (mac_str)),
-                          fdb_entry->vlan_id, fdb_entry_node_data->port_id,
+                          fdb_entry->bv_id, fdb_entry_node_data->bridge_port_id,
                           fdb_entry_node_data->entry_type, fdb_entry_node_data->action,
                           fdb_entry_node_data->metadata);
 
@@ -110,9 +145,9 @@ static sai_status_t sai_npu_create_fdb_entry (const sai_fdb_entry_t *fdb_entry,
 
     if (sai_rc != SAI_STATUS_SUCCESS) {
         SAI_FDB_LOG_ERR ("Error inserting FDB entry to DB for MAC: %s, "
-                            "vlan: %d.", std_mac_to_string
+                            "vlan/bridge: 0x%"PRIx64"", std_mac_to_string
                             (&(fdb_entry->mac_address), mac_str,
-                             sizeof (mac_str)), fdb_entry->vlan_id);
+                             sizeof (mac_str)), fdb_entry->bv_id);
 
         return SAI_STATUS_FAILURE;
     }
@@ -136,29 +171,29 @@ sai_fdb_entry_node_t *fdb_entry_node)
     char            mac_str [SAI_MAC_STR_LEN] = {0};
     sai_fdb_entry_t sai_fdb_entry;
 
-    SAI_FDB_LOG_TRACE ("FDB Entry attribute set for MAC: %s vlan: %d",
+    SAI_FDB_LOG_TRACE ("FDB Entry attribute set for MAC: %s vlan/bridge: 0x%"PRIx64"",
                           std_mac_to_string ((const sai_mac_t *)
                            &(fdb_entry_node->fdb_key.mac_address), mac_str,
-                           sizeof (mac_str)), fdb_entry_node->fdb_key.vlan_id);
+                           sizeof (mac_str)), fdb_entry_node->fdb_key.bv_id);
 
     /* Insert FDB record to DB. */
     memcpy (&sai_fdb_entry.mac_address, &(fdb_entry_node->fdb_key.mac_address),
             sizeof (sai_mac_t));
 
-    sai_fdb_entry.vlan_id = fdb_entry_node->fdb_key.vlan_id;
+    sai_fdb_entry.bv_id = fdb_entry_node->fdb_key.bv_id;
 
     /* Update FDB record in DB with attribute set info. */
     sai_rc = sai_fdb_set_db_entry ((const sai_fdb_entry_t *)&sai_fdb_entry,
-                                   fdb_entry_node->port_id,
+                                   fdb_entry_node->bridge_port_id,
                                    fdb_entry_node->entry_type,
                                    fdb_entry_node->action,
                                    fdb_entry_node->metadata);
 
     if (sai_rc != SAI_STATUS_SUCCESS) {
         SAI_FDB_LOG_ERR ("Error updating FDB entry to DB for MAC: %s, "
-                            "vlan: %d.", std_mac_to_string
+                            "vlan/bridge: 0x%"PRIx64".", std_mac_to_string
                             ((const sai_mac_t *)&(sai_fdb_entry.mac_address),
-                             mac_str, sizeof (mac_str)), sai_fdb_entry.vlan_id);
+                             mac_str, sizeof (mac_str)), sai_fdb_entry.bv_id);
 
         return SAI_STATUS_FAILURE;
     }
@@ -433,19 +468,19 @@ static sai_status_t sai_npu_mcast_cpu_flood_enable_get (bool *enable)
     return SAI_STATUS_SUCCESS;
 }
 
-sai_status_t sai_get_port_for_fdb_entry (const sai_fdb_entry_t *fdb_entry,
-                                         sai_object_id_t *port_id)
+sai_status_t sai_get_bridge_port_for_fdb_entry (const sai_fdb_entry_t *fdb_entry,
+                                         sai_object_id_t *bridge_port_id)
 {
     sai_fdb_entry_node_t fdb_entry_node;
     char                 mac_str [SAI_MAC_STR_LEN] = {0};
     sai_status_t         ret_val = SAI_STATUS_FAILURE;
 
     STD_ASSERT(fdb_entry != NULL);
-    STD_ASSERT(port_id != NULL);
+    STD_ASSERT(bridge_port_id != NULL);
 
     sai_fdb_lock ();
 
-    if (sai_fdb_get_port_from_cache (fdb_entry, port_id) !=
+    if (sai_fdb_get_bridge_port_from_cache (fdb_entry, bridge_port_id) !=
         SAI_STATUS_SUCCESS) {
         memset (&fdb_entry_node, 0, sizeof(sai_fdb_entry_node_t));
 
@@ -453,26 +488,26 @@ sai_status_t sai_get_port_for_fdb_entry (const sai_fdb_entry_t *fdb_entry,
             sai_npu_get_fdb_entry_from_hardware (fdb_entry, &fdb_entry_node);
 
         if (ret_val != SAI_STATUS_SUCCESS) {
-            SAI_FDB_LOG_ERR ("FDB Entry not found for MAC: %s vlan: %d",
+            SAI_FDB_LOG_ERR ("FDB Entry not found for MAC: %s vlan/bridge: 0x%"PRIx64"",
                                 std_mac_to_string (&(fdb_entry->mac_address),
                                                    mac_str, sizeof (mac_str)),
-                                fdb_entry->vlan_id);
+                                fdb_entry->bv_id);
 
             sai_fdb_unlock ();
 
             return ret_val;
         }
 
-        *port_id = fdb_entry_node.port_id;
+        *bridge_port_id = fdb_entry_node.bridge_port_id;
 
         /* Adding to cache to be used for future calls */
         ret_val = sai_insert_fdb_entry_node (fdb_entry,&fdb_entry_node);
 
         if (ret_val != SAI_STATUS_SUCCESS) {
-            SAI_FDB_LOG_WARN ("Unable to cache FDB entry MAC: %s, vlan: %d",
+            SAI_FDB_LOG_WARN ("Unable to cache FDB entry MAC: %s, vlan/bridge: 0x%"PRIx64"",
                                 std_mac_to_string (&(fdb_entry->mac_address),
                                                    mac_str, sizeof(mac_str)),
-                                fdb_entry->vlan_id);
+                                fdb_entry->bv_id);
         }
     }
 

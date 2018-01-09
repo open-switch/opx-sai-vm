@@ -169,6 +169,18 @@ static sai_status_t sai_npu_vlan_stp_get (sai_vlan_id_t vlan_id,
     return SAI_STATUS_SUCCESS;
 }
 
+static sai_status_t sai_npu_stp_port_notif_handler(sai_object_id_t port_id, bool create)
+{
+    return SAI_STATUS_SUCCESS;
+}
+
+static sai_status_t sai_npu_stp_port_lag_handler(const dn_sai_stp_port_info_t *p_stp_port_info,
+                                                 sai_object_id_t lag_id, uint_t port_cnt,
+                                                 sai_object_id_t *port_list, bool is_add)
+{
+    return SAI_STATUS_SUCCESS;
+}
+
 static sai_npu_stp_api_t sai_vm_stp_api_table = {
     sai_npu_stp_init,
     sai_npu_stp_default_instance_get,
@@ -180,6 +192,8 @@ static sai_npu_stp_api_t sai_vm_stp_api_table = {
     sai_npu_stp_port_state_set,
     sai_npu_stp_port_state_get,
     sai_npu_vlan_stp_get,
+    sai_npu_stp_port_notif_handler,
+    sai_npu_stp_port_lag_handler,
 };
 
 sai_npu_stp_api_t* sai_vm_stp_api_query (void)

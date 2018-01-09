@@ -20,6 +20,7 @@
 #include "sai_l2mc_common.h"
 #include "sai_l2mc_api.h"
 #include "sai_port_utils.h"
+#include <inttypes.h>
 
 static dn_sai_id_gen_info_t l2mc_obj_gen_info;
 static dn_sai_id_gen_info_t l2mc_group_obj_gen_info;
@@ -94,15 +95,14 @@ static sai_status_t sai_vm_l2mc_group_create(dn_sai_l2mc_group_node_t *l2mc_grou
     return SAI_STATUS_SUCCESS;
 }
 
-static sai_status_t sai_vm_l2mc_group_delete(const dn_sai_l2mc_group_node_t *l2mc_group_node)
+static sai_status_t sai_vm_l2mc_group_delete(dn_sai_l2mc_group_node_t *l2mc_group_node)
 {
 
     STD_ASSERT(l2mc_group_node != NULL);
-    if(sai_is_obj_id_l2mc_group(l2mc_group_node->l2mc_group_id)) {
-        SAI_L2MC_LOG_ERR("Wrong l2mc_group_id");
+    if(!sai_is_obj_id_l2mc_group(l2mc_group_node->l2mc_group_id)) {
+        SAI_L2MC_LOG_ERR("Wrong l2mc_group_id 0x%"PRIx64"", l2mc_group_node->l2mc_group_id);
         return SAI_STATUS_FAILURE;
     }
-
     return SAI_STATUS_SUCCESS;
 }
 
@@ -111,8 +111,8 @@ static sai_status_t sai_vm_l2mc_member_remove(
 {
 
     STD_ASSERT(l2mc_member_node != NULL);
-    if(sai_is_obj_id_l2mc_member(l2mc_member_node->l2mc_member_id)) {
-        SAI_L2MC_LOG_ERR("Wrong l2mc_member_id");
+    if(!sai_is_obj_id_l2mc_member(l2mc_member_node->l2mc_member_id)) {
+        SAI_L2MC_LOG_ERR("Wrong l2mc_member_id 0x%"PRIx64"", l2mc_member_node->l2mc_member_id);
         return SAI_STATUS_FAILURE;
     }
     return SAI_STATUS_SUCCESS;
@@ -131,12 +131,29 @@ static sai_status_t sai_vm_l2mc_member_create(dn_sai_l2mc_member_node_t *l2mc_me
     return SAI_STATUS_SUCCESS;
 }
 
+static sai_status_t sai_vm_l2mc_member_lag_notif_handler(const dn_sai_l2mc_member_node_t
+                                                         *l2mc_member_node,
+                                                         sai_object_id_t lag_id,
+                                                         uint_t port_cnt,
+                                                         const sai_object_id_t *port_list,
+                                                         bool is_add)
+{
+    return SAI_STATUS_SUCCESS;
+}
+
+void sai_vm_l2mc_group_dump_hw_info(const void *hw_info)
+{
+    STD_ASSERT(hw_info != NULL);
+}
+
 static sai_npu_l2mc_api_t sai_vm_l2mc_api_table = {
     sai_vm_l2mc_init,
     sai_vm_l2mc_group_create,
     sai_vm_l2mc_group_delete,
     sai_vm_l2mc_member_create,
     sai_vm_l2mc_member_remove,
+    sai_vm_l2mc_member_lag_notif_handler,
+    sai_vm_l2mc_group_dump_hw_info
 };
 
 sai_npu_l2mc_api_t* sai_vm_l2mc_api_query (void)

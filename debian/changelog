@@ -1,9 +1,10 @@
-opx-sai-vm (16.0.0+opx1) unstable; urgency=medium
+opx-sai-vm (17.1.0) unstable; urgency=medium
 
-  * Update: Defined Supported speed initalization information
-  * Update: Added function to get supported speed values
-
- -- Dell EMC <ops-dev@lists.openswitch.net>  Tue, 19 Dec 2017  08:10:00 -0800
+  * Update: VLAN ID made as non-mandatory attribute
+  * Update: Force FDB flush for VM. This allows MAC address flooding and traffic recovery in case of link breakages.
+  * Update: Implement VM packet I/O using SAI Host IF.
+ 
+ -- Dell EMC <ops-dev@lists.openswitch.net>  Thu, 12 Dec 2017  11:00:00 -0800
 
 opx-sai-vm (16.0.0) unstable; urgency=medium
 

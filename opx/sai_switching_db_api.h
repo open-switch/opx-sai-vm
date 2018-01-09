@@ -52,13 +52,13 @@ sai_status_t sai_fdb_create_db_entry (const sai_fdb_entry_t *fdb_entry,
 /*
  * @brief Set attributes of an existing entry in the FDB database table
  * @param fdb_entry - SAI FDB entry info which contains MAC address and VLAN.
- * @param port_id   - SAI port object ID for the FDB entry.
+ * @param bridge_port_id   - SAI port object ID for the FDB entry.
  * @param entry_type - Static or dynamic entry type.
  * @param action     - FDB entry packet action.
  * @return sai status code
  */
 sai_status_t sai_fdb_set_db_entry (const sai_fdb_entry_t *fdb_entry,
-                                   sai_object_id_t port_id,
+                                   sai_object_id_t bridge_port_id,
                                    sai_fdb_entry_type_t entry_type,
                                    sai_packet_action_t action,
                                    uint_t metadata);
@@ -73,14 +73,14 @@ sai_status_t sai_fdb_delete_db_entry (const sai_fdb_entry_t* fdb_entry);
 /*
  * @brief Delete the FDB entries for the given port and vlan from the FDB
  * database table
- * @param port_id - SAI port object ID.
- * @param vlan_id - VLAN ID.
+ * @param bridge_port_id - SAI port object ID.
+ * @param bv_id - Bridge or VLAN Object ID.
  * @param delete_all - Delete both static and dynamic entry types
  * @param flush_type - Entry type to be flushed either static or dynamic or all
  * @return sai status code
  */
-sai_status_t sai_fdb_delete_all_db_entries (sai_object_id_t port_id,
-                                            sai_vlan_id_t vlan_id, bool delete_all,
+sai_status_t sai_fdb_delete_all_db_entries (sai_object_id_t bridge_port_id,
+                                            sai_object_id_t bv_id, bool delete_all,
                                             sai_fdb_flush_entry_type_t flush_type);
 
 
@@ -105,7 +105,7 @@ sai_status_t sai_vlan_delete_db_entry (sai_vlan_id_t vlan_id);
  * @return sai status code
  */
 sai_status_t sai_vlan_set_db_entry (sai_vlan_id_t vlan_id,
-                                    sai_attribute_t *p_attr);
+                                    const sai_attribute_t *p_attr);
 
 /*
  * @brief Update the port added to the VLAN on the VLAN PORT LIST
@@ -114,7 +114,7 @@ sai_status_t sai_vlan_set_db_entry (sai_vlan_id_t vlan_id,
  * @return sai status code
  */
 sai_status_t sai_vlan_add_port_list_to_db_entry(
-        sai_vlan_member_node_t vlan_member_node);
+        const sai_vlan_member_node_t *vlan_member_node);
 
 /*
  * @brief Update the port deleted from the VLAN on the VLAN PORT LIST
@@ -123,7 +123,7 @@ sai_status_t sai_vlan_add_port_list_to_db_entry(
  * @return sai status code
  */
 sai_status_t sai_vlan_delete_port_list_from_db_entry(
-        sai_vlan_member_node_t vlan_member_node);
+        const sai_vlan_member_node_t *vlan_member_node);
 
 #ifdef __cplusplus
 }

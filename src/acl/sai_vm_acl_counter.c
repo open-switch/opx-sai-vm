@@ -64,7 +64,7 @@ sai_status_t sai_npu_create_acl_cntr (sai_acl_table_t *acl_table,
                                    SAI_VM_ACL_TABLE_MAX_COUNTERS, 0);
 
     if (free_idx < 0) {
-        SAI_ACL_LOG_ERR ("No more free counters available on ACL TABLE %d "
+        SAI_ACL_LOG_ERR ("No more free counters available on ACL TABLE 0x%"PRIx64" "
                          "(object Id: 0x%"PRIx64").", table_id,
                          acl_cntr->table_id);
 
@@ -91,7 +91,7 @@ sai_status_t sai_npu_create_acl_cntr (sai_acl_table_t *acl_table,
     STD_BIT_ARRAY_CLR (sai_vm_access_acl_cntr_bitmap (table_id), free_idx);
 
     SAI_ACL_LOG_TRACE ("ACL Counter Creation success, Cntr ID: %d, Obj Id: "
-                       " 0x%"PRIx64" on Table Id: %d Obj Id: 0x%"PRIx64".",
+                       " 0x%"PRIx64" on Table Id: 0x%"PRIx64" Obj Id: 0x%"PRIx64".",
                        cntr_id, cntr_obj_id, table_id, acl_cntr->table_id);
 
     return SAI_STATUS_SUCCESS;
@@ -116,7 +116,7 @@ sai_status_t sai_npu_delete_acl_cntr (sai_acl_counter_t *acl_cntr)
     sai_rc = sai_acl_counter_delete_db_entry (acl_cntr);
 
     if (sai_rc != SAI_STATUS_SUCCESS) {
-        SAI_ACL_LOG_ERR ("Error removing entry from DB for ACL Counter %d, "
+        SAI_ACL_LOG_ERR ("Error removing entry from DB for ACL Counter 0x%"PRIx64", "
                          "Object ID: 0x%" PRIx64 ".", cntr_id,
                          acl_cntr->counter_key.counter_id);
 
@@ -127,8 +127,8 @@ sai_status_t sai_npu_delete_acl_cntr (sai_acl_counter_t *acl_cntr)
 
     STD_BIT_ARRAY_SET (sai_vm_access_acl_cntr_bitmap (table_id), bitmap_idx);
 
-    SAI_ACL_LOG_TRACE ("ACL Counter deletion success, Cntr ID: %d, Obj Id: "
-                       " 0x%"PRIx64" from Tbl ID: %d, Obj Id: 0x%"PRIx64".",
+    SAI_ACL_LOG_TRACE ("ACL Counter deletion success, Cntr ID: 0x%"PRIx64", Obj Id: "
+                       " 0x%"PRIx64" from Tbl ID: 0x%"PRIx64", Obj Id: 0x%"PRIx64".",
                        cntr_id, acl_cntr->counter_key.counter_id, table_id,
                        acl_cntr->table_id);
 
@@ -148,7 +148,7 @@ sai_status_t sai_npu_set_acl_cntr (sai_acl_counter_t *acl_cntr,
     sai_rc = sai_acl_counter_db_entry_set_cntrs (acl_cntr, count_value);
 
     if (sai_rc != SAI_STATUS_SUCCESS) {
-        SAI_ACL_LOG_ERR ("Error setting counter value %d in DB entry for "
+        SAI_ACL_LOG_ERR ("Error setting counter value %lu in DB entry for "
                          "ACL Counter Obj ID: 0x%" PRIx64 ".", count_value,
                          acl_cntr->counter_key.counter_id);
 
@@ -187,7 +187,7 @@ sai_status_t sai_npu_attach_cntr_to_acl_rule (sai_acl_rule_t *acl_rule,
     if (sai_rc != SAI_STATUS_SUCCESS) {
         SAI_ACL_LOG_ERR ("Error setting counter ref count %d in DB entry for"
                          " ACL Counter Obj ID: 0x%" PRIx64 ".",
-                         acl_cntr->shared_count, cntr_id);
+                         acl_cntr->shared_count, acl_cntr->counter_key.counter_id);
 
         return sai_rc;
     }
@@ -199,7 +199,7 @@ sai_status_t sai_npu_attach_cntr_to_acl_rule (sai_acl_rule_t *acl_rule,
 
     if (sai_rc != SAI_STATUS_SUCCESS) {
         SAI_ACL_LOG_ERR ("Error setting counter ID 0x%"PRIx64" in DB entry "
-                         "for ACL Rule ID: 0x%"PRIx64".", cntr_id,
+                         "for ACL Rule ID: 0x%"PRIx64".", acl_cntr->counter_key.counter_id,
                          acl_rule->rule_key.acl_id);
 
         return sai_rc;
@@ -207,7 +207,7 @@ sai_status_t sai_npu_attach_cntr_to_acl_rule (sai_acl_rule_t *acl_rule,
 
     SAI_ACL_LOG_TRACE ("Attaching counter obj: 0x%"PRIx64" to ACL rule obj: "
                        "0x%"PRIx64", counter shared_count after attaching: "
-                       "%d.", cntr_id, acl_rule->rule_key.acl_id,
+                       "%d.", acl_cntr->counter_key.counter_id, acl_rule->rule_key.acl_id,
                        acl_cntr->shared_count);
 
     return SAI_STATUS_SUCCESS;
@@ -231,7 +231,7 @@ sai_status_t sai_npu_detach_cntr_from_acl_rule (sai_acl_rule_t *acl_rule,
     if (sai_rc != SAI_STATUS_SUCCESS) {
         SAI_ACL_LOG_ERR ("Error setting counter ref count %d in DB entry for"
                          " ACL Counter Obj ID: 0x%" PRIx64 ".",
-                         acl_cntr->shared_count, cntr_id);
+                         acl_cntr->shared_count, acl_cntr->counter_key.counter_id);
 
         return sai_rc;
     }
@@ -243,7 +243,7 @@ sai_status_t sai_npu_detach_cntr_from_acl_rule (sai_acl_rule_t *acl_rule,
 
     if (sai_rc != SAI_STATUS_SUCCESS) {
         SAI_ACL_LOG_ERR ("Error setting counter ID 0x%"PRIx64" in DB entry "
-                         "for ACL Rule ID: 0x%"PRIx64".", cntr_id,
+                         "for ACL Rule ID: 0x%"PRIx64".", acl_cntr->counter_key.counter_id,
                          acl_rule->rule_key.acl_id);
 
         return sai_rc;
@@ -252,7 +252,7 @@ sai_status_t sai_npu_detach_cntr_from_acl_rule (sai_acl_rule_t *acl_rule,
 
     SAI_ACL_LOG_TRACE ("Detaching counter obj: 0x%"PRIx64" from ACL rule "
                        "obj: 0x%"PRIx64", counter shared_count after "
-                       "detaching: %d.", cntr_id, acl_rule->rule_key.acl_id,
+                       "detaching: %d.", acl_cntr->counter_key.counter_id, acl_rule->rule_key.acl_id,
                        acl_cntr->shared_count);
 
     return SAI_STATUS_SUCCESS;

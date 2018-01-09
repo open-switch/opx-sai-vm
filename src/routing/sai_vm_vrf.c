@@ -30,6 +30,8 @@
 #include "sai_l3_common.h"
 #include "sai_l3_util.h"
 #include "sai_oid_utils.h"
+#include "sai_vm_vport.h"
+
 #include "sairouter.h"
 #include "saitypes.h"
 #include "saistatus.h"
@@ -46,7 +48,7 @@ static inline void sai_vm_vrf_log_trace (sai_fib_vrf_t *p_vrf_node,
 {
     char p_buf [SAI_FIB_MAX_BUFSZ];
 
-    SAI_ROUTER_LOG_TRACE ("%s, VR Obj Id: 0x%"PRIx64", VRF ID: %d, V4 admin "
+    SAI_ROUTER_LOG_TRACE ("%s, VR Obj Id: 0x%"PRIx64", VRF ID: 0x%"PRIx64", V4 admin "
                           "state: %s, V6 admin state: %s, IP Options packet"
                           " action: %d (%s), MAC: %s, RIF count: %d.",
                           p_info_str, p_vrf_node->vrf_id,
@@ -101,7 +103,7 @@ static sai_status_t sai_npu_vr_create (sai_fib_vrf_t *p_vrf,
 
     STD_BIT_ARRAY_CLR (sai_vm_access_vrf_bitmap (), vrf_id);
 
-    SAI_ROUTER_LOG_TRACE ("VRF Creation success, VRF ID: %d.", *p_vr_id);
+    SAI_ROUTER_LOG_TRACE ("VRF Creation success, VRF ID: 0x%"PRIx64".", *p_vr_id);
 
     return SAI_STATUS_SUCCESS;
 }
@@ -149,7 +151,7 @@ static sai_status_t sai_npu_vr_attribute_set (sai_fib_vrf_t *p_vrf, uint_t attr_
     sai_rc = sai_router_set_db_entry (p_vrf, attr_flags);
 
     if (sai_rc != SAI_STATUS_SUCCESS) {
-        SAI_ROUTER_LOG_ERR ("Error updating entry to DB for VRF ID %d, "
+        SAI_ROUTER_LOG_ERR ("Error updating entry to DB for VRF ID 0x%"PRIx64", "
                             "OBJ ID: 0x%"PRIx64".", vrf_id, p_vrf->vrf_id);
 
         return SAI_STATUS_FAILURE;
@@ -287,7 +289,10 @@ static sai_status_t sai_npu_fib_router_mac_set (const sai_mac_t *p_router_mac)
         SAI_SWITCH_LOG_TRACE ("Failed to update the switch attribute %d in "
                               "DB table.", attr.id);
     }
-
+    else {
+        sai_rc = sai_vport_set_switch_mac_address(p_router_mac);
+        // Note: called function logs any errors
+    }
     return sai_rc;
 }
 

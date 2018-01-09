@@ -123,7 +123,7 @@ static sai_status_t sai_vm_qos_map_attribute_get (dn_sai_qos_map_t *p_map,
                                                   uint_t attr_count, sai_attribute_t *attr_list)
 {
     sai_status_t    sai_rc = SAI_STATUS_SUCCESS;
-    size_t          list_idx = 0;
+    uint_t          list_idx = 0;
     sai_attribute_t  *p_attr = NULL;
 
     STD_ASSERT (p_map != NULL);

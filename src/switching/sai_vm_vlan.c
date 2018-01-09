@@ -65,13 +65,17 @@ static sai_object_id_t sai_vm_vlan_member_id_create(void)
     return SAI_NULL_OBJECT_ID;
 }
 
-static sai_status_t sai_npu_vlan_member_remove(sai_vlan_member_node_t vlan_member_node)
+static sai_status_t sai_npu_vlan_member_remove(const sai_vlan_member_node_t* vlan_member_node)
 {
     sai_status_t sai_rc = SAI_STATUS_SUCCESS;
 
-    SAI_VLAN_LOG_TRACE("Removing port 0x%"PRIx64" to vlan %d.",
-            vlan_member_node.port_id,
-            sai_vlan_obj_id_to_vlan_id(vlan_member_node.vlan_id));
+    if(vlan_member_node == NULL) {
+        SAI_VLAN_LOG_TRACE("NULL pointer passed in vlan member remove");
+        return SAI_STATUS_INVALID_PARAMETER;
+    }
+    SAI_VLAN_LOG_TRACE("Removing bridge port 0x%"PRIx64" from vlan %d.",
+            vlan_member_node->bridge_port_id,
+            sai_vlan_obj_id_to_vlan_id(vlan_member_node->vlan_id));
 
     /* Update the port removed from the VLAN in the DB. */
     sai_rc = sai_vlan_delete_port_list_from_db_entry(vlan_member_node);
@@ -79,7 +83,7 @@ static sai_status_t sai_npu_vlan_member_remove(sai_vlan_member_node_t vlan_membe
     if (sai_rc != SAI_STATUS_SUCCESS) {
         SAI_VLAN_LOG_ERR ("Error removing port list from DB entry for "
                 "VLAN ID: %d.",
-                sai_vlan_obj_id_to_vlan_id(vlan_member_node.vlan_id));
+                sai_vlan_obj_id_to_vlan_id(vlan_member_node->vlan_id));
 
         return SAI_STATUS_FAILURE;
     }
@@ -93,13 +97,13 @@ static sai_status_t sai_npu_vlan_member_create(sai_vlan_member_node_t *vlan_memb
 
     STD_ASSERT(vlan_member_node != NULL);
 
-    SAI_VLAN_LOG_TRACE("Adding port 0x%"PRIx64" to vlan %d.",
-            vlan_member_node->port_id,
+    SAI_VLAN_LOG_TRACE("Adding bridge port 0x%"PRIx64" to vlan %d.",
+            vlan_member_node->bridge_port_id,
             sai_vlan_obj_id_to_vlan_id(vlan_member_node->vlan_id));
 
     /* Update list of ports added to the VLAN in the DB. */
     sai_rc =
-        sai_vlan_add_port_list_to_db_entry(*vlan_member_node);
+        sai_vlan_add_port_list_to_db_entry(vlan_member_node);
 
     if (sai_rc != SAI_STATUS_SUCCESS) {
         SAI_VLAN_LOG_ERR("Error adding port list to DB entry for "
@@ -112,10 +116,9 @@ static sai_status_t sai_npu_vlan_member_create(sai_vlan_member_node_t *vlan_memb
     vlan_member_node->vlan_member_id = sai_vm_vlan_member_id_create();
     if(SAI_NULL_OBJECT_ID ==
             vlan_member_node->vlan_member_id) {
-        sai_npu_vlan_member_remove(*vlan_member_node);
+        sai_npu_vlan_member_remove(vlan_member_node);
         return SAI_STATUS_FAILURE;
     }
-
     return SAI_STATUS_SUCCESS;
 }
 
@@ -211,50 +214,6 @@ static sai_status_t sai_npu_vlan_delete (sai_vlan_id_t vlan_id)
     return SAI_STATUS_SUCCESS;
 }
 
-static sai_status_t sai_npu_set_vlan_max_learned_address (sai_vlan_id_t vlan_id,
-                                                          uint32_t value)
-{
-    sai_status_t    sai_rc = SAI_STATUS_SUCCESS;
-    sai_attribute_t attr;
-
-    if (!sai_is_valid_vlan_id (vlan_id)) {
-        SAI_VLAN_LOG_ERR ("Invalid vlan ID %d", vlan_id);
-
-        return SAI_STATUS_INVALID_VLAN_ID;
-    }
-
-    /* Update VLAN record in DB with max learn limit info. */
-    attr.id = SAI_VLAN_ATTR_MAX_LEARNED_ADDRESSES;
-    attr.value.u32 = value;
-
-    sai_rc = sai_vlan_set_db_entry (vlan_id, &attr);
-
-    if (sai_rc != SAI_STATUS_SUCCESS) {
-        SAI_VLAN_LOG_ERR ("Error updating VLAN entry in DB with max learn "
-                              "limit attribute for vlan ID: %d.", vlan_id);
-
-        return SAI_STATUS_FAILURE;
-    }
-
-    return SAI_STATUS_SUCCESS;
-}
-
-static sai_status_t sai_npu_get_vlan_max_learned_address (sai_vlan_id_t vlan_id,
-                                                          uint32_t *value)
-{
-    STD_ASSERT(value != NULL);
-
-    if (!sai_is_valid_vlan_id (vlan_id)) {
-        SAI_VLAN_LOG_ERR ("Invalid vlan ID %d", vlan_id);
-
-        return SAI_STATUS_INVALID_VLAN_ID;
-    }
-
-    *value = sai_vlan_max_learn_adddress_cache_read(vlan_id);
-
-    return SAI_STATUS_SUCCESS;
-}
-
 static sai_status_t sai_npu_get_vlan_stats (sai_vlan_id_t vlan_id,
                                             const sai_vlan_stat_t *cntr_ids,
                                             unsigned int number_of_cntrs,
@@ -275,101 +234,81 @@ static sai_status_t sai_npu_clear_vlan_stats (sai_vlan_id_t vlan_id,
     return SAI_STATUS_SUCCESS;
 }
 
-static sai_status_t sai_npu_vlan_learn_disable_set(sai_vlan_id_t vlan_id, bool disable)
-{
-    sai_status_t    sai_rc = SAI_STATUS_SUCCESS;
-    sai_attribute_t attr;
-
-    /* Update VLAN record in DB with disable learn info */
-    attr.id = SAI_VLAN_ATTR_LEARN_DISABLE;
-    attr.value.booldata = disable;
-
-    sai_rc = sai_vlan_set_db_entry (vlan_id, &attr);
-
-    if (sai_rc != SAI_STATUS_SUCCESS) {
-        SAI_VLAN_LOG_ERR ("Error updating VLAN entry in DB with learn disable"
-                              "for vlan ID: %d.", vlan_id);
-
-        return SAI_STATUS_FAILURE;
-    }
-
-    SAI_VLAN_LOG_TRACE("Vlan ID:%d learn disable:%d", vlan_id, disable);
-    return SAI_STATUS_SUCCESS;
-
-}
-
-static sai_status_t sai_npu_vlan_learn_disable_get(sai_vlan_id_t vlan_id, bool *disable)
-{
-    if(disable == NULL) {
-        SAI_VLAN_LOG_ERR("Error invalid paramter disable is passed");
-        STD_ASSERT(0);
-        return SAI_STATUS_INVALID_PARAMETER;
-    }
-    *disable = sai_vlan_learn_disable_cache_read(vlan_id);
-    return SAI_STATUS_SUCCESS;
-}
-
-static sai_status_t sai_npu_vlan_meta_data_set(sai_vlan_id_t vlan_id, uint_t value)
-{
-    sai_status_t    sai_rc = SAI_STATUS_SUCCESS;
-    sai_attribute_t attr;
-
-    /* Update VLAN record in DB with vlan meta data*/
-    attr.id = SAI_VLAN_ATTR_META_DATA;
-    attr.value.u32 = value;
-
-    sai_rc = sai_vlan_set_db_entry (vlan_id, &attr);
-
-    if (sai_rc != SAI_STATUS_SUCCESS) {
-        SAI_VLAN_LOG_ERR ("Error updating VLAN entry in DB with metadata"
-                              "for vlan ID: %d.", vlan_id);
-
-        return SAI_STATUS_FAILURE;
-    }
-
-    SAI_VLAN_LOG_TRACE("Vlan ID:%d metadata:%d", vlan_id, value);
-    return SAI_STATUS_SUCCESS;
-
-}
-
-static sai_status_t sai_npu_vlan_meta_data_get(sai_vlan_id_t vlan_id, uint_t *value)
-{
-    if(value == NULL) {
-        SAI_VLAN_LOG_ERR("Error invalid paramter is passed");
-        STD_ASSERT(0);
-        return SAI_STATUS_INVALID_PARAMETER;
-    }
-    *value = sai_vlan_meta_data_cache_read(vlan_id);
-    return SAI_STATUS_SUCCESS;
-}
-
 static sai_status_t sai_npu_set_vlan_member_tagging_mode(
-        sai_vlan_member_node_t vlan_member_node)
+        const sai_vlan_member_node_t* vlan_member_node)
 {
     sai_status_t rc = SAI_STATUS_SUCCESS;
+    sai_vlan_member_node_t tmp_vlan_member_node;
+
+    memset(&tmp_vlan_member_node, 0, sizeof(tmp_vlan_member_node));
+    memcpy(&tmp_vlan_member_node, vlan_member_node, sizeof(tmp_vlan_member_node));
 
     if((rc = sai_npu_vlan_member_remove(vlan_member_node)) ==
         SAI_STATUS_SUCCESS) {
-        rc = sai_npu_vlan_member_create(&vlan_member_node);
+        rc = sai_npu_vlan_member_create(&tmp_vlan_member_node);
     }
     return rc;
+}
+
+static sai_status_t sai_npu_vlan_set_attribute(sai_object_id_t vlan_obj_id,
+                                               const sai_attribute_t *attr)
+{
+    sai_vlan_id_t vlan_id = sai_vlan_obj_id_to_vlan_id(vlan_obj_id);
+
+    if(attr == NULL) {
+        SAI_VLAN_LOG_TRACE("attr is NULL in set vlan attr in cache for vlan %d", vlan_id);
+        return SAI_STATUS_INVALID_PARAMETER;
+    }
+
+    switch(attr->id){
+        /* This is handled in STP module. Nothing to update in cache */
+        case SAI_VLAN_ATTR_STP_INSTANCE:
+            return SAI_STATUS_SUCCESS;
+        case SAI_VLAN_ATTR_LEARN_DISABLE:
+        case SAI_VLAN_ATTR_META_DATA:
+        case SAI_VLAN_ATTR_MAX_LEARNED_ADDRESSES:
+            return sai_vlan_set_db_entry(vlan_id, attr);
+        case SAI_VLAN_ATTR_IPV4_MCAST_LOOKUP_KEY_TYPE:
+        case SAI_VLAN_ATTR_IPV6_MCAST_LOOKUP_KEY_TYPE:
+        case SAI_VLAN_ATTR_UNKNOWN_NON_IP_MCAST_OUTPUT_GROUP_ID:
+        case SAI_VLAN_ATTR_UNKNOWN_IPV4_MCAST_OUTPUT_GROUP_ID:
+        case SAI_VLAN_ATTR_UNKNOWN_IPV6_MCAST_OUTPUT_GROUP_ID:
+        case SAI_VLAN_ATTR_UNKNOWN_LINKLOCAL_MCAST_OUTPUT_GROUP_ID:
+        case SAI_VLAN_ATTR_INGRESS_ACL:
+        case SAI_VLAN_ATTR_EGRESS_ACL:
+            return SAI_STATUS_ATTR_NOT_IMPLEMENTED_0;
+
+        case SAI_VLAN_ATTR_VLAN_ID:
+        case SAI_VLAN_ATTR_MEMBER_LIST:
+            return SAI_STATUS_INVALID_ATTRIBUTE_0;
+
+        default:
+            return SAI_STATUS_UNKNOWN_ATTRIBUTE_0;
+    }
+    return SAI_STATUS_FAILURE;
+}
+
+sai_status_t sai_vm_vlan_member_lag_notif_handler_fn(const sai_vlan_member_node_t
+                                                     *vlan_member_node,
+                                                     sai_object_id_t lag_id,
+                                                     uint_t port_cnt,
+                                                     const sai_object_id_t *port_list,
+                                                     bool is_add)
+{
+    return SAI_STATUS_SUCCESS;
 }
 
 static sai_npu_vlan_api_t sai_vm_vlan_api_table = {
     sai_npu_vlan_init,
     sai_npu_vlan_create,
     sai_npu_vlan_delete,
+    sai_npu_vlan_set_attribute,
     sai_npu_vlan_member_create,
     sai_npu_vlan_member_remove,
-    sai_npu_set_vlan_max_learned_address,
-    sai_npu_get_vlan_max_learned_address,
     sai_npu_get_vlan_stats,
     sai_npu_clear_vlan_stats,
-    sai_npu_vlan_learn_disable_set,
-    sai_npu_vlan_learn_disable_get,
-    sai_npu_vlan_meta_data_set,
-    sai_npu_vlan_meta_data_get,
     sai_npu_set_vlan_member_tagging_mode,
+    sai_vm_vlan_member_lag_notif_handler_fn,
 };
 
 sai_npu_vlan_api_t* sai_vm_vlan_api_query (void)

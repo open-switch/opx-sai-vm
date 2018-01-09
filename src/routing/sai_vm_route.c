@@ -43,7 +43,7 @@ static inline void sai_vm_route_log_trace (sai_fib_route_t *p_route,
 
     STD_ASSERT (p_route != NULL);
 
-    SAI_ROUTE_LOG_TRACE ("%s VRF: 0x%"PRIx64", Prefix: %s/%d, NH type: %d, "
+    SAI_ROUTE_LOG_TRACE ("%s VRF: 0x%"PRIx64", Prefix: %s/%d, NH type: %s, "
                          "NH Id: 0x%"PRIx64", Packet action: %s.",
                          p_trace_str, p_route->vrf_id, sai_ip_addr_to_str (
                          &p_route->key.prefix, addr_str, sizeof (addr_str)),

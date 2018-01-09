@@ -42,7 +42,7 @@ static void sai_vm_rif_log_trace (sai_fib_router_interface_t *p_rif_node,
 {
     char   p_buf [SAI_VM_MAX_BUFSZ];
 
-    SAI_RIF_LOG_TRACE ("%s, RIF ID: %d (VRF: %d, %s %d), "
+    SAI_RIF_LOG_TRACE ("%s, RIF ID: %ld (VRF: 0x%"PRIx64", %s %d), "
                        "V4 admin state: %s, V6 admin state: %s, MTU: %d, "
                        "IP Options packet action: %d (%s), MAC: %s.",
                        p_info_str, sai_uoid_npu_obj_id_get
@@ -146,7 +146,7 @@ sai_fib_router_interface_t *p_rif_node, sai_npu_object_id_t *p_rif_id)
     rif_obj_id = sai_uoid_create (SAI_OBJECT_TYPE_ROUTER_INTERFACE, rif_id);
 
     if (sai_fib_router_interface_node_get (rif_obj_id)) {
-        SAI_RIF_LOG_TRACE ("RIF node exists already with RIF ID: %d, "
+        SAI_RIF_LOG_TRACE ("RIF node exists already with RIF ID: %ld, "
                            "RIF Object ID: 0x%"PRIx64".", rif_id, rif_obj_id);
 
         return SAI_STATUS_ITEM_ALREADY_EXISTS;
@@ -158,13 +158,13 @@ sai_fib_router_interface_t *p_rif_node, sai_npu_object_id_t *p_rif_id)
     sai_rc = sai_routerintf_create_db_entry (rif_obj_id, p_rif_node);
 
     if (sai_rc != SAI_STATUS_SUCCESS) {
-        SAI_RIF_LOG_ERR ("Error inserting entry to DB for RIF ID %d, "
+        SAI_RIF_LOG_ERR ("Error inserting entry to DB for RIF ID %ld, "
                          "OBJ ID: 0x%"PRIx64".", rif_id, rif_obj_id);
 
         return SAI_STATUS_FAILURE;
     }
 
-    SAI_RIF_LOG_TRACE ("RIF Creation success, RIF ID: %d.", *p_rif_id);
+    SAI_RIF_LOG_TRACE ("RIF Creation success, RIF ID: %ld.", *p_rif_id);
 
     return SAI_STATUS_SUCCESS;
 }
@@ -178,19 +178,19 @@ static sai_status_t sai_npu_router_interface_remove (sai_fib_router_interface_t 
 
     rif_id = sai_uoid_npu_obj_id_get (p_rif->rif_id);
 
-    SAI_RIF_LOG_TRACE ("RIF Deletion, RIF ID: %d.", rif_id);
+    SAI_RIF_LOG_TRACE ("RIF Deletion, RIF ID: %ld.", rif_id);
 
     /* Remove RIF record from DB. */
     sai_rc = sai_routerintf_delete_db_entry (p_rif->rif_id);
 
     if (sai_rc != SAI_STATUS_SUCCESS) {
-        SAI_RIF_LOG_ERR ("Error removing entry from DB for RIF ID %d, "
+        SAI_RIF_LOG_ERR ("Error removing entry from DB for RIF ID %ld, "
                          "OBJ ID: 0x%"PRIx64".", rif_id, p_rif->rif_id);
 
         return SAI_STATUS_FAILURE;
     }
 
-    SAI_RIF_LOG_TRACE ("RIF ID: %d deletion success.", rif_id);
+    SAI_RIF_LOG_TRACE ("RIF ID: %ld deletion success.", rif_id);
 
     return SAI_STATUS_SUCCESS;
 }
@@ -213,7 +213,7 @@ sai_fib_router_interface_t *p_rif, uint_t attr_flags)
     sai_rc = sai_routerintf_set_db_entry (p_rif, attr_flags);
 
     if (sai_rc != SAI_STATUS_SUCCESS) {
-        SAI_RIF_LOG_ERR ("Error updating entry to DB for RIF ID %d, "
+        SAI_RIF_LOG_ERR ("Error updating entry to DB for RIF ID %ld, "
                          "OBJ ID: 0x%"PRIx64".", rif_id, p_rif->rif_id);
 
         return SAI_STATUS_FAILURE;

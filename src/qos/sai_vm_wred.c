@@ -49,7 +49,7 @@ static const dn_sai_attribute_entry_t sai_wred_attr[] = {
 static sai_status_t sai_vm_wred_create(dn_sai_qos_wred_t *p_wred_node,
                                        uint_t attr_count,
                                        const sai_attribute_t *p_attr,
-                                        sai_npu_object_id_t *p_wred_id)
+                                       sai_npu_object_id_t *p_wred_id)
 {
     uint_t  wred_profile_idx = 0;
 
@@ -108,7 +108,7 @@ static bool sai_vm_wred_is_hw_object()
 
 static sai_status_t sai_vm_wred_set(
         sai_object_id_t wred_link_id,
-                                                          dn_sai_qos_wred_t *p_wred_node,
+        dn_sai_qos_wred_t *p_wred_node,
         dn_sai_qos_wred_link_t wred_link_type)
 {
     return SAI_STATUS_SUCCESS;

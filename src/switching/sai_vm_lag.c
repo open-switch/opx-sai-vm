@@ -127,6 +127,20 @@ static sai_status_t sai_npu_lag_port_flag_get (sai_object_id_t  lag_id,
     return SAI_STATUS_SUCCESS;
 }
 
+static sai_status_t sai_npu_lag_attribute_set(sai_lag_node_t *lag_info,
+                                              const sai_attribute_t *attr)
+{
+    return SAI_STATUS_SUCCESS;
+}
+
+static sai_status_t sai_npu_lag_attr_get_from_member (sai_object_id_t lag_id,
+                                                     sai_object_id_t lag_member_id,
+                                                     uint_t attr_count,
+                                                     sai_attribute_t *attr_list)
+{
+    return SAI_STATUS_SUCCESS;
+}
+
 static sai_npu_lag_api_t sai_vm_lag_api_table = {
     sai_npu_lag_init,
     sai_npu_lag_create,
@@ -135,6 +149,8 @@ static sai_npu_lag_api_t sai_vm_lag_api_table = {
     sai_npu_remove_ports_from_lag,
     sai_npu_lag_port_flag_set,
     sai_npu_lag_port_flag_get,
+    sai_npu_lag_attribute_set,
+    sai_npu_lag_attr_get_from_member,
 };
 
 sai_npu_lag_api_t* sai_vm_lag_api_query (void)

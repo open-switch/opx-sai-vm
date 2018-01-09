@@ -35,6 +35,8 @@
 #include "std_mac_utils.h"
 #include "std_type_defs.h"
 #include "std_assert.h"
+#include "sai_vlan_api.h"
+#include "sai_bridge_api.h"
 #include <inttypes.h>
 
 static inline void sai_vm_neighbor_log_trace (sai_fib_nh_t *p_next_hop,
@@ -77,6 +79,7 @@ static sai_status_t sai_npu_neighbor_create (sai_fib_nh_t *p_next_hop)
     sai_fib_router_interface_t *p_rif = NULL;
     sai_object_id_t             rif_obj_id = 0;
     sai_object_id_t             port_obj_id = 0;
+    sai_object_id_t             bridge_port_id = 0;
     sai_fdb_entry_t             fdb_entry;
 
     STD_ASSERT (p_next_hop != NULL);
@@ -88,7 +91,7 @@ static sai_status_t sai_npu_neighbor_create (sai_fib_nh_t *p_next_hop)
     p_rif = sai_fib_router_interface_node_get (rif_obj_id);
 
     if ((!p_rif)) {
-        SAI_NEIGHBOR_LOG_ERR ("RIF node not found for RIF Id: %d.",
+        SAI_NEIGHBOR_LOG_ERR ("RIF node not found for RIF Id: 0x%"PRIx64".",
                               rif_obj_id);
 
         return SAI_STATUS_INVALID_OBJECT_ID;
@@ -101,9 +104,10 @@ static sai_status_t sai_npu_neighbor_create (sai_fib_nh_t *p_next_hop)
         memcpy (fdb_entry.mac_address, p_next_hop->mac_addr,
                 sizeof (sai_mac_t));
 
-        fdb_entry.vlan_id = p_rif->attachment.vlan_id;
+        fdb_entry.bv_id = sai_vlan_obj_id_to_vlan_id(p_rif->attachment.vlan_id);
 
-        status = sai_get_port_for_fdb_entry (&fdb_entry, &port_obj_id);
+        status = sai_get_bridge_port_for_fdb_entry (&fdb_entry, &bridge_port_id);
+
 
         if (status != SAI_STATUS_SUCCESS) {
             SAI_NEIGHBOR_LOG_ERR ("Failed to lookup port for Neighbor MAC "
@@ -111,6 +115,14 @@ static sai_status_t sai_npu_neighbor_create (sai_fib_nh_t *p_next_hop)
 
             return status;
         }
+        status = sai_bridge_port_get_port_id(bridge_port_id, &port_obj_id);
+        if (status != SAI_STATUS_SUCCESS) {
+            SAI_NEIGHBOR_LOG_ERR ("Failed to get port obj fro bridge port 0x%"PRIx64" "
+                                  "Err: %d.", bridge_port_id, status);
+
+            return status;
+        }
+
     }
 
     /* Insert Neighbor record to DB. */

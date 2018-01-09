@@ -121,7 +121,7 @@ static sai_status_t sai_vm_scheduler_attribute_get (dn_sai_qos_scheduler_t *p_sc
 {
     sai_status_t            sai_rc = SAI_STATUS_SUCCESS;
     sai_attribute_t         *p_attr = NULL;
-    size_t                  list_index = 0;
+    uint_t                  list_index = 0;
 
     STD_ASSERT (p_sched_node != NULL);
     STD_ASSERT (p_attr_list != NULL);
