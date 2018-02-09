@@ -65,6 +65,22 @@ static void sai_vm_port_info_node_handler (std_config_node_t port_node,
                 port_info->ext_phy_addr = 0;
             }
 
+        } else if (strncmp (std_config_name_get(sai_node),
+                            SAI_NODE_NAME_SUPPORTED_SPEED, SAI_MAX_NAME_LEN) == 0) {
+
+            size_t speed_map_sz;
+            uint32_t index;
+            speed_desc_t* speed_map= get_speed_map(&speed_map_sz);
+            port_info->port_speed_capb = 0;
+            speed_desc_t *map_entry = NULL;
+
+            for (map_entry=speed_map, index=0; index < speed_map_sz; ++index) {
+                sai_std_config_attr_uint_update(sai_node, map_entry->speed,
+                                                &port_info->port_speed_capb,
+                                                map_entry->speed_cap_bit);
+                ++map_entry;
+            }
+
         } else if (strncmp (std_config_name_get (sai_node),
                             SAI_NODE_NAME_BREAKOUT, SAI_MAX_NAME_LEN) == 0) {
 
@@ -173,6 +189,7 @@ sai_status_t sai_vm_port_info_update (sai_vm_port_init_info_t *vm_init_info)
         port_info->max_lanes_per_port = vm_init_info[pport].max_lanes_per_port;
         port_info->port_lane_bmap = vm_init_info[pport].port_lane_bmap;
         port_info->port_speed = vm_init_info[pport].port_speed;
+        port_info->port_speed_capb = vm_init_info[pport].port_speed_capb;
         port_info->media_type = SAI_PORT_MEDIA_TYPE_NOT_PRESENT;
         port_info->local_port_id = vm_init_info[pport].local_port_id;
         port_info->sai_port_id = sai_port_id_create (SAI_PORT_TYPE_LOGICAL,

@@ -24,6 +24,7 @@
 #ifndef __SAI_VM_PORT_UTIL_H__
 #define __SAI_VM_PORT_UTIL_H__
 
+#include "sai_switch_init_config.h"
 #include "sai_port_common.h"
 #include "std_config_node.h"
 #include "std_type_defs.h"
@@ -62,6 +63,9 @@ typedef struct _sai_vm_port_init_info_t {
     /** Port speed in Gbps */
     sai_port_speed_t             port_speed;
 
+    /** Port supported speed [sai_port_speed_capability_t] */
+    uint_t                       port_speed_capb;
+
     /** Maximum  Lanes support per port */
     uint_t                       max_lanes_per_port;
 
@@ -69,6 +73,27 @@ typedef struct _sai_vm_port_init_info_t {
     uint64_t                     port_lane_bmap;
 
 } sai_vm_port_init_info_t;
+
+/**
+ * @brief Type for representing supported speed information
+ */
+typedef struct _speed_desc_t {
+
+    /** Representing SAI port supported speed capability */
+    uint_t                       speed_cap_bit;
+
+    /** Representing SAI port supported speed value in Mbps */
+    sai_uint32_t                 speed_value;
+
+    /** Representing SAI port supported speed attribute value */
+    char                         *speed;
+
+} speed_desc_t;
+
+/**
+ * Map supported speed information [supported speed capability, supported speed value in Mbps, attribute value]
+ */
+const speed_desc_t* get_speed_map(size_t *sz);
 
 /**
  * VM vendor specific switch init config handler
