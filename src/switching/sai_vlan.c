@@ -279,13 +279,16 @@ static sai_status_t sai_l2_remove_vlan(sai_object_id_t vlan_obj_id)
 
     sai_vlan_lock();
 
-    if((ret_val = sai_is_vlan_configurable(vlan_id))
-            == SAI_STATUS_SUCCESS) {
-        if(sai_is_vlan_obj_in_use(vlan_id)) {
-            return SAI_STATUS_OBJECT_IN_USE;
+    do {
+        ret_val = sai_is_vlan_configurable(vlan_id);
+        if(ret_val == SAI_STATUS_SUCCESS) {
+            if(sai_is_vlan_obj_in_use(vlan_id)) {
+                ret_val =  SAI_STATUS_OBJECT_IN_USE;
+                break;
+            }
+            ret_val = sai_l2_delete_vlan(vlan_id);
         }
-        ret_val = sai_l2_delete_vlan(vlan_id);
-    }
+    }while (0);
 
     sai_vlan_unlock();
     return ret_val;

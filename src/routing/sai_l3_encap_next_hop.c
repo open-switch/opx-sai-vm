@@ -696,6 +696,7 @@ void sai_fib_route_attr_set_affected_encap_nh_update (
     sai_fib_nh_t     *p_encap_nh;
     sai_fib_nh_t     *p_next_encap_nh;
     sai_fib_vrf_t    *p_vrf_node = NULL;
+    bool              encap_nh_resolved = false;
 
     p_vrf_node = sai_fib_vrf_node_get (p_route_node->vrf_id);
 
@@ -713,15 +714,19 @@ void sai_fib_route_attr_set_affected_encap_nh_update (
                  sai_fib_route_get_next_dep_encap_nh (p_route_node, p_encap_nh);
 
         sai_fib_encap_nh_lpm_route_attr_set (p_encap_nh, p_new_route_info);
+        encap_nh_resolved = true;
     }
 
-    sai_fib_encap_nh_signal_dep_route_walk ();
+    if(encap_nh_resolved) {
+        sai_fib_encap_nh_signal_dep_route_walk ();
+    }
 }
 
 
 /* Encap Next Hop resolution for underlay lpm route changes */
 static void sai_fib_route_create_affected_encap_nh_update (
-                                                    sai_fib_route_t *p_new_route)
+                                                    sai_fib_route_t *p_new_route,
+                                                    bool *encap_nh_resolved)
 {
     sai_fib_route_t  *p_less_specific;
     sai_fib_nh_t     *p_encap_nh;
@@ -762,6 +767,7 @@ static void sai_fib_route_create_affected_encap_nh_update (
 
                 /* Resolve the Encap Next Hop */
                 sai_fib_encap_nh_lpm_route_resolve (p_vrf_node, p_encap_nh);
+                *encap_nh_resolved = true;
             }
         }
 
@@ -772,7 +778,8 @@ static void sai_fib_route_create_affected_encap_nh_update (
 }
 
 static void sai_fib_route_del_affected_encap_nh_update (
-                                                      sai_fib_route_t *p_route)
+                                                      sai_fib_route_t *p_route,
+                                                      bool *encap_nh_resolved)
 {
     sai_fib_nh_t     *p_encap_nh;
     sai_fib_nh_t     *p_next_encap_nh;
@@ -793,12 +800,14 @@ static void sai_fib_route_del_affected_encap_nh_update (
         p_next_encap_nh = sai_fib_route_get_next_dep_encap_nh (p_route, p_encap_nh);
 
         sai_fib_encap_nh_lpm_route_resolve (p_vrf_node, p_encap_nh);
+        *encap_nh_resolved = true;
     }
 }
 
 void sai_fib_route_affected_encap_nh_update (sai_fib_route_t *p_route,
                                              dn_sai_operations_t op_code)
 {
+    bool encap_nh_resolved = false;
     /* Default route is handled like route attribute set case */
     if (sai_fib_is_default_route_node (p_route)) {
 
@@ -809,14 +818,16 @@ void sai_fib_route_affected_encap_nh_update (sai_fib_route_t *p_route,
 
     if (op_code == SAI_OP_CREATE) {
 
-        sai_fib_route_create_affected_encap_nh_update (p_route);
+        sai_fib_route_create_affected_encap_nh_update (p_route, &encap_nh_resolved);
 
     } else if (op_code == SAI_OP_REMOVE) {
 
-        sai_fib_route_del_affected_encap_nh_update (p_route);
+        sai_fib_route_del_affected_encap_nh_update (p_route, &encap_nh_resolved);
     }
 
-    sai_fib_encap_nh_signal_dep_route_walk ();
+    if(encap_nh_resolved) {
+        sai_fib_encap_nh_signal_dep_route_walk ();
+    }
 
     return;
 }
