@@ -150,7 +150,6 @@ static sai_status_t sai_port_attr_internal_loopback_set (sai_object_id_t port_id
                                 (attr->value.s32 == SAI_PORT_INTERNAL_LOOPBACK_MODE_MAC) ) ?
                               SAI_PORT_OPER_STATUS_UP : SAI_PORT_OPER_STATUS_DOWN);
 
-
     ret = sai_port_attr_info_cache_set (port_id, sai_port_info, &sai_attr_set);
     if (ret != SAI_STATUS_SUCCESS) {
         SAI_PORT_LOG_ERR ("Oper status %d cache set for port 0x%"PRIx64" failed "
@@ -276,6 +275,21 @@ static sai_status_t sai_port_attr_supported_speed_get(sai_object_id_t port,
     return ret_code;
 }
 
+sai_status_t sai_port_attr_eee_get(sai_object_id_t sai_port_id,  sai_attribute_value_t *value)
+{
+    int eee_state;
+    sai_port_info_t *port_info = sai_port_info_get(sai_port_id);
+
+    STD_ASSERT (port_info != NULL);
+
+    value->booldata=port_info->eee_support;
+    eee_state = (value->booldata) ? true : false;
+
+    SAI_PORT_LOG_TRACE("EEE state get for npu port %d is %d", sai_port_id, eee_state);
+
+    return SAI_STATUS_SUCCESS;
+}
+
 static sai_status_t sai_npu_port_get_attribute (sai_object_id_t port_id,
                                                 const sai_port_info_t *sai_port_info,
                                                 uint_t attr_count,
@@ -346,6 +360,12 @@ static sai_status_t sai_npu_port_get_attribute (sai_object_id_t port_id,
             case SAI_PORT_ATTR_QOS_SCHEDULER_GROUP_LIST:
                 ret_code = sai_qos_port_sched_group_id_list_get (port_id,
                                                                  &attr_list[attr_idx].value.objlist);
+                break;
+
+            case SAI_PORT_ATTR_EEE_ENABLE:
+            case SAI_PORT_ATTR_EEE_IDLE_TIME:
+            case SAI_PORT_ATTR_EEE_WAKE_TIME:
+                ret_code= sai_port_attr_eee_get(port_id, &attr_list[attr_idx].value);
                 break;
 
             case SAI_PORT_ATTR_POLICER_ID:

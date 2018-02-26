@@ -44,6 +44,9 @@ static void sai_vm_port_info_node_handler (std_config_node_t port_node,
     STD_ASSERT (port_node != NULL);
     STD_ASSERT (port_info != NULL);
 
+    /* Set port info defaults */
+    port_info->eee_support = false;
+
     for (sai_node = std_config_get_child (port_node);
          sai_node != NULL;
          sai_node = std_config_next_node (sai_node)) {
@@ -190,6 +193,7 @@ sai_status_t sai_vm_port_info_update (sai_vm_port_init_info_t *vm_init_info)
         port_info->port_lane_bmap = vm_init_info[pport].port_lane_bmap;
         port_info->port_speed = vm_init_info[pport].port_speed;
         port_info->port_speed_capb = vm_init_info[pport].port_speed_capb;
+        port_info->eee_support = vm_init_info[pport].eee_support;
         port_info->media_type = SAI_PORT_MEDIA_TYPE_NOT_PRESENT;
         port_info->local_port_id = vm_init_info[pport].local_port_id;
         port_info->sai_port_id = sai_port_id_create (SAI_PORT_TYPE_LOGICAL,

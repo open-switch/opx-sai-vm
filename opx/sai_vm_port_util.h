@@ -72,6 +72,8 @@ typedef struct _sai_vm_port_init_info_t {
     /** Bitmap of the active lanes in the port */
     uint64_t                     port_lane_bmap;
 
+    bool                         eee_support;
+
 } sai_vm_port_init_info_t;
 
 /**
