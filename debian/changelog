@@ -1,3 +1,9 @@
+opx-sai-vm (17.1.0+opx4) unstable; urgency=medium
+
+  * Update: Change debian/control file so apt-get update will work.
+  
+ -- Dell EMC <ops-dev@lists.openswitch.net>  Thu, 08 Mar 2018  10:00:00 -0800
+ 
 opx-sai-vm (17.1.0+opx3) unstable; urgency=medium
 
   * Bugfix: Setting EEE default to false

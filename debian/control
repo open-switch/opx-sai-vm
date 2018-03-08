@@ -7,6 +7,7 @@ Build-Depends:dh-autoreconf, debhelper (>= 9), autotools-dev, libopx-logging-dev
 Standards-Version: 1.0.1
 
 Package: libopx-sai-vm1
+Provides: libopx-sai
 Replaces: opx-sai-api-dev
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
