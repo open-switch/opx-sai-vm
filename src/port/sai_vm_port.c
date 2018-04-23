@@ -397,7 +397,7 @@ static sai_status_t sai_npu_port_get_attribute (sai_object_id_t port_id,
         }
 
         if (ret_code != SAI_STATUS_SUCCESS) {
-            SAI_PORT_LOG_ERR ("Attr get for port id 0x%"PRIx64"'s attr index %d "
+            SAI_PORT_LOG_TRACE ("Attr get for port id 0x%"PRIx64"'s attr index %d "
                               "attr id %d failed with err %d", port_id, attr_idx,
                               attr_list[attr_idx].id, ret_code);
             return sai_get_indexed_ret_val(ret_code, attr_idx);
