@@ -24,7 +24,7 @@
 #include "sai_npu_switch.h"
 
 #include "sai.h"
-#include "saiqosmaps.h"
+#include "saiqosmap.h"
 
 #include "std_type_defs.h"
 #include "std_utils.h"
@@ -88,10 +88,8 @@ dn_sai_qos_map_t *p_map_node, uint_t map_type)
     {
         case SAI_QOS_MAP_TYPE_DOT1P_TO_TC:
         case SAI_QOS_MAP_TYPE_DOT1P_TO_COLOR:
-        case SAI_QOS_MAP_TYPE_DOT1P_TO_TC_AND_COLOR:
         case SAI_QOS_MAP_TYPE_DSCP_TO_TC:
         case SAI_QOS_MAP_TYPE_DSCP_TO_COLOR:
-        case SAI_QOS_MAP_TYPE_DSCP_TO_TC_AND_COLOR:
         case SAI_QOS_MAP_TYPE_TC_TO_QUEUE:
         case SAI_QOS_MAP_TYPE_TC_TO_PRIORITY_GROUP:
         case SAI_QOS_MAP_TYPE_PFC_PRIORITY_TO_QUEUE:
@@ -125,8 +123,7 @@ static sai_status_t sai_qos_map_update_ingress_maps(dn_sai_qos_port_t *p_qos_por
      * other than the removed one.
      */
     if((map_type == SAI_QOS_MAP_TYPE_DOT1P_TO_TC) ||
-       (map_type == SAI_QOS_MAP_TYPE_DOT1P_TO_COLOR) ||
-       (map_type == SAI_QOS_MAP_TYPE_DOT1P_TO_TC_AND_COLOR)){
+       (map_type == SAI_QOS_MAP_TYPE_DOT1P_TO_COLOR)) {
         if(p_qos_port_node->maps_id[SAI_QOS_MAP_TYPE_DSCP_TO_TC] != SAI_NULL_OBJECT_ID){
             map_id = p_qos_port_node->maps_id[SAI_QOS_MAP_TYPE_DSCP_TO_TC];
 
@@ -152,29 +149,12 @@ static sai_status_t sai_qos_map_update_ingress_maps(dn_sai_qos_port_t *p_qos_por
 
             return sai_rc;
         }
-
-        if(p_qos_port_node->maps_id[SAI_QOS_MAP_TYPE_DSCP_TO_TC_AND_COLOR] != SAI_NULL_OBJECT_ID){
-            map_id = p_qos_port_node->maps_id[SAI_QOS_MAP_TYPE_DSCP_TO_TC_AND_COLOR];
-
-            SAI_MAPS_LOG_TRACE("Ingress map update for maptype %d mapid 0x%"PRIx64"",
-                               SAI_QOS_MAP_TYPE_DSCP_TO_TC_AND_COLOR, map_id);
-
-            sai_rc = sai_qos_map_npu_api_get()->port_map_set
-                (p_qos_port_node->port_id, map_id,
-                 SAI_QOS_MAP_TYPE_DSCP_TO_TC_AND_COLOR, true);
-
-            return sai_rc;
-        }
     }
     else if((map_type == SAI_QOS_MAP_TYPE_DSCP_TO_TC) ||
-            (map_type == SAI_QOS_MAP_TYPE_DSCP_TO_COLOR) ||
-            (map_type == SAI_QOS_MAP_TYPE_DSCP_TO_TC_AND_COLOR)){
+            (map_type == SAI_QOS_MAP_TYPE_DSCP_TO_COLOR)) {
 
         if ((p_qos_port_node->maps_id[SAI_QOS_MAP_TYPE_DOT1P_TO_TC] == SAI_NULL_OBJECT_ID) &&
-            (p_qos_port_node->maps_id[SAI_QOS_MAP_TYPE_DOT1P_TO_COLOR] == SAI_NULL_OBJECT_ID) &&
-            (p_qos_port_node->maps_id[SAI_QOS_MAP_TYPE_DOT1P_TO_TC_AND_COLOR] == SAI_NULL_OBJECT_ID)) {
-
-            SAI_MAPS_LOG_TRACE("Ingress map update for SAI_QOS_MAP_TYPE_DOT1P_TO_TC_AND_COLOR with default mapid");
+            (p_qos_port_node->maps_id[SAI_QOS_MAP_TYPE_DOT1P_TO_COLOR] == SAI_NULL_OBJECT_ID)) {
 
             sai_rc = sai_qos_map_npu_api_get()->port_map_set
                      (p_qos_port_node->port_id, SAI_NULL_OBJECT_ID,
@@ -207,17 +187,6 @@ static sai_status_t sai_qos_map_update_ingress_maps(dn_sai_qos_port_t *p_qos_por
                 return sai_rc;
             }
 
-            if (p_qos_port_node->maps_id[SAI_QOS_MAP_TYPE_DOT1P_TO_TC_AND_COLOR] != SAI_NULL_OBJECT_ID) {
-                map_id = p_qos_port_node->maps_id[SAI_QOS_MAP_TYPE_DOT1P_TO_TC_AND_COLOR];
-
-                SAI_MAPS_LOG_TRACE("Ingress map update for maptype %d mapid 0x%"PRIx64"",
-                                   SAI_QOS_MAP_TYPE_DOT1P_TO_TC_AND_COLOR, map_id);
-
-                sai_rc = sai_qos_map_npu_api_get()->port_map_set
-                         (p_qos_port_node->port_id, map_id,
-                         SAI_QOS_MAP_TYPE_DOT1P_TO_TC_AND_COLOR, true);
-                return sai_rc;
-            }
         }
     }
 

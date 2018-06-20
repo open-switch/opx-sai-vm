@@ -131,10 +131,8 @@ static const struct {
     {SAI_PORT_ATTR_QOS_DEFAULT_TC,    "SAI_PORT_ATTR_QOS_DEFAULT_TC"},
     {SAI_PORT_ATTR_QOS_DOT1P_TO_TC_MAP,    "SAI_PORT_ATTR_QOS_DOT1P_TO_TC_MAP"},
     {SAI_PORT_ATTR_QOS_DOT1P_TO_COLOR_MAP,    "SAI_PORT_ATTR_QOS_DOT1P_TO_COLOR_MAP"},
-    {SAI_PORT_ATTR_QOS_DOT1P_TO_TC_AND_COLOR_MAP,    "SAI_PORT_ATTR_QOS_DOT1P_TO_TC_AND_COLOR_MAP"},
     {SAI_PORT_ATTR_QOS_DSCP_TO_TC_MAP,    "SAI_PORT_ATTR_QOS_DSCP_TO_TC_MAP"},
     {SAI_PORT_ATTR_QOS_DSCP_TO_COLOR_MAP,    "SAI_PORT_ATTR_QOS_DSCP_TO_COLOR_MAP"},
-    {SAI_PORT_ATTR_QOS_DSCP_TO_TC_AND_COLOR_MAP,    "SAI_PORT_ATTR_QOS_DSCP_TO_TC_AND_COLOR_MAP"},
     {SAI_PORT_ATTR_QOS_TC_TO_QUEUE_MAP,    "SAI_PORT_ATTR_QOS_TC_TO_QUEUE_MAP"},
     {SAI_PORT_ATTR_QOS_TC_AND_COLOR_TO_DOT1P_MAP,    "SAI_PORT_ATTR_QOS_TC_AND_COLOR_TO_DOT1P_MAP"},
     {SAI_PORT_ATTR_QOS_TC_AND_COLOR_TO_DSCP_MAP,    "SAI_PORT_ATTR_QOS_TC_AND_COLOR_TO_DSCP_MAP"},
@@ -246,10 +244,8 @@ static sai_status_t sai_port_apply_attribute (sai_object_id_t port_id,
                 break;
                 /** Fall through */
             case SAI_PORT_ATTR_QOS_TC_TO_QUEUE_MAP:
-            case SAI_PORT_ATTR_QOS_DOT1P_TO_TC_AND_COLOR_MAP:
             case SAI_PORT_ATTR_QOS_TC_AND_COLOR_TO_DOT1P_MAP:
             case SAI_PORT_ATTR_QOS_TC_AND_COLOR_TO_DSCP_MAP:
-            case SAI_PORT_ATTR_QOS_DSCP_TO_TC_AND_COLOR_MAP:
             case SAI_PORT_ATTR_QOS_DOT1P_TO_TC_MAP:
             case SAI_PORT_ATTR_QOS_DOT1P_TO_COLOR_MAP:
             case SAI_PORT_ATTR_QOS_DSCP_TO_TC_MAP:
@@ -399,8 +395,8 @@ sai_status_t sai_port_get_attribute(sai_object_id_t port_id,
 }
 
 sai_status_t sai_port_get_stats(sai_object_id_t port_id,
-                                const sai_port_stat_t *counter_ids,
                                 uint32_t number_of_counters,
+                                const sai_port_stat_t *counter_ids,
                                 uint64_t* counters)
 {
     sai_status_t     ret = SAI_STATUS_FAILURE;
@@ -443,8 +439,8 @@ sai_status_t sai_port_get_stats(sai_object_id_t port_id,
 }
 
 sai_status_t sai_port_clear_stats(sai_object_id_t port_id,
-                                  const sai_port_stat_t *counter_ids,
-                                  uint32_t number_of_counters)
+                                  uint32_t number_of_counters,
+                                  const sai_port_stat_t *counter_ids)
 {
     sai_status_t     ret = SAI_STATUS_FAILURE;
     sai_port_info_t *sai_port_info = NULL;

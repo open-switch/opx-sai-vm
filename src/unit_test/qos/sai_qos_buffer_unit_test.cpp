@@ -105,21 +105,21 @@ class qos_buffer : public ::testing::Test
                                                           sai_attr_set)));
 
 
-            ASSERT_EQ(SAI_STATUS_SUCCESS,sai_api_query(SAI_API_BUFFERS,
+            ASSERT_EQ(SAI_STATUS_SUCCESS,sai_api_query(SAI_API_BUFFER,
                         (static_cast<void**>(static_cast<void*>(&sai_buffer_api_table)))));
 
             ASSERT_TRUE(sai_buffer_api_table != NULL);
 
             EXPECT_TRUE(sai_buffer_api_table->create_buffer_pool != NULL);
             EXPECT_TRUE(sai_buffer_api_table->remove_buffer_pool != NULL);
-            EXPECT_TRUE(sai_buffer_api_table->set_buffer_pool_attr != NULL);
-            EXPECT_TRUE(sai_buffer_api_table->get_buffer_pool_attr != NULL);
-            EXPECT_TRUE(sai_buffer_api_table->set_ingress_priority_group_attr != NULL);
-            EXPECT_TRUE(sai_buffer_api_table->get_ingress_priority_group_attr != NULL);
+            EXPECT_TRUE(sai_buffer_api_table->set_buffer_pool_attribute != NULL);
+            EXPECT_TRUE(sai_buffer_api_table->get_buffer_pool_attribute != NULL);
+            EXPECT_TRUE(sai_buffer_api_table->set_ingress_priority_group_attribute != NULL);
+            EXPECT_TRUE(sai_buffer_api_table->get_ingress_priority_group_attribute != NULL);
             EXPECT_TRUE(sai_buffer_api_table->create_buffer_profile != NULL);
             EXPECT_TRUE(sai_buffer_api_table->remove_buffer_profile != NULL);
-            EXPECT_TRUE(sai_buffer_api_table->set_buffer_profile_attr != NULL);
-            EXPECT_TRUE(sai_buffer_api_table->get_buffer_profile_attr != NULL);
+            EXPECT_TRUE(sai_buffer_api_table->set_buffer_profile_attribute != NULL);
+            EXPECT_TRUE(sai_buffer_api_table->get_buffer_profile_attribute != NULL);
 
             ASSERT_EQ(NULL,sai_api_query(SAI_API_PORT,
                         (static_cast<void**>(static_cast<void*>(&sai_port_api_table)))));
@@ -131,7 +131,7 @@ class qos_buffer : public ::testing::Test
             EXPECT_TRUE(sai_port_api_table->get_port_stats != NULL);
 
 
-            ASSERT_EQ(SAI_STATUS_SUCCESS,sai_api_query(SAI_API_QOS_MAPS,
+            ASSERT_EQ(SAI_STATUS_SUCCESS,sai_api_query(SAI_API_QOS_MAP,
                         (static_cast<void**>(static_cast<void*>(&sai_qos_map_api_table)))));
 
             ASSERT_TRUE(sai_qos_map_api_table != NULL);
@@ -255,7 +255,7 @@ TEST_F(qos_buffer, buffer_pool_create_test)
 
     /** Check if default mode is dynamic */
     get_attr.id = SAI_BUFFER_POOL_ATTR_THRESHOLD_MODE;
-    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_buffer_api_table->get_buffer_pool_attr(pool_id,
+    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_buffer_api_table->get_buffer_pool_attribute(pool_id,
                                      1, &get_attr));
     ASSERT_EQ (get_attr.value.s32, SAI_BUFFER_POOL_THRESHOLD_MODE_DYNAMIC);
 
@@ -278,38 +278,38 @@ TEST_F(qos_buffer, buffer_pool_attr_test)
 
     set_attr.id = SAI_BUFFER_POOL_ATTR_SIZE;
     set_attr.value.u32 = sai_buffer_pool_test_size_2;
-    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_pool_attr(pool_id,
+    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_pool_attribute(pool_id,
                                      (const sai_attribute_t *)&set_attr));
 
     get_attr.id = SAI_BUFFER_POOL_ATTR_SIZE;
-    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_buffer_api_table->get_buffer_pool_attr(pool_id,
+    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_buffer_api_table->get_buffer_pool_attribute(pool_id,
                                      1, &get_attr));
     ASSERT_EQ (get_attr.value.u32, sai_buffer_pool_test_size_2);
 
     set_attr.id = SAI_BUFFER_POOL_ATTR_SIZE;
     set_attr.value.u32 = 3;
-    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_pool_attr(pool_id,
+    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_pool_attribute(pool_id,
                                      (const sai_attribute_t *)&set_attr));
 
     set_attr.id = SAI_BUFFER_POOL_ATTR_SIZE;
     set_attr.value.u32 = sai_buffer_pool_test_size_1;
-    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_pool_attr(pool_id,
+    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_pool_attribute(pool_id,
                                      (const sai_attribute_t *)&set_attr));
 
     printf("Update back to sai_buffer_pool_test_size_1\r\n");
     set_attr.id = SAI_BUFFER_POOL_ATTR_TYPE;
     set_attr.value.u32 = SAI_BUFFER_POOL_TYPE_EGRESS;
-    ASSERT_EQ(SAI_STATUS_INVALID_ATTRIBUTE_0, sai_buffer_api_table->set_buffer_pool_attr(pool_id,
+    ASSERT_EQ(SAI_STATUS_INVALID_ATTRIBUTE_0, sai_buffer_api_table->set_buffer_pool_attribute(pool_id,
                                      (const sai_attribute_t *)&set_attr));
 
     set_attr.id = SAI_BUFFER_POOL_ATTR_THRESHOLD_MODE;
     set_attr.value.u32 = SAI_BUFFER_POOL_THRESHOLD_MODE_DYNAMIC;
-    ASSERT_EQ(SAI_STATUS_INVALID_ATTRIBUTE_0, sai_buffer_api_table->set_buffer_pool_attr(pool_id,
+    ASSERT_EQ(SAI_STATUS_INVALID_ATTRIBUTE_0, sai_buffer_api_table->set_buffer_pool_attribute(pool_id,
                                      (const sai_attribute_t *)&set_attr));
 
     set_attr.id = SAI_BUFFER_POOL_ATTR_SHARED_SIZE;
     set_attr.value.u32 = sai_buffer_pool_test_size_2;
-    ASSERT_EQ(SAI_STATUS_INVALID_ATTRIBUTE_0, sai_buffer_api_table->set_buffer_pool_attr(pool_id,
+    ASSERT_EQ(SAI_STATUS_INVALID_ATTRIBUTE_0, sai_buffer_api_table->set_buffer_pool_attribute(pool_id,
                                      (const sai_attribute_t *)&set_attr));
 
     ASSERT_EQ(SAI_STATUS_SUCCESS,
@@ -444,10 +444,10 @@ TEST_F(qos_buffer, max_buffer_size_test)
     set_attr.id = SAI_BUFFER_POOL_ATTR_SIZE;
     set_attr.value.u32 = buf_size;
 
-    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_pool_attr(pool_id[1],
+    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_pool_attribute(pool_id[1],
                                      (const sai_attribute_t *)&set_attr));
 
-    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_pool_attr(pool_id[3],
+    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_pool_attribute(pool_id[3],
                                      (const sai_attribute_t *)&set_attr));
 
     ASSERT_EQ(SAI_STATUS_SUCCESS, sai_create_buffer_pool(sai_buffer_api_table,
@@ -564,40 +564,40 @@ TEST_F(qos_buffer, egr_buffer_profile_attr_test)
     set_attr.value.u32 = sai_buffer_profile_test_size_1;
 
     ASSERT_EQ (SAI_STATUS_INVALID_ATTRIBUTE_0,
-               sai_buffer_api_table->set_buffer_profile_attr (profile_id,
+               sai_buffer_api_table->set_buffer_profile_attribute (profile_id,
                                               (const sai_attribute_t *)&set_attr));
 
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_POOL_ID;
     set_attr.value.oid = pool_id_2;
 
     ASSERT_EQ (SAI_STATUS_INVALID_ATTRIBUTE_0,
-               sai_buffer_api_table->set_buffer_profile_attr (profile_id,
+               sai_buffer_api_table->set_buffer_profile_attribute (profile_id,
                                                (const sai_attribute_t *)&set_attr));
 
     set_attr.value.oid = pool_id_3;
 
     ASSERT_EQ (SAI_STATUS_INVALID_ATTRIBUTE_0,
-               sai_buffer_api_table->set_buffer_profile_attr (profile_id,
+               sai_buffer_api_table->set_buffer_profile_attribute (profile_id,
                                                (const sai_attribute_t *)&set_attr));
 
     printf("Update pool id \r\n");
     set_attr.value.oid = pool_id_4;
 
     ASSERT_EQ (SAI_STATUS_INVALID_ATTRIBUTE_0,
-               sai_buffer_api_table->set_buffer_profile_attr (profile_id,
+               sai_buffer_api_table->set_buffer_profile_attribute (profile_id,
                                                (const sai_attribute_t *)&set_attr));
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_SHARED_DYNAMIC_TH;
     set_attr.value.u8 = 1;
 
     ASSERT_EQ (SAI_STATUS_INVALID_ATTRIBUTE_0,
-               sai_buffer_api_table->set_buffer_profile_attr (profile_id,
+               sai_buffer_api_table->set_buffer_profile_attribute (profile_id,
                                               (const sai_attribute_t *)&set_attr));
     printf("Update XON threshold \r\n");
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_SHARED_STATIC_TH;
     set_attr.value.u32 = sai_buffer_profile_test_size_3;
 
     ASSERT_EQ (SAI_STATUS_SUCCESS,
-               sai_buffer_api_table->set_buffer_profile_attr (profile_id,
+               sai_buffer_api_table->set_buffer_profile_attribute (profile_id,
                                               (const sai_attribute_t *)&set_attr));
 
     printf("Get XON threshold \r\n");
@@ -606,7 +606,7 @@ TEST_F(qos_buffer, egr_buffer_profile_attr_test)
     get_attr[2].id = SAI_BUFFER_PROFILE_ATTR_SHARED_STATIC_TH;
 
     ASSERT_EQ (SAI_STATUS_SUCCESS,
-               sai_buffer_api_table->get_buffer_profile_attr (profile_id, 3, get_attr));
+               sai_buffer_api_table->get_buffer_profile_attribute (profile_id, 3, get_attr));
 
     EXPECT_EQ (get_attr[0].value.oid, pool_id_1);
     EXPECT_EQ (get_attr[1].value.u32, sai_buffer_profile_test_size_1);
@@ -656,44 +656,44 @@ TEST_F(qos_buffer, ing_buffer_profile_attr_test)
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_BUFFER_SIZE;
     set_attr.value.u32 = sai_buffer_profile_test_size_2;
     ASSERT_EQ (SAI_STATUS_SUCCESS,
-               sai_buffer_api_table->set_buffer_profile_attr (profile_id,
+               sai_buffer_api_table->set_buffer_profile_attribute (profile_id,
                                               (const sai_attribute_t *)&set_attr));
 
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_XOFF_TH;
     set_attr.value.u32 = sai_buffer_profile_test_size_1;
     ASSERT_EQ (SAI_STATUS_SUCCESS,
-               sai_buffer_api_table->set_buffer_profile_attr (profile_id,
+               sai_buffer_api_table->set_buffer_profile_attribute (profile_id,
                                               (const sai_attribute_t *)&set_attr));
 
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_POOL_ID;
     set_attr.value.oid = pool_id_2;
     ASSERT_EQ (SAI_STATUS_INVALID_ATTRIBUTE_0,
-               sai_buffer_api_table->set_buffer_profile_attr (profile_id,
+               sai_buffer_api_table->set_buffer_profile_attribute (profile_id,
                                                (const sai_attribute_t *)&set_attr));
     set_attr.value.oid = pool_id_3;
     ASSERT_EQ (SAI_STATUS_INVALID_ATTRIBUTE_0,
-               sai_buffer_api_table->set_buffer_profile_attr (profile_id,
+               sai_buffer_api_table->set_buffer_profile_attribute (profile_id,
                                                (const sai_attribute_t *)&set_attr));
     set_attr.value.oid = pool_id_4;
     ASSERT_EQ (SAI_STATUS_INVALID_ATTRIBUTE_0,
-               sai_buffer_api_table->set_buffer_profile_attr (profile_id,
+               sai_buffer_api_table->set_buffer_profile_attribute (profile_id,
                                                (const sai_attribute_t *)&set_attr));
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_SHARED_DYNAMIC_TH;
     set_attr.value.u8 = 2;
     ASSERT_EQ (SAI_STATUS_SUCCESS,
-               sai_buffer_api_table->set_buffer_profile_attr (profile_id,
+               sai_buffer_api_table->set_buffer_profile_attribute (profile_id,
                                               (const sai_attribute_t *)&set_attr));
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_SHARED_STATIC_TH;
     set_attr.value.u32 = sai_buffer_profile_test_size_3;
     ASSERT_EQ (SAI_STATUS_INVALID_ATTRIBUTE_0,
-               sai_buffer_api_table->set_buffer_profile_attr (profile_id,
+               sai_buffer_api_table->set_buffer_profile_attribute (profile_id,
                                               (const sai_attribute_t *)&set_attr));
     get_attr[0].id = SAI_BUFFER_PROFILE_ATTR_POOL_ID;
     get_attr[1].id = SAI_BUFFER_PROFILE_ATTR_BUFFER_SIZE;
     get_attr[2].id = SAI_BUFFER_PROFILE_ATTR_SHARED_DYNAMIC_TH;
     get_attr[3].id = SAI_BUFFER_PROFILE_ATTR_XOFF_TH;
     ASSERT_EQ (SAI_STATUS_SUCCESS,
-               sai_buffer_api_table->get_buffer_profile_attr (profile_id, 4,
+               sai_buffer_api_table->get_buffer_profile_attribute (profile_id, 4,
                                                               get_attr));
     EXPECT_EQ (get_attr[0].value.oid, pool_id_1);
     EXPECT_EQ (get_attr[1].value.u32, sai_buffer_profile_test_size_2);
@@ -733,13 +733,13 @@ TEST_F(qos_buffer, buffer_profile_pg_basic_test)
 
     set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     set_attr.value.oid = profile_id;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_obj, (const sai_attribute_t *)&set_attr));
 
     memset(get_attr, 0, sizeof(get_attr));
     get_attr[0].id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->
-               get_ingress_priority_group_attr (pg_obj, 1, get_attr));
+               get_ingress_priority_group_attribute (pg_obj, 1, get_attr));
 
     EXPECT_EQ (get_attr[0].value.oid, profile_id);
 
@@ -748,7 +748,7 @@ TEST_F(qos_buffer, buffer_profile_pg_basic_test)
 
     set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     set_attr.value.oid = SAI_NULL_OBJECT_ID;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_obj, (const sai_attribute_t *)&set_attr));
 
     ASSERT_EQ (SAI_STATUS_SUCCESS,
@@ -779,7 +779,7 @@ TEST_F(qos_buffer, buffer_profile_pool_size_test)
     set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     set_attr.value.oid = profile_id;
     ASSERT_EQ (SAI_STATUS_INSUFFICIENT_RESOURCES, sai_buffer_api_table->
-               set_ingress_priority_group_attr (pg_obj, (const sai_attribute_t *)&set_attr));
+               set_ingress_priority_group_attribute (pg_obj, (const sai_attribute_t *)&set_attr));
 
     ASSERT_EQ (SAI_STATUS_SUCCESS,
                sai_buffer_api_table->remove_buffer_profile (profile_id));
@@ -812,13 +812,13 @@ TEST_F(qos_buffer, buffer_profile_pg_size_test)
 
     set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     set_attr.value.oid = profile_id;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_obj, (const sai_attribute_t *)&set_attr));
 
     memset(get_attr, 0, sizeof(get_attr));
     get_attr[0].id = SAI_BUFFER_POOL_ATTR_SHARED_SIZE;
     ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->
-               get_buffer_pool_attr (pool_id_1, 1, get_attr));
+               get_buffer_pool_attribute (pool_id_1, 1, get_attr));
 
     EXPECT_EQ (get_attr[0].value.u32,
               (shared_size - (sai_buffer_profile_test_size_2 + sai_buffer_profile_test_size_1)));
@@ -828,10 +828,10 @@ TEST_F(qos_buffer, buffer_profile_pg_size_test)
     set_attr.value.u32 = sai_buffer_profile_test_size_1;
 
     ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->
-               set_buffer_profile_attr (profile_id, (const sai_attribute_t *)&set_attr));
+               set_buffer_profile_attribute (profile_id, (const sai_attribute_t *)&set_attr));
     memset(get_attr, 0, sizeof(get_attr));
     get_attr[0].id = SAI_BUFFER_POOL_ATTR_SHARED_SIZE;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->get_buffer_pool_attr (
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->get_buffer_pool_attribute (
                                                pool_id_1, 1,  get_attr));
     EXPECT_EQ (get_attr[0].value.u32,
               (shared_size - (sai_buffer_profile_test_size_1 + sai_buffer_profile_test_size_1)));
@@ -841,10 +841,10 @@ TEST_F(qos_buffer, buffer_profile_pg_size_test)
     set_attr.value.u32 = sai_buffer_profile_test_size_2;
 
     ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->
-               set_buffer_profile_attr (profile_id, (const sai_attribute_t *)&set_attr));
+               set_buffer_profile_attribute (profile_id, (const sai_attribute_t *)&set_attr));
     memset(get_attr, 0, sizeof(get_attr));
     get_attr[0].id = SAI_BUFFER_POOL_ATTR_SHARED_SIZE;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->get_buffer_pool_attr (
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->get_buffer_pool_attribute (
                                                pool_id_1, 1,  get_attr));
     EXPECT_EQ (get_attr[0].value.u32,
               (shared_size - (sai_buffer_profile_test_size_1 + sai_buffer_profile_test_size_2)));
@@ -852,41 +852,41 @@ TEST_F(qos_buffer, buffer_profile_pg_size_test)
     /** Move PG to a different pool, not vlaid */
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_POOL_ID;
     set_attr.value.oid = pool_id_2;
-    ASSERT_EQ (SAI_STATUS_INVALID_ATTRIBUTE_0, sai_buffer_api_table->set_buffer_profile_attr (
+    ASSERT_EQ (SAI_STATUS_INVALID_ATTRIBUTE_0, sai_buffer_api_table->set_buffer_profile_attribute (
                                               profile_id, (const sai_attribute_t *)&set_attr));
     memset(get_attr, 0, sizeof(get_attr));
     get_attr[0].id = SAI_BUFFER_POOL_ATTR_SHARED_SIZE;
     ASSERT_EQ (SAI_STATUS_SUCCESS,
-               sai_buffer_api_table->get_buffer_pool_attr (pool_id_1, 1, get_attr));
+               sai_buffer_api_table->get_buffer_pool_attribute (pool_id_1, 1, get_attr));
     EXPECT_EQ (get_attr[0].value.u32,
               (shared_size - (sai_buffer_profile_test_size_1 + sai_buffer_profile_test_size_2)));
 
     memset(get_attr, 0, sizeof(get_attr));
     get_attr[0].id = SAI_BUFFER_POOL_ATTR_SHARED_SIZE;
     ASSERT_EQ (SAI_STATUS_SUCCESS,
-               sai_buffer_api_table->get_buffer_pool_attr (pool_id_2, 1, get_attr));
+               sai_buffer_api_table->get_buffer_pool_attribute (pool_id_2, 1, get_attr));
     EXPECT_EQ (get_attr[0].value.u32, shared_size_2);
 
     /** Change pool size */
     set_attr.id = SAI_BUFFER_POOL_ATTR_SIZE;
     set_attr.value.u32 = sai_buffer_pool_test_size_3;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_pool_attr (
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_pool_attribute (
                                               pool_id_2, (const sai_attribute_t *)&set_attr));
     memset(get_attr, 0, sizeof(get_attr));
     get_attr[0].id = SAI_BUFFER_POOL_ATTR_SHARED_SIZE;
     ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->
-               get_buffer_pool_attr (pool_id_2, 1, get_attr));
+               get_buffer_pool_attribute (pool_id_2, 1, get_attr));
     EXPECT_EQ (get_attr[0].value.u32, shared_size_3);
 
     /** Remove PG from pool */
     set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     set_attr.value.oid = SAI_NULL_OBJECT_ID;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_obj, (const sai_attribute_t *)&set_attr));
 
     get_attr[0].id = SAI_BUFFER_POOL_ATTR_SHARED_SIZE;
     ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->
-               get_buffer_pool_attr (pool_id_1, 1, get_attr));
+               get_buffer_pool_attribute (pool_id_1, 1, get_attr));
 
     EXPECT_EQ (get_attr[0].value.u32, shared_size);
 
@@ -940,54 +940,54 @@ TEST_F(qos_buffer, pg_buffer_profile_replace_test)
 
     set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     set_attr.value.oid = profile_id[0];
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_obj, (const sai_attribute_t *)&set_attr));
 
     set_attr.value.oid =  profile_id[3];
-    ASSERT_EQ (SAI_STATUS_INVALID_PARAMETER, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_INVALID_PARAMETER, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_obj, (const sai_attribute_t *)&set_attr));
 
     set_attr.value.oid =  profile_id[4];
-    ASSERT_EQ (SAI_STATUS_INVALID_PARAMETER, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_INVALID_PARAMETER, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_obj, (const sai_attribute_t *)&set_attr));
 
     set_attr.value.oid = profile_id[1];
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_obj, (const sai_attribute_t *)&set_attr));
 
     memset(get_attr, 0, sizeof(get_attr));
     get_attr[0].id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->get_ingress_priority_group_attr (
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->get_ingress_priority_group_attribute (
                                                pg_obj, 1,  get_attr));
     EXPECT_EQ (get_attr[0].value.oid, profile_id[1]);
 
         memset(get_attr, 0, sizeof(get_attr));
     get_attr[0].id = SAI_BUFFER_POOL_ATTR_SHARED_SIZE;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->get_buffer_pool_attr (
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->get_buffer_pool_attribute (
                                                pool_id[0], 1,  get_attr));
     EXPECT_EQ (get_attr[0].value.u32,
               (shared_size_1 - (sai_buffer_profile_test_size_1 + sai_buffer_profile_test_size_1)));
 
     set_attr.value.oid = profile_id[2];
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_obj, (const sai_attribute_t *)&set_attr));
 
     memset(get_attr, 0, sizeof(get_attr));
     get_attr[0].id = SAI_BUFFER_POOL_ATTR_SHARED_SIZE;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->get_buffer_pool_attr (
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->get_buffer_pool_attribute (
                                                pool_id[0], 1,  get_attr));
     EXPECT_EQ (get_attr[0].value.u32, shared_size_1);
 
     memset(get_attr, 0, sizeof(get_attr));
     get_attr[0].id = SAI_BUFFER_POOL_ATTR_SHARED_SIZE;
     ASSERT_EQ (SAI_STATUS_SUCCESS,
-               sai_buffer_api_table->get_buffer_pool_attr (pool_id[1], 1, get_attr));
+               sai_buffer_api_table->get_buffer_pool_attribute (pool_id[1], 1, get_attr));
     EXPECT_EQ (get_attr[0].value.u32,
               (shared_size_2 - (sai_buffer_profile_test_size_1 + sai_buffer_profile_test_size_1)));
 
     set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     set_attr.value.oid = SAI_NULL_OBJECT_ID;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_obj, (const sai_attribute_t *)&set_attr));
 
     ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->remove_buffer_profile (profile_id[0]));
@@ -1044,26 +1044,26 @@ TEST_F(qos_buffer, buffer_profile_pg_profile_th_test)
     ASSERT_EQ(SAI_STATUS_SUCCESS, sai_qos_buffer_get_first_pg(sai_port_api_table, port_id, &pg_obj));
     set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     set_attr.value.oid = profile_id_1;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_obj, (const sai_attribute_t *)&set_attr));
     /* Reseevred 1MB */
     memset(get_attr, 0, sizeof(get_attr));
     get_attr[0].id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->
-               get_ingress_priority_group_attr (pg_obj, 1, get_attr));
+               get_ingress_priority_group_attribute (pg_obj, 1, get_attr));
 
     EXPECT_EQ (get_attr[0].value.oid, profile_id_1);
 
     printf("Replace with profile 2 \r\n");
     set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     set_attr.value.oid = profile_id_2;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_obj, (const sai_attribute_t *)&set_attr));
    // reserved is 1MB
     memset(get_attr, 0, sizeof(get_attr));
     get_attr[0].id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->
-               get_ingress_priority_group_attr (pg_obj, 1, get_attr));
+               get_ingress_priority_group_attribute (pg_obj, 1, get_attr));
 
     EXPECT_EQ (get_attr[0].value.oid, profile_id_2);
 
@@ -1071,13 +1071,13 @@ TEST_F(qos_buffer, buffer_profile_pg_profile_th_test)
 
     set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     set_attr.value.oid = profile_id_3;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_obj, (const sai_attribute_t *)&set_attr));
     // reseve 1MB
     memset(get_attr, 0, sizeof(get_attr));
     get_attr[0].id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->
-               get_ingress_priority_group_attr (pg_obj, 1, get_attr));
+               get_ingress_priority_group_attribute (pg_obj, 1, get_attr));
 
     EXPECT_EQ (get_attr[0].value.oid, profile_id_3);
     printf("After profile 3 \r\n");
@@ -1086,7 +1086,7 @@ TEST_F(qos_buffer, buffer_profile_pg_profile_th_test)
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_SHARED_STATIC_TH;
     set_attr.value.u32 = 0;
 
-    ASSERT_EQ (SAI_STATUS_INVALID_ATTRIBUTE_0, sai_buffer_api_table->set_buffer_profile_attr (profile_id_3,
+    ASSERT_EQ (SAI_STATUS_INVALID_ATTRIBUTE_0, sai_buffer_api_table->set_buffer_profile_attribute (profile_id_3,
                                               (const sai_attribute_t *)&set_attr));
     printf("modify pool id \r\n");
 
@@ -1094,33 +1094,33 @@ TEST_F(qos_buffer, buffer_profile_pg_profile_th_test)
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_THRESHOLD_MODE;
     set_attr.value.oid = SAI_BUFFER_PROFILE_THRESHOLD_MODE_STATIC;
 
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_profile_attr (profile_id_3,
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_profile_attribute (profile_id_3,
                                               (const sai_attribute_t *)&set_attr));
 
     printf(" SAI_BUFFER_PROFILE_ATTR_SHARED_STATIC_TH \r\n");
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_SHARED_STATIC_TH;
     set_attr.value.u32 = 0;
 
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_profile_attr (profile_id_3,
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_profile_attribute (profile_id_3,
                                               (const sai_attribute_t *)&set_attr));
     printf("modify pool id \r\n");
     /* Change buffer pool to a differnt type since profile th is enabled */
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_POOL_ID;
     set_attr.value.oid = pool_id_2;
 
-    ASSERT_EQ (SAI_STATUS_INVALID_ATTRIBUTE_0, sai_buffer_api_table->set_buffer_profile_attr (profile_id_3,
+    ASSERT_EQ (SAI_STATUS_INVALID_ATTRIBUTE_0, sai_buffer_api_table->set_buffer_profile_attribute (profile_id_3,
                                               (const sai_attribute_t *)&set_attr));
 
     printf("Applying profile id 4 \r\n");
     set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     set_attr.value.oid = profile_id_4;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_obj, (const sai_attribute_t *)&set_attr));
 
     memset(get_attr, 0, sizeof(get_attr));
     get_attr[0].id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->
-               get_ingress_priority_group_attr (pg_obj, 1, get_attr));
+               get_ingress_priority_group_attribute (pg_obj, 1, get_attr));
 
     EXPECT_EQ (get_attr[0].value.oid, profile_id_4);
 
@@ -1128,32 +1128,32 @@ TEST_F(qos_buffer, buffer_profile_pg_profile_th_test)
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_SHARED_DYNAMIC_TH;
     set_attr.value.u32 = 2;
 
-    ASSERT_EQ (SAI_STATUS_INVALID_ATTRIBUTE_0, sai_buffer_api_table->set_buffer_profile_attr (profile_id_4,
+    ASSERT_EQ (SAI_STATUS_INVALID_ATTRIBUTE_0, sai_buffer_api_table->set_buffer_profile_attribute (profile_id_4,
                                               (const sai_attribute_t *)&set_attr));
     /* Set profile th mode and change profile value. */
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_THRESHOLD_MODE;
     set_attr.value.oid = SAI_BUFFER_PROFILE_THRESHOLD_MODE_DYNAMIC;
 
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_profile_attr (profile_id_4,
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_profile_attribute (profile_id_4,
                                               (const sai_attribute_t *)&set_attr));
 
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_SHARED_DYNAMIC_TH;
     set_attr.value.u32 = 2;
 
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_profile_attr (profile_id_4,
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_profile_attribute (profile_id_4,
                                               (const sai_attribute_t *)&set_attr));
 
     /* Change buffer pool to a differnt type since profile th is enabled */
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_POOL_ID;
     set_attr.value.oid = pool_id_1;
 
-    ASSERT_EQ (SAI_STATUS_INVALID_ATTRIBUTE_0, sai_buffer_api_table->set_buffer_profile_attr (profile_id_4,
+    ASSERT_EQ (SAI_STATUS_INVALID_ATTRIBUTE_0, sai_buffer_api_table->set_buffer_profile_attribute (profile_id_4,
                                               (const sai_attribute_t *)&set_attr));
 
     printf("Removing profile from pg \r\n");
     set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     set_attr.value.oid = SAI_NULL_OBJECT_ID;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_obj, (const sai_attribute_t *)&set_attr));
 
 
@@ -1300,27 +1300,27 @@ TEST_F(qos_buffer, buffer_profile_queue_profile_th_test)
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_SHARED_STATIC_TH;
     set_attr.value.u32 = 0;
 
-    ASSERT_EQ (SAI_STATUS_INVALID_ATTRIBUTE_0, sai_buffer_api_table->set_buffer_profile_attr (profile_id_3,
+    ASSERT_EQ (SAI_STATUS_INVALID_ATTRIBUTE_0, sai_buffer_api_table->set_buffer_profile_attribute (profile_id_3,
                                               (const sai_attribute_t *)&set_attr));
 
     /* Set profile th mode and change profile value. Setting to 0 which should be setting to unlimited value */
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_THRESHOLD_MODE;
     set_attr.value.oid = SAI_BUFFER_PROFILE_THRESHOLD_MODE_STATIC;
 
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_profile_attr (profile_id_3,
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_profile_attribute (profile_id_3,
                                               (const sai_attribute_t *)&set_attr));
 
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_SHARED_STATIC_TH;
     set_attr.value.u32 = 0;
 
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_profile_attr (profile_id_3,
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_profile_attribute (profile_id_3,
                                               (const sai_attribute_t *)&set_attr));
 
     /* Change buffer pool to a differnt type since profile th is enabled */
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_POOL_ID;
     set_attr.value.oid = pool_id_2;
 
-    ASSERT_EQ (SAI_STATUS_INVALID_ATTRIBUTE_0, sai_buffer_api_table->set_buffer_profile_attr (profile_id_3,
+    ASSERT_EQ (SAI_STATUS_INVALID_ATTRIBUTE_0, sai_buffer_api_table->set_buffer_profile_attribute (profile_id_3,
                                               (const sai_attribute_t *)&set_attr));
 
     set_attr.id = SAI_QUEUE_ATTR_BUFFER_PROFILE_ID;
@@ -1339,27 +1339,27 @@ TEST_F(qos_buffer, buffer_profile_queue_profile_th_test)
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_SHARED_DYNAMIC_TH;
     set_attr.value.u32 = 2;
 
-    ASSERT_EQ (SAI_STATUS_INVALID_ATTRIBUTE_0, sai_buffer_api_table->set_buffer_profile_attr (profile_id_4,
+    ASSERT_EQ (SAI_STATUS_INVALID_ATTRIBUTE_0, sai_buffer_api_table->set_buffer_profile_attribute (profile_id_4,
                                               (const sai_attribute_t *)&set_attr));
 
     /* Set profile th mode and change profile value. */
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_THRESHOLD_MODE;
     set_attr.value.oid = SAI_BUFFER_PROFILE_THRESHOLD_MODE_DYNAMIC;
 
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_profile_attr (profile_id_4,
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_profile_attribute (profile_id_4,
                                               (const sai_attribute_t *)&set_attr));
 
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_SHARED_DYNAMIC_TH;
     set_attr.value.u32 = 2;
 
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_profile_attr (profile_id_4,
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_profile_attribute (profile_id_4,
                                               (const sai_attribute_t *)&set_attr));
 
     /* Change buffer pool to a differnt type since profile th is enabled */
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_POOL_ID;
     set_attr.value.oid = pool_id_1;
 
-    ASSERT_EQ (SAI_STATUS_INVALID_ATTRIBUTE_0, sai_buffer_api_table->set_buffer_profile_attr (profile_id_4,
+    ASSERT_EQ (SAI_STATUS_INVALID_ATTRIBUTE_0, sai_buffer_api_table->set_buffer_profile_attribute (profile_id_4,
                                               (const sai_attribute_t *)&set_attr));
     set_attr.id = SAI_QUEUE_ATTR_BUFFER_PROFILE_ID;
     set_attr.value.oid = SAI_NULL_OBJECT_ID;
@@ -1411,7 +1411,7 @@ TEST_F(qos_buffer, buffer_profile_queue_size_test)
     memset(get_attr, 0, sizeof(get_attr));
     get_attr[0].id = SAI_BUFFER_POOL_ATTR_SHARED_SIZE;
     ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->
-               get_buffer_pool_attr (pool_id_1, 1, get_attr));
+               get_buffer_pool_attribute (pool_id_1, 1, get_attr));
 
     EXPECT_EQ (get_attr[0].value.u32,
               (shared_size_2 - sai_buffer_profile_test_size_1));
@@ -1422,10 +1422,10 @@ TEST_F(qos_buffer, buffer_profile_queue_size_test)
     set_attr.value.u32 = sai_buffer_profile_test_size_2;
 
     ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->
-               set_buffer_profile_attr (profile_id, (const sai_attribute_t *)&set_attr));
+               set_buffer_profile_attribute (profile_id, (const sai_attribute_t *)&set_attr));
     memset(get_attr, 0, sizeof(get_attr));
     get_attr[0].id = SAI_BUFFER_POOL_ATTR_SHARED_SIZE;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->get_buffer_pool_attr (
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->get_buffer_pool_attribute (
                                                pool_id_1, 1,  get_attr));
     EXPECT_EQ (get_attr[0].value.u32,
               (shared_size_2 - sai_buffer_profile_test_size_2));
@@ -1433,30 +1433,30 @@ TEST_F(qos_buffer, buffer_profile_queue_size_test)
     /** Move QUEUE to a different pool */
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_POOL_ID;
     set_attr.value.oid = pool_id_2;
-    ASSERT_EQ (SAI_STATUS_INVALID_ATTRIBUTE_0, sai_buffer_api_table->set_buffer_profile_attr (
+    ASSERT_EQ (SAI_STATUS_INVALID_ATTRIBUTE_0, sai_buffer_api_table->set_buffer_profile_attribute (
                                               profile_id, (const sai_attribute_t *)&set_attr));
 
     memset(get_attr, 0, sizeof(get_attr));
     get_attr[0].id = SAI_BUFFER_POOL_ATTR_SHARED_SIZE;
     ASSERT_EQ (SAI_STATUS_SUCCESS,
-               sai_buffer_api_table->get_buffer_pool_attr (pool_id_1, 1, get_attr));
+               sai_buffer_api_table->get_buffer_pool_attribute (pool_id_1, 1, get_attr));
     EXPECT_EQ (get_attr[0].value.u32, (shared_size_2 - sai_buffer_profile_test_size_2));
 
     memset(get_attr, 0, sizeof(get_attr));
     get_attr[0].id = SAI_BUFFER_POOL_ATTR_SHARED_SIZE;
     ASSERT_EQ (SAI_STATUS_SUCCESS,
-               sai_buffer_api_table->get_buffer_pool_attr (pool_id_2, 1, get_attr));
+               sai_buffer_api_table->get_buffer_pool_attribute (pool_id_2, 1, get_attr));
     EXPECT_EQ (get_attr[0].value.u32, (shared_size_1));
 
     /** Change pool size */
     set_attr.id = SAI_BUFFER_POOL_ATTR_SIZE;
     set_attr.value.u32 = sai_buffer_pool_test_size_2;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_pool_attr (
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_pool_attribute (
                                               pool_id_2, (const sai_attribute_t *)&set_attr));
     memset(get_attr, 0, sizeof(get_attr));
     get_attr[0].id = SAI_BUFFER_POOL_ATTR_SHARED_SIZE;
     ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->
-               get_buffer_pool_attr (pool_id_2, 1, get_attr));
+               get_buffer_pool_attribute (pool_id_2, 1, get_attr));
     EXPECT_EQ (get_attr[0].value.u32, (shared_size_2));
 
     /** Remove QUEUE from pool */
@@ -1467,7 +1467,7 @@ TEST_F(qos_buffer, buffer_profile_queue_size_test)
 
     get_attr[0].id = SAI_BUFFER_POOL_ATTR_SHARED_SIZE;
     ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->
-               get_buffer_pool_attr (pool_id_2, 1, get_attr));
+               get_buffer_pool_attribute (pool_id_2, 1, get_attr));
 
     EXPECT_EQ (get_attr[0].value.u32, shared_size_2);
 
@@ -1537,7 +1537,7 @@ TEST_F(qos_buffer, queue_buffer_profile_replace_test)
 
     memset(get_attr, 0, sizeof(get_attr));
     get_attr[0].id = SAI_BUFFER_POOL_ATTR_SHARED_SIZE;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->get_buffer_pool_attr (
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->get_buffer_pool_attribute (
                                                pool_id[0], 1,  get_attr));
     EXPECT_EQ (get_attr[0].value.u32,
               (shared_size_1 - sai_buffer_profile_test_size_1));
@@ -1548,14 +1548,14 @@ TEST_F(qos_buffer, queue_buffer_profile_replace_test)
 
     memset(get_attr, 0, sizeof(get_attr));
     get_attr[0].id = SAI_BUFFER_POOL_ATTR_SHARED_SIZE;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->get_buffer_pool_attr (
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->get_buffer_pool_attribute (
                                                pool_id[0], 1,  get_attr));
     EXPECT_EQ (get_attr[0].value.u32, shared_size_1);
 
     memset(get_attr, 0, sizeof(get_attr));
     get_attr[0].id = SAI_BUFFER_POOL_ATTR_SHARED_SIZE;
     ASSERT_EQ (SAI_STATUS_SUCCESS,
-               sai_buffer_api_table->get_buffer_pool_attr (pool_id[1], 1, get_attr));
+               sai_buffer_api_table->get_buffer_pool_attribute (pool_id[1], 1, get_attr));
     EXPECT_EQ (get_attr[0].value.u32,
               (shared_size_2 - sai_buffer_profile_test_size_1));
 
@@ -1601,12 +1601,12 @@ TEST_F (qos_buffer, ingress_buffer_pool_stats_get)
     ASSERT_EQ(SAI_STATUS_SUCCESS, sai_qos_buffer_get_first_pg(sai_port_api_table, port_id, &pg_id));
     set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     set_attr.value.oid = profile_id;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_id, (const sai_attribute_t *)&set_attr));
 
     for(idx = 0; idx < num_counters; idx++) {
-        sai_rc = sai_buffer_api_table->get_buffer_pool_stats(pool_id, &counter_id[idx],
-                                                            1, &counter_val);
+        sai_rc = sai_buffer_api_table->get_buffer_pool_stats(pool_id, 1, &counter_id[idx],
+                                                             &counter_val);
         if(sai_rc == SAI_STATUS_SUCCESS) {
              printf("Get counter ID %d is supported. Val:0x%" PRIx64 "\r\n",counter_id[idx],counter_val);
         } else if( sai_rc == SAI_STATUS_NOT_SUPPORTED) {
@@ -1617,7 +1617,7 @@ TEST_F (qos_buffer, ingress_buffer_pool_stats_get)
     }
     set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     set_attr.value.oid = SAI_NULL_OBJECT_ID;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_id, (const sai_attribute_t *)&set_attr));
 
     ASSERT_EQ (SAI_STATUS_SUCCESS,
@@ -1660,8 +1660,8 @@ TEST_F (qos_buffer, egress_buffer_pool_stats_get)
 
 
     for(idx = 0; idx < num_counters; idx++) {
-        sai_rc = sai_buffer_api_table->get_buffer_pool_stats(pool_id, &counter_id[idx],
-                                                            1, &counter_val);
+        sai_rc = sai_buffer_api_table->get_buffer_pool_stats(pool_id, 1, &counter_id[idx],
+                                                             &counter_val);
         if(sai_rc == SAI_STATUS_SUCCESS) {
              printf("Get counter ID %d is supported. Val:0x%" PRIx64 "\r\n",counter_id[idx],counter_val);
         } else if( sai_rc == SAI_STATUS_NOT_SUPPORTED) {
@@ -1715,11 +1715,11 @@ TEST_F (qos_buffer, pg_stats_get)
     ASSERT_EQ(SAI_STATUS_SUCCESS, sai_qos_buffer_get_first_pg(sai_port_api_table, port_id, &pg_id));
     set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     set_attr.value.oid = profile_id;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_id, (const sai_attribute_t *)&set_attr));
     for(idx = 0; idx < num_counters; idx++) {
-        sai_rc = sai_buffer_api_table->get_ingress_priority_group_stats(pg_id, &counter_id[idx],
-                                                            1, &counter_val);
+        sai_rc = sai_buffer_api_table->get_ingress_priority_group_stats(pg_id, 1, &counter_id[idx],
+                                                                        &counter_val);
         if(sai_rc == SAI_STATUS_SUCCESS) {
              printf("Get counter ID %d is supported. Val:0x%" PRIx64 "\r\n",counter_id[idx],counter_val);
         } else if( sai_rc == SAI_STATUS_NOT_SUPPORTED) {
@@ -1730,7 +1730,7 @@ TEST_F (qos_buffer, pg_stats_get)
     }
     set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     set_attr.value.oid = SAI_NULL_OBJECT_ID;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_id, (const sai_attribute_t *)&set_attr));
 
     ASSERT_EQ (SAI_STATUS_SUCCESS,
@@ -1775,7 +1775,7 @@ TEST_F(qos_buffer, pg_stats_clear)
     ASSERT_EQ(SAI_STATUS_SUCCESS, sai_qos_buffer_get_first_pg(sai_port_api_table, port_id, &pg_id));
     set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     set_attr.value.oid = profile_id;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_id, (const sai_attribute_t *)&set_attr));
 
     for(idx = 0; idx < num_counters; idx++) {
@@ -1791,7 +1791,7 @@ TEST_F(qos_buffer, pg_stats_clear)
 
     set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     set_attr.value.oid = SAI_NULL_OBJECT_ID;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_id, (const sai_attribute_t *)&set_attr));
 
     ASSERT_EQ (SAI_STATUS_SUCCESS,
@@ -1813,7 +1813,7 @@ sai_create_dot1p_to_tc_map (sai_qos_map_api_t* sai_qos_map_api_table,
     unsigned int loop_idx = 0;
 
     attr_list[attr_count].id = SAI_QOS_MAP_ATTR_TYPE;
-    attr_list[attr_count].value.s32 = SAI_QOS_MAP_TYPE_DOT1P_TO_TC_AND_COLOR;
+    attr_list[attr_count].value.s32 = SAI_QOS_MAP_TYPE_DOT1P_TO_TC;
     attr_count ++;
 
     map_list.count = 8;
@@ -1823,7 +1823,6 @@ sai_create_dot1p_to_tc_map (sai_qos_map_api_t* sai_qos_map_api_table,
     {
         map_list.list[loop_idx].key.dot1p = loop_idx;
         map_list.list[loop_idx].value.tc = loop_idx;
-        map_list.list[loop_idx].value.color = SAI_PACKET_COLOR_GREEN;
     }
 
     attr_list[attr_count].id = SAI_QOS_MAP_ATTR_MAP_TO_VALUE_LIST;
@@ -1866,9 +1865,8 @@ sai_create_dot1p_to_tc_map (sai_qos_map_api_t* sai_qos_map_api_table,
 
     for (loop_idx = 0; loop_idx < get_attr.value.qosmap.count; loop_idx ++)
     {
-        printf("dot1p %d tc %d %d color\r\n",get_attr.value.qosmap.list[loop_idx].key.dot1p,
-               get_attr.value.qosmap.list[loop_idx].value.tc,
-               get_attr.value.qosmap.list[loop_idx].value.color);
+        printf("dot1p %d tc %d \r\n",get_attr.value.qosmap.list[loop_idx].key.dot1p,
+               get_attr.value.qosmap.list[loop_idx].value.tc);
     }
     free(map_list.list);
 
@@ -2279,8 +2277,8 @@ sai_get_ingress_pg_stats(sai_port_api_t* sai_port_api_table,
         printf(" INGRESS PG %d STATISTICS - PG ID %lx\n", loop_idx, pg_id[loop_idx]);
         for (unsigned int idx = 0; idx < num_counters; idx++)
         {
-            sai_rc = sai_buffer_api_table->get_ingress_priority_group_stats(pg_id[loop_idx], &counter_id[idx],
-                                                            1, &counter_val);
+            sai_rc = sai_buffer_api_table->get_ingress_priority_group_stats(pg_id[loop_idx], 1, &counter_id[idx],
+                                                                            &counter_val);
             if (sai_rc == SAI_STATUS_SUCCESS) {
                 printf("Get counter ID %d is supported. Val:0x%" PRIx64 "\r\n",counter_id[idx],counter_val);
             } else if( sai_rc == SAI_STATUS_NOT_SUPPORTED) {
@@ -2336,9 +2334,9 @@ sai_get_egress_queue_stats(sai_port_api_t* sai_port_api_table,
              cntr_id <= SAI_QUEUE_STAT_SHARED_WATERMARK_BYTES; cntr_id++)
         {
 
-            sai_rc = sai_queue_api_table->get_queue_stats(queue_obj,
+            sai_rc = sai_queue_api_table->get_queue_stats(queue_obj,1,
                                                           (const sai_queue_stat_t*)&cntr_id,
-                                                          1, &counter_val);
+                                                           &counter_val);
             if (sai_rc == SAI_STATUS_SUCCESS) {
                  printf("Counter ID %d is supported. Val:0x%" PRIx64 "\r\n", cntr_id, counter_val);
             } else if( sai_rc == SAI_STATUS_NOT_SUPPORTED) {
@@ -2395,7 +2393,7 @@ sai_set_ingress_profile_id_for_pg(sai_port_api_t* sai_port_api_table,
         for (loop_idx = 0; loop_idx < num_pg; loop_idx++)
         {
             printf("Setting Buffer profile for pg no %d \r\n", loop_idx);
-            sai_rc = sai_buffer_api_table->set_ingress_priority_group_attr
+            sai_rc = sai_buffer_api_table->set_ingress_priority_group_attribute
                        (pg_id[loop_idx], (const sai_attribute_t *)&set_attr);
             if (sai_rc != SAI_STATUS_SUCCESS)
                 printf("Setting Buffer profile failed for pg no %d \r\n", loop_idx);
@@ -2404,7 +2402,7 @@ sai_set_ingress_profile_id_for_pg(sai_port_api_t* sai_port_api_table,
         if (pg_index > num_pg)
             return SAI_STATUS_FAILURE;
         printf("Setting Buffer profile for pg no %d \r\n", pg_index);
-        sai_rc = sai_buffer_api_table->set_ingress_priority_group_attr
+        sai_rc = sai_buffer_api_table->set_ingress_priority_group_attribute
                        (pg_id[pg_index], (const sai_attribute_t *)&set_attr);
         if (sai_rc != SAI_STATUS_SUCCESS)
             printf("Setting Buffer profile failed for pg no %d \r\n", pg_index);
@@ -2483,7 +2481,7 @@ TEST_F(qos_buffer, qos_ing_egr_admn_ctrl_static_test)
     sai_attribute_t set_attr;
     sai_object_id_t map_id[3] = { 0 };
     sai_attr_id_t map_name[3] = {
-                     SAI_PORT_ATTR_QOS_DOT1P_TO_TC_AND_COLOR_MAP,
+                     SAI_PORT_ATTR_QOS_DOT1P_TO_TC_MAP,
                      SAI_PORT_ATTR_QOS_TC_TO_PRIORITY_GROUP_MAP,
                      SAI_PORT_ATTR_QOS_TC_TO_QUEUE_MAP
                    };
@@ -2605,7 +2603,7 @@ TEST_F(qos_buffer, qos_ing_egr_admn_ctrl_dynamic_test)
     sai_attribute_t set_attr;
     sai_object_id_t map_id[3] = { 0};
     sai_attr_id_t map_name[3] = {
-                     SAI_PORT_ATTR_QOS_DOT1P_TO_TC_AND_COLOR_MAP,
+                     SAI_PORT_ATTR_QOS_DOT1P_TO_TC_MAP,
                      SAI_PORT_ATTR_QOS_TC_TO_PRIORITY_GROUP_MAP,
                      SAI_PORT_ATTR_QOS_TC_TO_QUEUE_MAP
                    };
@@ -2726,7 +2724,7 @@ TEST_F(qos_buffer, qos_ing_egr_admn_ctrl_pause_test)
     sai_attribute_t set_attr;
     sai_object_id_t map_id[3] = { 0};
     sai_attr_id_t map_name[3] = {
-                     SAI_PORT_ATTR_QOS_DOT1P_TO_TC_AND_COLOR_MAP,
+                     SAI_PORT_ATTR_QOS_DOT1P_TO_TC_MAP,
                      SAI_PORT_ATTR_QOS_TC_TO_PRIORITY_GROUP_MAP,
                      SAI_PORT_ATTR_QOS_TC_TO_QUEUE_MAP
                    };
@@ -2858,7 +2856,7 @@ TEST_F(qos_buffer, qos_ing_egr_admn_ctrl_pfc_test)
     sai_attribute_t set_attr;
     sai_object_id_t map_id[4] = { 0};
     sai_attr_id_t map_name[4] = {
-                     SAI_PORT_ATTR_QOS_DOT1P_TO_TC_AND_COLOR_MAP,
+                     SAI_PORT_ATTR_QOS_DOT1P_TO_TC_MAP,
                      SAI_PORT_ATTR_QOS_TC_TO_PRIORITY_GROUP_MAP,
                      SAI_PORT_ATTR_QOS_PFC_PRIORITY_TO_QUEUE_MAP,
                      SAI_PORT_ATTR_QOS_TC_TO_QUEUE_MAP

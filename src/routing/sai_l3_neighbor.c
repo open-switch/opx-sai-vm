@@ -235,7 +235,10 @@ static sai_status_t sai_fib_neighbor_info_fill (sai_fib_nh_t *p_nh_info,
                 (*p_flags) |= SAI_FIB_NEIGHBOR_META_DATA_ATTR_FLAG;
                 status      = SAI_STATUS_SUCCESS;
                 break;
-
+            case SAI_NEIGHBOR_ENTRY_ATTR_USER_TRAP_ID:
+               status = SAI_STATUS_NOT_SUPPORTED;
+               SAI_NEIGHBOR_LOG_ERR ("Unsupported attribute   Id: %d.",p_attr->id);
+               break;
             default:
                 SAI_NEIGHBOR_LOG_ERR ("Invalid atttribute id: %d.", p_attr->id);
                 break;

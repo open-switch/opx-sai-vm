@@ -180,7 +180,6 @@ class portTest : public ::testing::Test
         bool sai_port_attr_set_get(sai_object_id_t port_id, sai_attribute_t *sai_attr);
         bool sai_internal_loopback_set_get(sai_object_id_t port_id,
                                            sai_port_internal_loopback_mode_t lb_mode);
-        void sai_test_fdb_learn_mode(sai_port_fdb_learning_mode_t mode);
         void sai_port_create_speed_set(uint32_t speed);
         static void sai_get_port_hw_lane_map_table();
         void sai_check_breakout_mode_supported(sai_object_id_t port_id,
@@ -1376,7 +1375,7 @@ TEST_F(portTest, all_stats_get)
         counter <= SAI_PORT_STAT_PFC_7_TX_PKTS; counter++)
     {
         counter_ids[0] = (sai_port_stat_t)counter;
-        status = sai_port_api_table->get_port_stats(gport_id, counter_ids, 1, counters);
+        status = sai_port_api_table->get_port_stats(gport_id, 1, counter_ids, counters);
 
         if(status == SAI_STATUS_SUCCESS) {
             LOG_PRINT("port 0x%" PRIx64 " stat id %d value is %ld \r\n", gport_id, counter_ids[0], counters[0]);
@@ -1409,7 +1408,7 @@ TEST_F(portTest, eee_stats_get)
                 counter <= SAI_PORT_STAT_EEE_RX_DURATION; counter++)
         {
             counter_ids[0] = (sai_port_stat_t)counter;
-            status = sai_port_api_table->get_port_stats(port_info[port_idx].port_id, counter_ids, 1, counters);
+            status = sai_port_api_table->get_port_stats(port_info[port_idx].port_id, 1, counter_ids, counters);
 
             if(status == SAI_STATUS_SUCCESS) {
                 LOG_PRINT("port 0x%" PRIx64 " EEE stat id %d value is %ld \r\n", port_info[port_idx].port_id, counter_ids[0], counters[0]);
@@ -1441,7 +1440,7 @@ TEST_F(portTest, eee_stat_clear)
                 counter <= SAI_PORT_STAT_EEE_RX_DURATION; counter++)
         {
             counter_ids[0] = (sai_port_stat_t)counter;
-            status = sai_port_api_table->clear_port_stats(port_info[port_idx].port_id, counter_ids, 1);
+            status = sai_port_api_table->clear_port_stats(port_info[port_idx].port_id, 1, counter_ids);
 
             if(status == SAI_STATUS_SUCCESS) {
                 LOG_PRINT("port 0x%" PRIx64 " EEE stat id %d \r\n", port_info[port_idx].port_id, counter_ids[0]);
@@ -1467,7 +1466,7 @@ TEST_F(portTest, port_stat_clear)
         counter <= SAI_PORT_STAT_PFC_7_TX_PKTS; counter++)
     {
         counter_ids[0] = (sai_port_stat_t)counter;
-        status = sai_port_api_table->clear_port_stats(gport_id, counter_ids, 1);
+        status = sai_port_api_table->clear_port_stats(gport_id, 1, counter_ids);
 
         if(status == SAI_STATUS_SUCCESS) {
             LOG_PRINT("port 0x%" PRIx64 " stat id %d \r\n", gport_id, counter_ids[0]);

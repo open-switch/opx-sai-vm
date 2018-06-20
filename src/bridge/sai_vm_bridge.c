@@ -59,6 +59,8 @@ static const dn_sai_attribute_entry_t sai_bridge_port_type_sub_port_attr[] =  {
                                , false, true , true , true , true , true },
     { SAI_BRIDGE_PORT_ATTR_INGRESS_FILTERING
                                , false, true , true , true , true , false},
+    { SAI_BRIDGE_PORT_ATTR_EGRESS_FILTERING
+                               , false, true , true , true , true , false},
 };
 
 static const dn_sai_attribute_entry_t sai_bridge_port_type_port_attr[] =  {
@@ -87,6 +89,8 @@ static const dn_sai_attribute_entry_t sai_bridge_port_type_port_attr[] =  {
                                , false, true , true , true , true , true },
     { SAI_BRIDGE_PORT_ATTR_INGRESS_FILTERING
                                , false, true , true , true , true , true },
+    { SAI_BRIDGE_PORT_ATTR_EGRESS_FILTERING
+                               , false, true , true , true , true , true },
 };
 
 static const dn_sai_attribute_entry_t sai_bridge_port_type_tunnel_attr[] =  {
@@ -114,6 +118,8 @@ static const dn_sai_attribute_entry_t sai_bridge_port_type_tunnel_attr[] =  {
     { SAI_BRIDGE_PORT_ATTR_ADMIN_STATE
                                , false, true , true , true , true , true },
     { SAI_BRIDGE_PORT_ATTR_INGRESS_FILTERING
+                               , false, true , true , true , true , false},
+    { SAI_BRIDGE_PORT_ATTR_EGRESS_FILTERING
                                , false, true , true , true , true , false},
 };
 

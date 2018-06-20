@@ -382,8 +382,8 @@ static sai_status_t sai_vm_pg_create (dn_sai_qos_pg_t *p_pg_node,
 }
 
 static sai_status_t sai_vm_buffer_pool_stats_get (sai_object_id_t pool_id,
-                                                  const sai_buffer_pool_stat_t
-                                                  *counter_ids, uint32_t number_of_counters,
+                                                  const sai_buffer_pool_stat_t *counter_ids,
+                                                  uint32_t number_of_counters,
                                                   uint64_t* counters)
 {
     STD_ASSERT (counter_ids != NULL);

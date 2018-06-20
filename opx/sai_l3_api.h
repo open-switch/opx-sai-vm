@@ -21,7 +21,7 @@
 #include "std_type_defs.h"
 #include "sai_l3_common.h"
 #include "sai_oid_utils.h"
-#include "sairouterintf.h"
+#include "sairouterinterface.h"
 #include "saitypes.h"
 
 /** \defgroup SAIL3NPUAPIs SAI - L3 NPU specific function implementations

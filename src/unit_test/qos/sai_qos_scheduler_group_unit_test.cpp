@@ -121,8 +121,8 @@ void SetUpTestCase (void)
 
     ASSERT_TRUE (p_sai_scheduler_api_table != NULL);
 
-    ASSERT_TRUE (p_sai_scheduler_api_table->create_scheduler_profile != NULL);
-    ASSERT_TRUE (p_sai_scheduler_api_table->remove_scheduler_profile != NULL);
+    ASSERT_TRUE (p_sai_scheduler_api_table->create_scheduler!= NULL);
+    ASSERT_TRUE (p_sai_scheduler_api_table->remove_scheduler!= NULL);
     ASSERT_TRUE (p_sai_scheduler_api_table->set_scheduler_attribute != NULL);
     ASSERT_TRUE (p_sai_scheduler_api_table->get_scheduler_attribute != NULL);
 

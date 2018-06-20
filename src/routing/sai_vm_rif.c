@@ -28,7 +28,7 @@
 #include "sai_l3_api.h"
 #include "sai_l3_common.h"
 #include "sai_l3_util.h"
-#include "sairouterintf.h"
+#include "sairouterinterface.h"
 #include "saitypes.h"
 #include "saistatus.h"
 #include "std_mac_utils.h"

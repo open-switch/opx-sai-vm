@@ -26,8 +26,8 @@ extern "C" {
 #include "saitypes.h"
 #include "saistatus.h"
 #include "saiswitch.h"
-#include "sairouter.h"
-#include "sairouterintf.h"
+#include "saivirtualrouter.h"
+#include "sairouterinterface.h"
 #include "saineighbor.h"
 #include "sainexthop.h"
 #include "sainexthopgroup.h"
@@ -1282,7 +1282,7 @@ sai_status_t saiL3Test ::sai_test_route_create (sai_object_id_t vrf,
         sai_test_route_attr_value_fill (&p_attr_list [ap_idx], val);
     }
 
-    sai_rc = p_sai_route_api_tbl->create_route (&uc_route_entry, attr_count,
+    sai_rc = p_sai_route_api_tbl->create_route_entry(&uc_route_entry, attr_count,
                                                 p_attr_list);
 
     if (sai_rc != SAI_STATUS_SUCCESS) {
@@ -1318,7 +1318,7 @@ sai_status_t saiL3Test ::sai_test_route_remove (sai_object_id_t vrf,
         return sai_rc;
     }
 
-    sai_rc = p_sai_route_api_tbl->remove_route (&uc_route_entry);
+    sai_rc = p_sai_route_api_tbl->remove_route_entry(&uc_route_entry);
 
     if (sai_rc != SAI_STATUS_SUCCESS) {
         printf ("SAI Route remove failed with error: %d\r\n", sai_rc);
@@ -1358,7 +1358,7 @@ sai_status_t saiL3Test ::sai_test_route_attr_set (sai_object_id_t vrf,
 
     sai_test_route_attr_value_fill (&attr, value);
 
-    sai_rc = p_sai_route_api_tbl->set_route_attribute (&uc_route_entry, &attr);
+    sai_rc = p_sai_route_api_tbl->set_route_entry_attribute(&uc_route_entry, &attr);
 
     if (sai_rc != SAI_STATUS_SUCCESS) {
         printf ("SAI ROUTE attribute set failed with error: %d\r\n",
@@ -1422,7 +1422,7 @@ sai_status_t saiL3Test ::sai_test_route_attr_get (sai_object_id_t vrf,
                 ap_idx, sai_test_route_attr_id_to_name_get (attr_id), attr_id);
     }
 
-    sai_rc = p_sai_route_api_tbl->get_route_attribute (&uc_route_entry,
+    sai_rc = p_sai_route_api_tbl->get_route_entry_attribute(&uc_route_entry,
                                                        attr_count, p_attr_list);
 
     if (sai_rc != SAI_STATUS_SUCCESS) {
@@ -1871,7 +1871,7 @@ sai_status_t saiL3Test::sai_test_neighbor_attr_set (
     sai_test_neighbor_attr_value_pair_fill (&attr, attr_id, int_attr_value,
                                             p_str_attr_value);
 
-    sai_rc = p_sai_nbr_api_tbl->set_neighbor_attribute (
+    sai_rc = p_sai_nbr_api_tbl->set_neighbor_entry_attribute(
                                 (const sai_neighbor_entry_t *) &neighbor_entry,
                                 &attr);
 
@@ -1981,7 +1981,7 @@ sai_status_t saiL3Test::sai_test_neighbor_attr_get (
 
     va_end (varg_list);
 
-    sai_rc = p_sai_nbr_api_tbl->get_neighbor_attribute (
+    sai_rc = p_sai_nbr_api_tbl->get_neighbor_entry_attribute (
                                 (const sai_neighbor_entry_t *) &neighbor_entry,
                                 attr_count, p_attr_list);
 

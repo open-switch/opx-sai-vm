@@ -1113,9 +1113,9 @@ sai_status_t sai_buffer_init (void)
     return SAI_STATUS_SUCCESS;
 }
 
-sai_status_t sai_qos_buffer_pool_stats_get (sai_object_id_t pool_id,
+sai_status_t sai_qos_buffer_pool_stats_get (sai_object_id_t pool_id, uint32_t number_of_counters,
                                             const sai_buffer_pool_stat_t *counter_ids,
-                                            uint32_t number_of_counters, uint64_t* counters)
+                                            uint64_t* counters)
 {
     return sai_buffer_npu_api_get()->buffer_pool_stats_get(pool_id, counter_ids,
                                                            number_of_counters, counters);
@@ -1136,6 +1136,8 @@ static sai_buffer_api_t sai_qos_buffer_method_table = {
     sai_qos_buffer_pool_attr_get,
     sai_qos_buffer_pool_stats_get,
     sai_qos_buffer_pool_stats_clear,
+    NULL,
+    NULL,
     sai_qos_pg_attr_set,
     sai_qos_pg_attr_get,
     sai_qos_pg_stats_get,

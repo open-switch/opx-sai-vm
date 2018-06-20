@@ -17,7 +17,7 @@
 *************************************************************************/
 extern "C" {
 #include "sai.h"
-#include "saihostintf.h"
+#include "saihostif.h"
 #include "saitypes.h"
 }
 
@@ -130,7 +130,7 @@ class hostIntfInit : public ::testing::Test
             EXPECT_EQ (SAI_STATUS_SUCCESS,
                     (p_sai_switch_api_tbl->create_switch (&switch_id , attr_count,
                                                           sai_attr_set)));
-            ASSERT_EQ(NULL,sai_api_query(SAI_API_HOST_INTERFACE,
+            ASSERT_EQ(NULL,sai_api_query(SAI_API_HOSTIF,
                         (static_cast<void**>(static_cast<void*>(&sai_hostif_api_table)))));
 
             ASSERT_TRUE(sai_hostif_api_table != NULL);
@@ -141,14 +141,14 @@ class hostIntfInit : public ::testing::Test
             EXPECT_TRUE(sai_hostif_api_table->get_hostif_attribute !=NULL);
             EXPECT_TRUE(sai_hostif_api_table->create_hostif_trap_group !=NULL);
             EXPECT_TRUE(sai_hostif_api_table->remove_hostif_trap_group !=NULL);
-            EXPECT_TRUE(sai_hostif_api_table->set_trap_group_attribute !=NULL);
-            EXPECT_TRUE(sai_hostif_api_table->get_trap_group_attribute !=NULL);
-            EXPECT_TRUE(sai_hostif_api_table->set_trap_attribute !=NULL);
-            EXPECT_TRUE(sai_hostif_api_table->get_trap_attribute !=NULL);
-            EXPECT_TRUE(sai_hostif_api_table->set_user_defined_trap_attribute !=NULL);
-            EXPECT_TRUE(sai_hostif_api_table->get_user_defined_trap_attribute !=NULL);
-            EXPECT_TRUE(sai_hostif_api_table->recv_packet !=NULL);
-            EXPECT_TRUE(sai_hostif_api_table->send_packet !=NULL);
+            EXPECT_TRUE(sai_hostif_api_table->set_hostif_trap_attribute !=NULL);
+            EXPECT_TRUE(sai_hostif_api_table->get_hostif_trap_attribute !=NULL);
+            EXPECT_TRUE(sai_hostif_api_table->set_hostif_trap_attribute !=NULL);
+            EXPECT_TRUE(sai_hostif_api_table->get_hostif_trap_attribute !=NULL);
+            EXPECT_TRUE(sai_hostif_api_table->set_hostif_user_defined_trap_attribute !=NULL);
+            EXPECT_TRUE(sai_hostif_api_table->get_hostif_user_defined_trap_attribute !=NULL);
+            EXPECT_TRUE(sai_hostif_api_table->recv_hostif_packet !=NULL);
+            EXPECT_TRUE(sai_hostif_api_table->send_hostif_packet !=NULL);
             sai_attribute_t sai_port_attr;
             sai_status_t ret = SAI_STATUS_SUCCESS;
 
@@ -256,7 +256,7 @@ TEST_F(hostIntfInit, set_get_trapgroup)
     attr[0].id = SAI_HOSTIF_TRAP_GROUP_ATTR_QUEUE;
     attr[1].id = SAI_HOSTIF_TRAP_GROUP_ATTR_ADMIN_STATE;
 
-    rc = sai_hostif_api_table->get_trap_group_attribute(trap_group_oid, 2, attr);
+    rc = sai_hostif_api_table->get_hostif_trap_attribute(trap_group_oid, 2, attr);
     ASSERT_EQ (rc, SAI_STATUS_SUCCESS);
 
     EXPECT_EQ(attr[0].value.u32, SAI_GTEST_CPU_QUEUE_2);
@@ -264,14 +264,14 @@ TEST_F(hostIntfInit, set_get_trapgroup)
 
     attr[0].id = SAI_HOSTIF_TRAP_GROUP_ATTR_QUEUE;
     attr[0].value.u32 = SAI_GTEST_CPU_QUEUE_1;
-    rc = sai_hostif_api_table->set_trap_group_attribute(trap_group_oid, attr);
+    rc = sai_hostif_api_table->set_hostif_trap_attribute(trap_group_oid, attr);
     ASSERT_EQ (rc, SAI_STATUS_SUCCESS);
 
     memset(&attr, 0, sizeof(attr));
     attr[0].id = SAI_HOSTIF_TRAP_GROUP_ATTR_QUEUE;
     attr[1].id = SAI_HOSTIF_TRAP_GROUP_ATTR_ADMIN_STATE;
 
-    rc = sai_hostif_api_table->get_trap_group_attribute(trap_group_oid, 2, attr);
+    rc = sai_hostif_api_table->get_hostif_trap_attribute(trap_group_oid, 2, attr);
     ASSERT_EQ (rc, SAI_STATUS_SUCCESS);
 
     EXPECT_EQ(attr[0].value.u32, SAI_GTEST_CPU_QUEUE_1);
@@ -293,19 +293,19 @@ TEST_F(hostIntfInit, set_ttl_trap)
     attr.id = SAI_HOSTIF_TRAP_ATTR_PACKET_ACTION;
     attr.value.s32 = SAI_PACKET_ACTION_TRAP;
 
-    rc = sai_hostif_api_table->set_trap_attribute(SAI_HOSTIF_TRAP_TYPE_TTL_ERROR, &attr);
+    rc = sai_hostif_api_table->set_hostif_trap_attribute(SAI_HOSTIF_TRAP_TYPE_TTL_ERROR, &attr);
     ASSERT_EQ (rc, SAI_STATUS_SUCCESS);
 
     attr.id = SAI_HOSTIF_TRAP_ATTR_TRAP_GROUP;
     attr.value.oid = trap_group_oid;
 
-    rc = sai_hostif_api_table->set_trap_attribute(SAI_HOSTIF_TRAP_TYPE_TTL_ERROR, &attr);
+    rc = sai_hostif_api_table->set_hostif_trap_attribute(SAI_HOSTIF_TRAP_TYPE_TTL_ERROR, &attr);
     ASSERT_EQ (rc, SAI_STATUS_SUCCESS);
 
     attr_list[0].id = SAI_HOSTIF_TRAP_ATTR_PACKET_ACTION;
     attr_list[1].id = SAI_HOSTIF_TRAP_ATTR_TRAP_GROUP;
 
-    rc = sai_hostif_api_table->get_trap_attribute(SAI_HOSTIF_TRAP_TYPE_TTL_ERROR, 2, attr_list);
+    rc = sai_hostif_api_table->get_hostif_trap_attribute(SAI_HOSTIF_TRAP_TYPE_TTL_ERROR, 2, attr_list);
     ASSERT_EQ (rc, SAI_STATUS_SUCCESS);
 
     EXPECT_EQ(attr_list[0].value.s32, SAI_PACKET_ACTION_TRAP);
@@ -314,7 +314,7 @@ TEST_F(hostIntfInit, set_ttl_trap)
     attr.id = SAI_HOSTIF_TRAP_ATTR_TRAP_GROUP;
     attr.value.oid = SAI_NULL_OBJECT_ID;
 
-    rc = sai_hostif_api_table->set_trap_attribute(SAI_HOSTIF_TRAP_TYPE_TTL_ERROR, &attr);
+    rc = sai_hostif_api_table->set_hostif_trap_attribute(SAI_HOSTIF_TRAP_TYPE_TTL_ERROR, &attr);
     ASSERT_EQ (rc, SAI_STATUS_SUCCESS);
 
     rc = sai_hostif_api_table->remove_hostif_trap_group(trap_group_oid);
@@ -333,19 +333,19 @@ TEST_F(hostIntfInit, set_l3_mtu_failure_trap)
     attr.id = SAI_HOSTIF_TRAP_ATTR_PACKET_ACTION;
     attr.value.s32 = SAI_PACKET_ACTION_TRAP;
 
-    rc = sai_hostif_api_table->set_trap_attribute(SAI_HOSTIF_TRAP_TYPE_L3_MTU_ERROR, &attr);
+    rc = sai_hostif_api_table->set_hostif_trap_attribute(SAI_HOSTIF_TRAP_TYPE_L3_MTU_ERROR, &attr);
     ASSERT_EQ (rc, SAI_STATUS_SUCCESS);
 
     attr.id = SAI_HOSTIF_TRAP_ATTR_TRAP_GROUP;
     attr.value.oid = trap_group_oid;
 
-    rc = sai_hostif_api_table->set_trap_attribute(SAI_HOSTIF_TRAP_TYPE_L3_MTU_ERROR, &attr);
+    rc = sai_hostif_api_table->set_hostif_trap_attribute(SAI_HOSTIF_TRAP_TYPE_L3_MTU_ERROR, &attr);
     ASSERT_EQ (rc, SAI_STATUS_SUCCESS);
 
     attr_list[0].id = SAI_HOSTIF_TRAP_ATTR_PACKET_ACTION;
     attr_list[1].id = SAI_HOSTIF_TRAP_ATTR_TRAP_GROUP;
 
-    rc = sai_hostif_api_table->get_trap_attribute(SAI_HOSTIF_TRAP_TYPE_L3_MTU_ERROR, 2, attr_list);
+    rc = sai_hostif_api_table->get_hostif_trap_attribute(SAI_HOSTIF_TRAP_TYPE_L3_MTU_ERROR, 2, attr_list);
     ASSERT_EQ (rc, SAI_STATUS_SUCCESS);
 
     EXPECT_EQ(attr_list[0].value.s32, SAI_PACKET_ACTION_TRAP);
@@ -354,7 +354,7 @@ TEST_F(hostIntfInit, set_l3_mtu_failure_trap)
     attr.id = SAI_HOSTIF_TRAP_ATTR_TRAP_GROUP;
     attr.value.oid = SAI_NULL_OBJECT_ID;
 
-    rc = sai_hostif_api_table->set_trap_attribute(SAI_HOSTIF_TRAP_TYPE_L3_MTU_ERROR, &attr);
+    rc = sai_hostif_api_table->set_hostif_trap_attribute(SAI_HOSTIF_TRAP_TYPE_L3_MTU_ERROR, &attr);
     ASSERT_EQ (rc, SAI_STATUS_SUCCESS);
 
     rc = sai_hostif_api_table->remove_hostif_trap_group(trap_group_oid);
@@ -373,13 +373,13 @@ TEST_F(hostIntfInit, set_samplepacket_trap)
     attr.id = SAI_HOSTIF_TRAP_ATTR_TRAP_GROUP;
     attr.value.oid = trap_group_oid;
 
-    rc = sai_hostif_api_table->set_trap_attribute(SAI_HOSTIF_TRAP_TYPE_SAMPLEPACKET, &attr);
+    rc = sai_hostif_api_table->set_hostif_trap_attribute(SAI_HOSTIF_TRAP_TYPE_SAMPLEPACKET, &attr);
     ASSERT_EQ (rc, SAI_STATUS_SUCCESS);
 
     memset(&attr, 0, sizeof(sai_attribute_t));
     attr.id = SAI_HOSTIF_TRAP_ATTR_TRAP_GROUP;
 
-    rc = sai_hostif_api_table->get_trap_attribute(SAI_HOSTIF_TRAP_TYPE_SAMPLEPACKET, 1, &attr);
+    rc = sai_hostif_api_table->get_hostif_trap_attribute(SAI_HOSTIF_TRAP_TYPE_SAMPLEPACKET, 1, &attr);
     ASSERT_EQ (rc, SAI_STATUS_SUCCESS);
 
     EXPECT_EQ(attr.value.oid, trap_group_oid);
@@ -387,7 +387,7 @@ TEST_F(hostIntfInit, set_samplepacket_trap)
     attr.id = SAI_HOSTIF_TRAP_ATTR_TRAP_GROUP;
     attr.value.oid = SAI_NULL_OBJECT_ID;
 
-    rc = sai_hostif_api_table->set_trap_attribute(SAI_HOSTIF_TRAP_TYPE_SAMPLEPACKET, &attr);
+    rc = sai_hostif_api_table->set_hostif_trap_attribute(SAI_HOSTIF_TRAP_TYPE_SAMPLEPACKET, &attr);
     ASSERT_EQ (rc, SAI_STATUS_SUCCESS);
 
     rc = sai_hostif_api_table->remove_hostif_trap_group(trap_group_oid);
@@ -407,13 +407,13 @@ TEST_F(hostIntfInit, set_dhcp_trap)
     attr.id = SAI_HOSTIF_TRAP_ATTR_TRAP_GROUP;
     attr.value.oid = trap_group_oid;
 
-    rc = sai_hostif_api_table->set_trap_attribute(SAI_HOSTIF_TRAP_TYPE_DHCP, &attr);
+    rc = sai_hostif_api_table->set_hostif_trap_attribute(SAI_HOSTIF_TRAP_TYPE_DHCP, &attr);
     ASSERT_EQ (rc, SAI_STATUS_SUCCESS);
 
     attr.id = SAI_HOSTIF_TRAP_ATTR_TRAP_PRIORITY;
     attr.value.u32 = 5;
 
-    rc = sai_hostif_api_table->set_trap_attribute(SAI_HOSTIF_TRAP_TYPE_DHCP, &attr);
+    rc = sai_hostif_api_table->set_hostif_trap_attribute(SAI_HOSTIF_TRAP_TYPE_DHCP, &attr);
     ASSERT_EQ (rc, SAI_STATUS_SUCCESS);
 
     portlist.count = 2;
@@ -424,14 +424,14 @@ TEST_F(hostIntfInit, set_dhcp_trap)
     /* TODO -  Until SAI implementaion changes, exclude list will work as enbale list */
     attr.id = SAI_HOSTIF_TRAP_ATTR_EXCLUDE_PORT_LIST;
     attr.value.objlist = portlist;
-    rc = sai_hostif_api_table->set_trap_attribute(SAI_HOSTIF_TRAP_TYPE_DHCP, &attr);
+    rc = sai_hostif_api_table->set_hostif_trap_attribute(SAI_HOSTIF_TRAP_TYPE_DHCP, &attr);
     free(portlist.list );
     ASSERT_EQ (rc, SAI_STATUS_SUCCESS);
 
     attr.id = SAI_HOSTIF_TRAP_ATTR_PACKET_ACTION;
     attr.value.s32 = SAI_PACKET_ACTION_TRAP;
 
-    rc = sai_hostif_api_table->set_trap_attribute(SAI_HOSTIF_TRAP_TYPE_DHCP, &attr);
+    rc = sai_hostif_api_table->set_hostif_trap_attribute(SAI_HOSTIF_TRAP_TYPE_DHCP, &attr);
     ASSERT_EQ (rc, SAI_STATUS_SUCCESS);
 
     attr_list[0].id = SAI_HOSTIF_TRAP_ATTR_TRAP_GROUP;
@@ -442,7 +442,7 @@ TEST_F(hostIntfInit, set_dhcp_trap)
                                 calloc(attr_list[2].value.objlist.count,
                                                 sizeof(sai_object_id_t));
     attr_list[3].id = SAI_HOSTIF_TRAP_ATTR_PACKET_ACTION;
-    rc = sai_hostif_api_table->get_trap_attribute(SAI_HOSTIF_TRAP_TYPE_DHCP,
+    rc = sai_hostif_api_table->get_hostif_trap_attribute(SAI_HOSTIF_TRAP_TYPE_DHCP,
                                                   4, attr_list);
     ASSERT_EQ (rc, SAI_STATUS_SUCCESS);
     EXPECT_EQ (attr_list[0].value.oid, trap_group_oid);
@@ -453,7 +453,7 @@ TEST_F(hostIntfInit, set_dhcp_trap)
     attr.id = SAI_HOSTIF_TRAP_ATTR_TRAP_GROUP;
     attr.value.oid = SAI_NULL_OBJECT_ID;
 
-    rc = sai_hostif_api_table->set_trap_attribute(SAI_HOSTIF_TRAP_TYPE_DHCP, &attr);
+    rc = sai_hostif_api_table->set_hostif_trap_attribute(SAI_HOSTIF_TRAP_TYPE_DHCP, &attr);
     ASSERT_EQ (rc, SAI_STATUS_SUCCESS);
 
     rc = sai_hostif_api_table->remove_hostif_trap_group(trap_group_oid);
@@ -473,39 +473,39 @@ TEST_F(hostIntfInit, share_set_trap_group)
     attr.id = SAI_HOSTIF_TRAP_ATTR_PACKET_ACTION;
     attr.value.s32 = SAI_PACKET_ACTION_TRAP;
 
-    rc = sai_hostif_api_table->set_trap_attribute(SAI_HOSTIF_TRAP_TYPE_L3_MTU_ERROR, &attr);
+    rc = sai_hostif_api_table->set_hostif_trap_attribute(SAI_HOSTIF_TRAP_TYPE_L3_MTU_ERROR, &attr);
     ASSERT_EQ (rc, SAI_STATUS_SUCCESS);
 
     attr.id = SAI_HOSTIF_TRAP_ATTR_TRAP_GROUP;
     attr.value.oid = trap_group_oid;
 
-    rc = sai_hostif_api_table->set_trap_attribute(SAI_HOSTIF_TRAP_TYPE_L3_MTU_ERROR, &attr);
+    rc = sai_hostif_api_table->set_hostif_trap_attribute(SAI_HOSTIF_TRAP_TYPE_L3_MTU_ERROR, &attr);
     ASSERT_EQ (rc, SAI_STATUS_SUCCESS);
 
     attr.id = SAI_HOSTIF_TRAP_ATTR_PACKET_ACTION;
     attr.value.s32 = SAI_PACKET_ACTION_TRAP;
 
-    rc = sai_hostif_api_table->set_trap_attribute(SAI_HOSTIF_TRAP_TYPE_TTL_ERROR, &attr);
+    rc = sai_hostif_api_table->set_hostif_trap_attribute(SAI_HOSTIF_TRAP_TYPE_TTL_ERROR, &attr);
     ASSERT_EQ (rc, SAI_STATUS_SUCCESS);
 
     attr.id = SAI_HOSTIF_TRAP_ATTR_TRAP_GROUP;
     attr.value.oid = trap_group_oid;
 
-    rc = sai_hostif_api_table->set_trap_attribute(SAI_HOSTIF_TRAP_TYPE_TTL_ERROR, &attr);
+    rc = sai_hostif_api_table->set_hostif_trap_attribute(SAI_HOSTIF_TRAP_TYPE_TTL_ERROR, &attr);
     ASSERT_EQ (rc, SAI_STATUS_SUCCESS);
 
     attr.id = SAI_HOSTIF_TRAP_GROUP_ATTR_QUEUE;
     attr.value.u32 = SAI_GTEST_CPU_QUEUE_2;
-    rc = sai_hostif_api_table->set_trap_group_attribute(trap_group_oid, &attr);
+    rc = sai_hostif_api_table->set_hostif_trap_attribute(trap_group_oid, &attr);
     ASSERT_EQ (rc, SAI_STATUS_SUCCESS);
 
     attr.id = SAI_HOSTIF_TRAP_ATTR_TRAP_GROUP;
     attr.value.oid = SAI_NULL_OBJECT_ID;
 
-    rc = sai_hostif_api_table->set_trap_attribute(SAI_HOSTIF_TRAP_TYPE_L3_MTU_ERROR, &attr);
+    rc = sai_hostif_api_table->set_hostif_trap_attribute(SAI_HOSTIF_TRAP_TYPE_L3_MTU_ERROR, &attr);
     ASSERT_EQ (rc, SAI_STATUS_SUCCESS);
 
-    rc = sai_hostif_api_table->set_trap_attribute(SAI_HOSTIF_TRAP_TYPE_TTL_ERROR, &attr);
+    rc = sai_hostif_api_table->set_hostif_trap_attribute(SAI_HOSTIF_TRAP_TYPE_TTL_ERROR, &attr);
     ASSERT_EQ (rc, SAI_STATUS_SUCCESS);
 
     rc = sai_hostif_api_table->remove_hostif_trap_group(trap_group_oid);
@@ -531,7 +531,7 @@ TEST_F(hostIntfInit, send_pkt_pipeline_bypass)
     sai_attr[1].id = SAI_HOSTIF_PACKET_ATTR_HOSTIF_TX_TYPE;
     sai_attr[1].value.s32 = SAI_HOSTIF_TX_TYPE_PIPELINE_BYPASS;
 
-    rc = sai_hostif_api_table->send_packet(SAI_NULL_OBJECT_ID, buffer,
+    rc = sai_hostif_api_table->send_hostif_packet(SAI_NULL_OBJECT_ID, buffer,
                                         sizeof(buffer), 2, &sai_attr[0]);
     ASSERT_EQ (rc, SAI_STATUS_SUCCESS);
 }
@@ -552,7 +552,7 @@ TEST_F(hostIntfInit, send_pkt_pipeline_lookup)
     sai_attr.id = SAI_HOSTIF_PACKET_ATTR_HOSTIF_TX_TYPE;
     sai_attr.value.s32 = SAI_HOSTIF_TX_TYPE_PIPELINE_LOOKUP;
 
-    rc = sai_hostif_api_table->send_packet(SAI_NULL_OBJECT_ID, buffer,
+    rc = sai_hostif_api_table->send_hostif_packet(SAI_NULL_OBJECT_ID, buffer,
                                            sizeof(buffer), 1, &sai_attr);
     ASSERT_EQ (rc, SAI_STATUS_SUCCESS);
 }

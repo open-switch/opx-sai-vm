@@ -758,6 +758,10 @@ void saiTunnelTest::sai_test_bridge_port_attr_value_fill (unsigned int attr_coun
                 p_attr->value.booldata = (int) va_arg ((*p_varg_list), int);
                 break;
 
+            case SAI_BRIDGE_PORT_ATTR_EGRESS_FILTERING:
+                p_attr->value.booldata = (int) va_arg ((*p_varg_list), int);
+                break;
+
             default:
                 TUNNEL_PRINT("Unknown bridge port attribute id %d",p_attr->id);
         }

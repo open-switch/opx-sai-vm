@@ -19,7 +19,7 @@
 #define __SAI_L3_API_UTILS_H__
 
 #include "saiswitch.h"
-#include "sairouterintf.h"
+#include "sairouterinterface.h"
 #include "saitypes.h"
 #include "saistatus.h"
 #include "std_struct_utils.h"

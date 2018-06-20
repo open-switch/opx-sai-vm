@@ -14,7 +14,7 @@ extern "C" {
 #include "saivlan.h"
 #include "saistp.h"
 #include "saitypes.h"
-#include "sairouter.h"
+#include "saivirtualrouter.h"
 #include "saibridge.h"
 
 sai_status_t

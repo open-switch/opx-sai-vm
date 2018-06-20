@@ -1,3 +1,13 @@
+opx-sai-vm (17.1.0+opx6) unstable; urgency=medium
+
+  * Bugfix: Add service unit to execute vm_dn_rules.sh for proper packet forwarding
+  * Update: Egress filtering attribute implementation for VM
+  * Update: Change the sai-api dependency to the latest version
+  * Update: Fix meta parser tool issues for FibreChannel objects 
+  * Bugfix: Fix FibreChannel naming conventions, add return status and valid SAI function parameter conventions
+   
+ -- Dell EMC <ops-dev@lists.openswitch.net>  Wed, 30 May 2018  10:00:00 -0800
+
 opx-sai-vm (17.1.0+opx5) unstable; urgency=medium
 
   * Update: Change in log message type

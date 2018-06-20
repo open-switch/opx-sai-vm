@@ -321,7 +321,7 @@ static sai_status_t sai_acl_table_validate_attributes(uint_t attr_count,
                                                     attribute_count);
                 }
                 break;
-            case SAI_ACL_TABLE_ATTR_ACTION_LIST:
+            case SAI_ACL_TABLE_ATTR_ACL_ACTION_TYPE_LIST:
                 /* ACL Table Actions */
                 action_count = attribute_value.s32list.count;
                 SAI_ACL_LOG_TRACE ("Actions count : %d", action_count);
@@ -508,7 +508,7 @@ static sai_status_t sai_acl_table_populate(sai_acl_table_t *acl_table,
                 acl_table->table_group_id = attribute_value.oid;
                 acl_table->virtual_group_create = true;
                 break;
-            case SAI_ACL_TABLE_ATTR_ACTION_LIST:
+            case SAI_ACL_TABLE_ATTR_ACL_ACTION_TYPE_LIST:
                 if (attribute_value.s32list.count > 0) {
                     for (count = 0; count <
                          attribute_value.s32list.count; count++) {
@@ -839,7 +839,7 @@ sai_status_t sai_get_acl_table(sai_object_id_t table_id,
                  case SAI_ACL_TABLE_ATTR_GROUP_ID:
                      attr_list[attribute_count].value.oid = acl_table->table_group_id;
                      break;
-                 case SAI_ACL_TABLE_ATTR_ACTION_LIST:
+                 case SAI_ACL_TABLE_ATTR_ACL_ACTION_TYPE_LIST:
                      SAI_ACL_LOG_TRACE ("Nothing to get for ACL Table Actions");
                      break;
                  default:

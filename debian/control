@@ -3,7 +3,7 @@ Section: net
 Priority: optional
 Maintainer: Dell EMC <ops-dev@lists.openswitch.net>
 Build-Depends:dh-autoreconf, debhelper (>= 9), autotools-dev, libopx-logging-dev (>= 2.1.0), libopx-common-dev (>= 1.4.0),
-            opx-sai-api-dev (>= 32.0.0), libopx-db-sql-dev (>= 1.1.1)
+            opx-sai-api-dev (>= 35.0.0), libopx-db-sql-dev (>= 1.1.1)
 Standards-Version: 1.0.1
 
 Package: libopx-sai-vm1

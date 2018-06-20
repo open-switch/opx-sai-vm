@@ -16,7 +16,7 @@
 *************************************************************************/
 #include "saitypes.h"
 #include "saistatus.h"
-#include "saihostintf.h"
+#include "saihostif.h"
 #include "sai_hostif_main.h"
 #include "sai_hostif_api.h"
 #include "sai_hostif_common.h"

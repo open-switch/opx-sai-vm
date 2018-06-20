@@ -1607,7 +1607,7 @@ sai_status_t sai_acl_rule_udf_filter_populate (sai_acl_table_t *acl_table,
      * ACL Table.
      */
     group_attr_id = SAI_ACL_TABLE_ATTR_USER_DEFINED_FIELD_GROUP_MIN + (
-                    attribute_id -SAI_ACL_ENTRY_ATTR_USER_DEFINED_FIELD_MIN);
+                    attribute_id - SAI_ACL_ENTRY_ATTR_USER_DEFINED_FIELD_GROUP_MIN);
 
     if ((udf_group_id = sai_acl_table_find_udf_group_id(
         acl_table, group_attr_id)) == SAI_NULL_OBJECT_ID) {

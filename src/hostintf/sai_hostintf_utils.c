@@ -21,7 +21,7 @@
 #include "sai_gen_utils.h"
 #include "sai_hostif_common.h"
 
-#include "saihostintf.h"
+#include "saihostif.h"
 #include "saiswitch.h"
 #include "saitypes.h"
 #include "saistatus.h"

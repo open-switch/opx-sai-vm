@@ -30,8 +30,8 @@ static const struct {
     sai_acl_table_attr_t table_field;
     char *table_string;
 } sai_acl_translate_field_to_string[] = {
-    {SAI_ACL_TABLE_ATTR_FIELD_SRC_IPv6, "Source IPv6 Address"},
-    {SAI_ACL_TABLE_ATTR_FIELD_DST_IPv6, "Destination IPv6 Address"},
+    {SAI_ACL_TABLE_ATTR_FIELD_SRC_IPV6, "Source IPv6 Address"},
+    {SAI_ACL_TABLE_ATTR_FIELD_DST_IPV6, "Destination IPv6 Address"},
     {SAI_ACL_TABLE_ATTR_FIELD_SRC_MAC, "Source MAC Address"},
     {SAI_ACL_TABLE_ATTR_FIELD_DST_MAC, "Destination MAC Address"},
     {SAI_ACL_TABLE_ATTR_FIELD_SRC_IP, "Source IPv4 Address"},
@@ -59,7 +59,7 @@ static const struct {
     {SAI_ACL_TABLE_ATTR_FIELD_TCP_FLAGS, "TCP Flags"},
     {SAI_ACL_TABLE_ATTR_FIELD_ACL_IP_TYPE, "IP Type"},
     {SAI_ACL_TABLE_ATTR_FIELD_ACL_IP_FRAG, "IP Frag"},
-    {SAI_ACL_TABLE_ATTR_FIELD_IPv6_FLOW_LABEL, "IPv6 Flow Label"},
+    {SAI_ACL_TABLE_ATTR_FIELD_IPV6_FLOW_LABEL, "IPv6 Flow Label"},
     {SAI_ACL_TABLE_ATTR_FIELD_TC, "TC"},
     {SAI_ACL_TABLE_ATTR_FIELD_ICMP_TYPE, "ICMPType"},
     {SAI_ACL_TABLE_ATTR_FIELD_ICMP_CODE, "ICMPCode"},
@@ -83,8 +83,8 @@ static const struct {
     sai_acl_entry_attr_t rule_attr;
     char *rule_string;
 } sai_acl_translate_rule_attr_to_string[] = {
-    {SAI_ACL_ENTRY_ATTR_FIELD_SRC_IPv6, "Source IPv6 Address"},
-    {SAI_ACL_ENTRY_ATTR_FIELD_DST_IPv6, "Destination IPv6 Address"},
+    {SAI_ACL_ENTRY_ATTR_FIELD_SRC_IPV6, "Source IPv6 Address"},
+    {SAI_ACL_ENTRY_ATTR_FIELD_DST_IPV6, "Destination IPv6 Address"},
     {SAI_ACL_ENTRY_ATTR_FIELD_SRC_MAC, "Source MAC Address"},
     {SAI_ACL_ENTRY_ATTR_FIELD_DST_MAC, "Destination MAC Address"},
     {SAI_ACL_ENTRY_ATTR_FIELD_SRC_IP, "Source IPv4 Address"},
@@ -111,7 +111,7 @@ static const struct {
     {SAI_ACL_ENTRY_ATTR_FIELD_TCP_FLAGS, "TCP Flags"},
     {SAI_ACL_ENTRY_ATTR_FIELD_ACL_IP_TYPE, "IP Type"},
     {SAI_ACL_ENTRY_ATTR_FIELD_ACL_IP_FRAG, "IP Frag"},
-    {SAI_ACL_ENTRY_ATTR_FIELD_IPv6_FLOW_LABEL, "IPv6 Flow Label"},
+    {SAI_ACL_ENTRY_ATTR_FIELD_IPV6_FLOW_LABEL, "IPv6 Flow Label"},
     {SAI_ACL_ENTRY_ATTR_FIELD_TC, "TC"},
     {SAI_ACL_ENTRY_ATTR_FIELD_ICMP_TYPE, "ICMPType"},
     {SAI_ACL_ENTRY_ATTR_FIELD_ICMP_CODE, "ICMPCode"},
@@ -141,8 +141,8 @@ static const struct {
     {SAI_ACL_ENTRY_ATTR_ACTION_SET_DST_MAC, "Set Destination MAC Action"},
     {SAI_ACL_ENTRY_ATTR_ACTION_SET_SRC_IP, "Set Source IP Action"},
     {SAI_ACL_ENTRY_ATTR_ACTION_SET_DST_IP, "Set Destination IP Action"},
-    {SAI_ACL_ENTRY_ATTR_ACTION_SET_SRC_IPv6, "Set Source IPv6 Action"},
-    {SAI_ACL_ENTRY_ATTR_ACTION_SET_DST_IPv6, "Set Destination IPv6 Action"},
+    {SAI_ACL_ENTRY_ATTR_ACTION_SET_SRC_IPV6, "Set Source IPv6 Action"},
+    {SAI_ACL_ENTRY_ATTR_ACTION_SET_DST_IPV6, "Set Destination IPv6 Action"},
     {SAI_ACL_ENTRY_ATTR_ACTION_SET_DSCP, "Set DSCP Action"},
     {SAI_ACL_ENTRY_ATTR_ACTION_SET_L4_SRC_PORT, "Set L4 Source Port"},
     {SAI_ACL_ENTRY_ATTR_ACTION_SET_L4_DST_PORT, "Set L4 Destination Port"},

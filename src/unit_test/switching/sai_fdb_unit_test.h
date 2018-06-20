@@ -58,6 +58,8 @@ static inline void sai_set_test_fdb_entry(sai_fdb_entry_t* fdb_entry,
         } else {
             fdb_entry->mac_address[5] = 0xa;
         }
+    } else {
+        fdb_entry->mac_address[5] = 0xc;
     }
     fdb_entry->bv_id = SAI_GTEST_VLAN_OBJ;
 }

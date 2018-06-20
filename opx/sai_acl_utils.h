@@ -330,8 +330,8 @@ static inline bool sai_acl_table_udf_field_attr_range(
 static inline bool sai_acl_rule_udf_field_attr_range(
                                         sai_attr_id_t attribute_id)
 {
-    if ((attribute_id >= SAI_ACL_ENTRY_ATTR_USER_DEFINED_FIELD_MIN) &&
-        (attribute_id <= SAI_ACL_ENTRY_ATTR_USER_DEFINED_FIELD_MAX)) {
+    if ((attribute_id >= SAI_ACL_ENTRY_ATTR_USER_DEFINED_FIELD_GROUP_MIN) &&
+        (attribute_id <= SAI_ACL_ENTRY_ATTR_USER_DEFINED_FIELD_GROUP_MAX)) {
         return true;
     }
 

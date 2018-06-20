@@ -350,6 +350,171 @@ TEST_F(fdbInit, flush_all_fdb_entries_by_vlan)
                                  get_attr_list));
 }
 
+TEST_F(fdbInit, flush_all_fdb_entries_by_bridge)
+{
+    sai_fdb_entry_t fdb_entry;
+    sai_attribute_t get_attr_list[SAI_MAX_FDB_TEST_ATTRIBUTES];
+    sai_attribute_t flush_attr[2];
+    sai_attribute_t attr[4];
+    sai_object_id_t bridge_id = SAI_NULL_OBJECT_ID;
+    sai_object_id_t bridge_port_id = SAI_NULL_OBJECT_ID;
+
+
+    attr[0].id = SAI_BRIDGE_ATTR_TYPE;
+    attr[0].value.s32 = SAI_BRIDGE_TYPE_1D;
+
+    ASSERT_EQ(SAI_STATUS_SUCCESS,
+              p_sai_bridge_api_tbl->create_bridge(&bridge_id, switch_id, 1, &attr[0]));
+
+    attr[0].id = SAI_BRIDGE_PORT_ATTR_TYPE;
+    attr[0].value.s32 = SAI_BRIDGE_PORT_TYPE_SUB_PORT;
+
+    attr[1].id = SAI_BRIDGE_PORT_ATTR_PORT_ID;
+    ASSERT_EQ(SAI_STATUS_SUCCESS,
+              p_sai_bridge_api_tbl->get_bridge_port_attribute(bridge_port_id_1, 1,
+                                                              &attr[1]));
+
+    attr[2].id = SAI_BRIDGE_PORT_ATTR_BRIDGE_ID;
+    attr[2].value.oid = bridge_id;
+
+    attr[3].id = SAI_BRIDGE_PORT_ATTR_VLAN_ID;
+    attr[3].value.u16 = 100;
+
+    ASSERT_EQ(SAI_STATUS_SUCCESS,
+              p_sai_bridge_api_tbl->create_bridge_port(&bridge_port_id, switch_id, 4, attr));
+
+    sai_set_test_fdb_entry(&fdb_entry,bridge_port_id);
+    fdb_entry.bv_id = bridge_id;
+    attr[0].id = SAI_FDB_ENTRY_ATTR_TYPE;
+    attr[0].value.s32 = SAI_FDB_ENTRY_TYPE_DYNAMIC;
+
+    attr[1].id = SAI_FDB_ENTRY_ATTR_BRIDGE_PORT_ID;
+    attr[1].value.oid = bridge_port_id;
+
+    attr[2].id = SAI_FDB_ENTRY_ATTR_PACKET_ACTION;
+    attr[2].value.s32 = SAI_PACKET_ACTION_FORWARD;
+
+    ASSERT_EQ(SAI_STATUS_SUCCESS,
+              sai_fdb_api_table->create_fdb_entry(
+                                 (const sai_fdb_entry_t*)&fdb_entry,
+                                 3,
+                                 (const sai_attribute_t*)attr));
+
+    sai_set_test_fdb_entry(&fdb_entry, bridge_port_id);
+    fdb_entry.bv_id = bridge_id;
+    memset(get_attr_list,0, sizeof(get_attr_list));
+    memset(flush_attr,0, sizeof(flush_attr));
+
+    flush_attr[0].id = SAI_FDB_FLUSH_ATTR_BV_ID;
+    flush_attr[0].value.oid =  bridge_id;
+
+    flush_attr[1].id = SAI_FDB_FLUSH_ATTR_ENTRY_TYPE;
+    flush_attr[1].value.s32 = SAI_FDB_FLUSH_ENTRY_TYPE_DYNAMIC;
+
+
+    ASSERT_EQ(SAI_STATUS_SUCCESS,
+              sai_fdb_api_table->flush_fdb_entries(switch_id, 2,
+                                 (const sai_attribute_t*)flush_attr));
+    get_attr_list[0].id = SAI_FDB_ENTRY_ATTR_TYPE;
+    get_attr_list[1].id = SAI_FDB_ENTRY_ATTR_BRIDGE_PORT_ID;
+    get_attr_list[2].id = SAI_FDB_ENTRY_ATTR_PACKET_ACTION;
+
+    ASSERT_EQ(SAI_STATUS_ADDR_NOT_FOUND,
+              sai_fdb_api_table->get_fdb_entry_attribute(
+                                 (const sai_fdb_entry_t*)&fdb_entry,
+                                 3,
+                                 get_attr_list));
+
+    ASSERT_EQ(SAI_STATUS_SUCCESS,
+              p_sai_bridge_api_tbl->remove_bridge_port(bridge_port_id));
+
+    ASSERT_EQ(SAI_STATUS_SUCCESS,
+              p_sai_bridge_api_tbl->remove_bridge(bridge_id));
+}
+
+TEST_F(fdbInit, flush_all_fdb_entries_by_bridge_bridge_port)
+{
+    sai_fdb_entry_t fdb_entry;
+    sai_attribute_t get_attr_list[SAI_MAX_FDB_TEST_ATTRIBUTES];
+    sai_attribute_t flush_attr[3];
+    sai_attribute_t attr[4];
+    sai_object_id_t bridge_id = SAI_NULL_OBJECT_ID;
+    sai_object_id_t bridge_port_id = SAI_NULL_OBJECT_ID;
+
+
+    attr[0].id = SAI_BRIDGE_ATTR_TYPE;
+    attr[0].value.s32 = SAI_BRIDGE_TYPE_1D;
+
+    ASSERT_EQ(SAI_STATUS_SUCCESS,
+              p_sai_bridge_api_tbl->create_bridge(&bridge_id, switch_id, 1, &attr[0]));
+
+    attr[0].id = SAI_BRIDGE_PORT_ATTR_TYPE;
+    attr[0].value.s32 = SAI_BRIDGE_PORT_TYPE_SUB_PORT;
+
+    attr[1].id = SAI_BRIDGE_PORT_ATTR_PORT_ID;
+    ASSERT_EQ(SAI_STATUS_SUCCESS,
+              p_sai_bridge_api_tbl->get_bridge_port_attribute(bridge_port_id_1, 1,
+                                                              &attr[1]));
+
+    attr[2].id = SAI_BRIDGE_PORT_ATTR_BRIDGE_ID;
+    attr[2].value.oid = bridge_id;
+
+    attr[3].id = SAI_BRIDGE_PORT_ATTR_VLAN_ID;
+    attr[3].value.u16 = 100;
+
+    ASSERT_EQ(SAI_STATUS_SUCCESS,
+              p_sai_bridge_api_tbl->create_bridge_port(&bridge_port_id, switch_id, 4, attr));
+
+    sai_set_test_fdb_entry(&fdb_entry,bridge_port_id);
+    fdb_entry.bv_id = bridge_id;
+    attr[0].id = SAI_FDB_ENTRY_ATTR_TYPE;
+    attr[0].value.s32 = SAI_FDB_ENTRY_TYPE_DYNAMIC;
+
+    attr[1].id = SAI_FDB_ENTRY_ATTR_BRIDGE_PORT_ID;
+    attr[1].value.oid = bridge_port_id;
+
+    attr[2].id = SAI_FDB_ENTRY_ATTR_PACKET_ACTION;
+    attr[2].value.s32 = SAI_PACKET_ACTION_FORWARD;
+
+    ASSERT_EQ(SAI_STATUS_SUCCESS,
+              sai_fdb_api_table->create_fdb_entry(
+                                 (const sai_fdb_entry_t*)&fdb_entry,
+                                 3,
+                                 (const sai_attribute_t*)attr));
+
+    sai_set_test_fdb_entry(&fdb_entry, bridge_port_id);
+    fdb_entry.bv_id = bridge_id;
+    memset(get_attr_list,0, sizeof(get_attr_list));
+    memset(flush_attr,0, sizeof(flush_attr));
+
+    flush_attr[0].id = SAI_FDB_FLUSH_ATTR_BV_ID;
+    flush_attr[0].value.oid =  bridge_id;
+
+    flush_attr[1].id = SAI_FDB_FLUSH_ATTR_ENTRY_TYPE;
+    flush_attr[1].value.s32 = SAI_FDB_FLUSH_ENTRY_TYPE_DYNAMIC;
+
+    flush_attr[2].id = SAI_FDB_FLUSH_ATTR_BRIDGE_PORT_ID;
+    flush_attr[2].value.oid = bridge_port_id;
+
+    ASSERT_EQ(SAI_STATUS_SUCCESS,
+              sai_fdb_api_table->flush_fdb_entries(switch_id, 2,
+                                 (const sai_attribute_t*)flush_attr));
+    get_attr_list[0].id = SAI_FDB_ENTRY_ATTR_TYPE;
+    get_attr_list[1].id = SAI_FDB_ENTRY_ATTR_BRIDGE_PORT_ID;
+    get_attr_list[2].id = SAI_FDB_ENTRY_ATTR_PACKET_ACTION;
+
+    ASSERT_EQ(SAI_STATUS_ADDR_NOT_FOUND,
+              sai_fdb_api_table->get_fdb_entry_attribute(
+                                 (const sai_fdb_entry_t*)&fdb_entry,
+                                 3,
+                                 get_attr_list));
+
+    ASSERT_EQ(SAI_STATUS_SUCCESS,
+              p_sai_bridge_api_tbl->remove_bridge_port(bridge_port_id));
+
+    ASSERT_EQ(SAI_STATUS_SUCCESS,
+              p_sai_bridge_api_tbl->remove_bridge(bridge_id));
+}
 TEST_F(fdbInit, flush_all_fdb_entries_by_port_vlan)
 {
     sai_fdb_entry_t fdb_entry;

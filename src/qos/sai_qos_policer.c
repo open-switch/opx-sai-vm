@@ -646,15 +646,17 @@ static sai_status_t sai_qos_policer_attribute_get(sai_object_id_t policer_id,
     return sai_rc;
 }
 
-static sai_status_t sai_qos_policer_stats_get(
-sai_object_id_t policer_id, const sai_policer_stat_t *counter_ids,
-uint32_t number_of_counters, uint64_t* counters)
+static sai_status_t sai_qos_policer_stats_get(sai_object_id_t policer_id,
+                                              uint32_t number_of_counters,
+                                              const sai_policer_stat_t *counter_ids,
+                                              uint64_t* counters)
 {
     return SAI_STATUS_NOT_SUPPORTED;
 }
 
-static sai_status_t sai_qos_policer_stats_clear(
-sai_object_id_t policer_id, uint32_t number_of_counters, const sai_policer_stat_t *counter_ids)
+static sai_status_t sai_qos_policer_stats_clear(sai_object_id_t policer_id,
+                                                uint32_t number_of_counters,
+                                                const sai_policer_stat_t *counter_ids)
 {
     return SAI_STATUS_NOT_SUPPORTED;
 }

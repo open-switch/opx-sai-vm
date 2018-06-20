@@ -150,14 +150,6 @@ sai_status_t sai_qos_port_attribute_get(sai_npu_object_id_t port_id,
             value->oid =  p_port->maps_id[SAI_QOS_MAP_TYPE_DSCP_TO_COLOR];
             break;
 
-        case SAI_PORT_ATTR_QOS_DOT1P_TO_TC_AND_COLOR_MAP:
-            value->oid =  p_port->maps_id[SAI_QOS_MAP_TYPE_DOT1P_TO_TC_AND_COLOR];
-            break;
-
-        case SAI_PORT_ATTR_QOS_DSCP_TO_TC_AND_COLOR_MAP:
-            value->oid =  p_port->maps_id[SAI_QOS_MAP_TYPE_DSCP_TO_TC_AND_COLOR];
-            break;
-
         case SAI_PORT_ATTR_QOS_TC_TO_QUEUE_MAP:
             value->oid =  p_port->maps_id[SAI_QOS_MAP_TYPE_TC_TO_QUEUE];
             break;

@@ -18,7 +18,7 @@
 #ifndef __SAI_HOSTIF_API_H__
 #define __SAI_HOSTIF_API_H__
 
-#include "saihostintf.h"
+#include "saihostif.h"
 #include "saitypes.h"
 #include "saistatus.h"
 

@@ -137,7 +137,7 @@ void saiACLCounterTest ::SetUpTestCase (void)
                                         SAI_ACL_TABLE_ATTR_FIELD_IP_PROTOCOL,
                                         SAI_ACL_TABLE_ATTR_FIELD_IN_PORT,
                                         SAI_ACL_TABLE_ATTR_FIELD_ECN,
-                                        SAI_ACL_TABLE_ATTR_FIELD_IPv6_FLOW_LABEL,
+                                        SAI_ACL_TABLE_ATTR_FIELD_IPV6_FLOW_LABEL,
                                         SAI_ACL_TABLE_ATTR_FIELD_IN_PORTS);
     ASSERT_EQ (SAI_STATUS_SUCCESS, sai_rc);
 
@@ -184,7 +184,7 @@ void saiACLCounterTest ::SetUpTestCase (void)
                                         SAI_ACL_TABLE_ATTR_FIELD_ETHER_TYPE,
                                         SAI_ACL_TABLE_ATTR_FIELD_IN_PORT,
                                         SAI_ACL_TABLE_ATTR_FIELD_IN_PORTS,
-                                        SAI_ACL_TABLE_ATTR_FIELD_IPv6_FLOW_LABEL);
+                                        SAI_ACL_TABLE_ATTR_FIELD_IPV6_FLOW_LABEL);
     ASSERT_EQ (SAI_STATUS_SUCCESS, sai_rc);
 
     if (sai_rc == SAI_STATUS_SUCCESS) {
@@ -220,8 +220,8 @@ void saiACLCounterTest ::SetUpTestCase (void)
                                         SAI_ACL_TABLE_ATTR_ACL_STAGE,
                                         SAI_ACL_STAGE_INGRESS,
                                         SAI_ACL_TABLE_ATTR_PRIORITY, 3,
-                                        SAI_ACL_TABLE_ATTR_FIELD_SRC_IPv6,
-                                        SAI_ACL_TABLE_ATTR_FIELD_DST_IPv6,
+                                        SAI_ACL_TABLE_ATTR_FIELD_SRC_IPV6,
+                                        SAI_ACL_TABLE_ATTR_FIELD_DST_IPV6,
                                         SAI_ACL_TABLE_ATTR_FIELD_L4_SRC_PORT,
                                         SAI_ACL_TABLE_ATTR_FIELD_L4_DST_PORT,
                                         SAI_ACL_TABLE_ATTR_FIELD_TTL,
@@ -232,7 +232,7 @@ void saiACLCounterTest ::SetUpTestCase (void)
                                         SAI_ACL_TABLE_ATTR_FIELD_ETHER_TYPE,
                                         SAI_ACL_TABLE_ATTR_FIELD_IN_PORT,
                                         SAI_ACL_TABLE_ATTR_FIELD_IN_PORTS,
-                                        SAI_ACL_TABLE_ATTR_FIELD_IPv6_FLOW_LABEL);
+                                        SAI_ACL_TABLE_ATTR_FIELD_IPV6_FLOW_LABEL);
     ASSERT_EQ (SAI_STATUS_SUCCESS, sai_rc);
 
     if (sai_rc == SAI_STATUS_SUCCESS) {
@@ -245,8 +245,8 @@ void saiACLCounterTest ::SetUpTestCase (void)
                                         SAI_ACL_TABLE_ATTR_ACL_STAGE,
                                         SAI_ACL_STAGE_EGRESS,
                                         SAI_ACL_TABLE_ATTR_PRIORITY, 3,
-                                        SAI_ACL_TABLE_ATTR_FIELD_SRC_IPv6,
-                                        SAI_ACL_TABLE_ATTR_FIELD_DST_IPv6,
+                                        SAI_ACL_TABLE_ATTR_FIELD_SRC_IPV6,
+                                        SAI_ACL_TABLE_ATTR_FIELD_DST_IPV6,
                                         SAI_ACL_TABLE_ATTR_FIELD_L4_SRC_PORT,
                                         SAI_ACL_TABLE_ATTR_FIELD_L4_DST_PORT,
                                         SAI_ACL_TABLE_ATTR_FIELD_TTL,
@@ -405,9 +405,9 @@ sai_object_id_t saiACLCounterTest ::sai_test_acl_rule_entry_create_with_counter 
                                        SAI_ACL_ENTRY_ATTR_TABLE_ID, ipv6_table_id,
                                        SAI_ACL_ENTRY_ATTR_PRIORITY, 25,
                                        SAI_ACL_ENTRY_ATTR_ADMIN_STATE, true,
-                                       SAI_ACL_ENTRY_ATTR_FIELD_SRC_IPv6,
+                                       SAI_ACL_ENTRY_ATTR_FIELD_SRC_IPV6,
                                        1, &src_ipv6_data, &src_ipv6_mask,
-                                       SAI_ACL_ENTRY_ATTR_FIELD_DST_IPv6,
+                                       SAI_ACL_ENTRY_ATTR_FIELD_DST_IPV6,
                                        1, &dst_ipv6_data, &dst_ipv6_mask,
                                        SAI_ACL_ENTRY_ATTR_FIELD_ETHER_TYPE,
                                        1, 34825, standard_mask,
@@ -533,9 +533,9 @@ sai_object_id_t saiACLCounterTest ::sai_test_acl_rule_entry_create_with_counter 
                                        SAI_ACL_ENTRY_ATTR_TABLE_ID, ipv6_table_id,
                                        SAI_ACL_ENTRY_ATTR_PRIORITY, 25,
                                        SAI_ACL_ENTRY_ATTR_ADMIN_STATE, true,
-                                       SAI_ACL_ENTRY_ATTR_FIELD_SRC_IPv6,
+                                       SAI_ACL_ENTRY_ATTR_FIELD_SRC_IPV6,
                                        1, &src_ipv6_data, &src_ipv6_mask,
-                                       SAI_ACL_ENTRY_ATTR_FIELD_DST_IPv6,
+                                       SAI_ACL_ENTRY_ATTR_FIELD_DST_IPV6,
                                        1, &dst_ipv6_data, &dst_ipv6_mask,
                                        SAI_ACL_ENTRY_ATTR_FIELD_ETHER_TYPE,
                                        1, 34825, standard_mask,

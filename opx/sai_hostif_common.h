@@ -21,7 +21,7 @@
 #include "sai.h"
 #include "saitypes.h"
 #include "saiswitch.h"
-#include "saihostintf.h"
+#include "saihostif.h"
 
 #include "std_type_defs.h"
 #include "std_llist.h"
@@ -33,7 +33,7 @@
 /** Logging utility for SAI Host Interface API */
 #define SAI_HOSTIF_LOG(level, msg, ...) \
     do { \
-        if (sai_is_log_enabled (SAI_API_HOST_INTERFACE, level)) { \
+        if (sai_is_log_enabled (SAI_API_HOSTIF, level)) { \
             SAI_LOG_UTIL(ev_log_t_SAI_HOSTIF, level, msg, ##__VA_ARGS__); \
         } \
     } while (0)

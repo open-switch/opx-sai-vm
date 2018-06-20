@@ -395,7 +395,7 @@ TEST_F(saiACLTableTest, table_create_with_same_priority)
                             SAI_ACL_TABLE_ATTR_ACL_STAGE,
                             SAI_ACL_STAGE_INGRESS,
                             SAI_ACL_TABLE_ATTR_PRIORITY, 1,
-                            SAI_ACL_TABLE_ATTR_FIELD_SRC_IPv6,
+                            SAI_ACL_TABLE_ATTR_FIELD_SRC_IPV6,
                             SAI_ACL_TABLE_ATTR_FIELD_DST_MAC,
                             SAI_ACL_TABLE_ATTR_FIELD_DST_IP);
         EXPECT_EQ (sai_test_invalid_attr_status_code (SAI_STATUS_INVALID_ATTR_VALUE_0, 1), sai_rc);
@@ -408,7 +408,7 @@ TEST_F(saiACLTableTest, table_create_with_same_priority)
                             SAI_ACL_TABLE_ATTR_ACL_STAGE,
                             SAI_ACL_STAGE_EGRESS,
                             SAI_ACL_TABLE_ATTR_PRIORITY, 1,
-                            SAI_ACL_TABLE_ATTR_FIELD_SRC_IPv6,
+                            SAI_ACL_TABLE_ATTR_FIELD_SRC_IPV6,
                             SAI_ACL_TABLE_ATTR_FIELD_DST_MAC,
                             SAI_ACL_TABLE_ATTR_FIELD_DST_IP);
         EXPECT_EQ (SAI_STATUS_SUCCESS, sai_rc);

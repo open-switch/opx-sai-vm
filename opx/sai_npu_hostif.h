@@ -17,7 +17,7 @@
 #define _SAI_NPU_HOST_IF_H_
 
 #include "saitypes.h"
-#include "saihostintf.h"
+#include "saihostif.h"
 #include "sai_hostif_common.h"
 
 /** @defgroup SAINPUHOSTIFAPI SAI - NPU Host Interface Functionality

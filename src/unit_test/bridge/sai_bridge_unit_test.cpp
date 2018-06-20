@@ -349,8 +349,23 @@ TEST_F(bridgeTest, 1q_bridge_port_attribute_set)
         get_attr.id = SAI_BRIDGE_PORT_ATTR_INGRESS_FILTERING;
         ASSERT_EQ(SAI_STATUS_SUCCESS,
                   p_sai_bridge_api_tbl->get_bridge_port_attribute(bridge_port_id, 1, &get_attr));
-        ASSERT_EQ(attr.value.s32, get_attr.value.s32);
+        ASSERT_EQ(attr.value.booldata, get_attr.value.booldata);
         printf("Attribute SAI_BRIDGE_PORT_ATTR_INGRESS_FILTERING is set to true successfully\r\n");
+    }
+
+    attr.id = SAI_BRIDGE_PORT_ATTR_EGRESS_FILTERING;
+    attr.value.booldata = true;
+
+    sai_rc = p_sai_bridge_api_tbl->set_bridge_port_attribute(bridge_port_id, &attr);
+    if(sai_rc != SAI_STATUS_SUCCESS) {
+        printf("Error %d is returned on setting SAI_BRIDGE_PORT_ATTR_EGRESS_FILTERING\r\n",
+               sai_rc);
+    } else {
+        get_attr.id = SAI_BRIDGE_PORT_ATTR_EGRESS_FILTERING;
+        ASSERT_EQ(SAI_STATUS_SUCCESS,
+                  p_sai_bridge_api_tbl->get_bridge_port_attribute(bridge_port_id, 1, &get_attr));
+        ASSERT_EQ(attr.value.booldata, get_attr.value.booldata);
+        printf("Attribute SAI_BRIDGE_PORT_ATTR_EGRESS_FILTERING is set to true successfully\r\n");
     }
 
     attr.id = SAI_BRIDGE_PORT_ATTR_END;
@@ -1009,7 +1024,7 @@ TEST_F(bridgeTest, 1d_bridge_port_attribute_set)
         get_attr.id = SAI_BRIDGE_PORT_ATTR_INGRESS_FILTERING;
         ASSERT_EQ(SAI_STATUS_SUCCESS,
                   p_sai_bridge_api_tbl->get_bridge_port_attribute(bridge_port_id, 1, &get_attr));
-        ASSERT_EQ(attr.value.s32, get_attr.value.s32);
+        ASSERT_EQ(attr.value.booldata, get_attr.value.booldata);
         printf("Attribute SAI_BRIDGE_PORT_ATTR_INGRESS_FILTERING is set to true successfully\r\n");
     }
 

@@ -169,6 +169,9 @@ typedef struct _dn_sai_bridge_port_info_t{
     /* If ingress filtering is set drop frames with unknown VLANs*/
     bool                                 ingress_filtering;
 
+    /* If egress filtering is set drop frames with unknown VLANs at egress*/
+    bool                                 egress_filtering;
+
     /* Egress tagging mode of the bridge port */
     sai_bridge_port_tagging_mode_t       egr_tagging_mode;
 

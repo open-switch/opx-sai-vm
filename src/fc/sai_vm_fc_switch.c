@@ -12,7 +12,7 @@
 /**
 * @file sai_vm_fc_switch.c
 *
-* @brief This file contains SAI-VM FC Switch API functionality 
+* @brief This file contains SAI-VM FC Switch API functionality
 *
 *************************************************************************/
 
@@ -42,6 +42,7 @@ static sai_status_t sai_get_fc_switch_attribute(sai_object_id_t fc_switch_id,
 }
 
 static sai_status_t sai_create_fc_switch (sai_object_id_t* fc_switch_id,
+                                   sai_object_id_t switch_id,
                                    uint32_t attr_count,
                                    const sai_attribute_t *attr_list)
 {
@@ -52,10 +53,10 @@ static sai_status_t sai_create_fc_switch (sai_object_id_t* fc_switch_id,
 }
 
 
-static void sai_remove_fc_switch(sai_object_id_t fc_switch_id)
+static sai_status_t sai_remove_fc_switch(sai_object_id_t fc_switch_id)
 
 {
-    return;
+    return SAI_STATUS_SUCCESS;
 }
 
 

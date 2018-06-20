@@ -231,7 +231,10 @@ static sai_status_t sai_npu_neighbor_attribute_get (sai_fib_nh_t *p_neighbor,
                 SAI_NEIGHBOR_LOG_TRACE ("Index: %d, Neighbor No Host Route: %d."
                                         , attr_index, p_attr->value.booldata);
                 break;
-
+            case SAI_NEIGHBOR_ENTRY_ATTR_USER_TRAP_ID:
+                status = SAI_STATUS_NOT_SUPPORTED;
+                SAI_NEIGHBOR_LOG_ERR ("Unsupported attribute   Id: %d.",p_attr->id);
+                break;
             default:
                 status = SAI_STATUS_INVALID_ATTRIBUTE_0;
 

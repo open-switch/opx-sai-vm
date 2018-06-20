@@ -163,7 +163,7 @@ sai_status_t samplepacketTest ::sai_test_samplepacket_session_create (sai_object
 
     printf ("Testing Session Create API with attribute count: %d\r\n", attr_count);
 
-    sai_rc = p_sai_samplepacket_api_tbl->create_samplepacket_session (p_session_id, switch_id,
+    sai_rc = p_sai_samplepacket_api_tbl->create_samplepacket(p_session_id, switch_id,
                                                                       attr_count, p_attr_list);
 
     if (sai_rc != SAI_STATUS_SUCCESS) {
@@ -178,7 +178,7 @@ sai_status_t samplepacketTest ::sai_test_samplepacket_session_create (sai_object
 sai_status_t samplepacketTest ::sai_test_samplepacket_session_destroy (sai_object_id_t session_id) {
     sai_status_t sai_rc = SAI_STATUS_SUCCESS;
 
-    sai_rc = p_sai_samplepacket_api_tbl->remove_samplepacket_session (session_id);
+    sai_rc = p_sai_samplepacket_api_tbl->remove_samplepacket(session_id);
 
     if (sai_rc != SAI_STATUS_SUCCESS) {
         printf ("SamplePacket Session destroy API failed with error: %d\r\n", sai_rc);

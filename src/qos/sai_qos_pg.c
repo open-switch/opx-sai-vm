@@ -268,9 +268,9 @@ sai_status_t sai_qos_pg_attr_get (sai_object_id_t ingress_pg_id,
     return sai_rc;
 }
 
-sai_status_t sai_qos_pg_stats_get (sai_object_id_t pg_id, const
-                                   sai_ingress_priority_group_stat_t *counter_ids,
-                                   uint32_t number_of_counters, uint64_t* counters)
+sai_status_t sai_qos_pg_stats_get (sai_object_id_t pg_id, uint32_t number_of_counters,
+                                   const sai_ingress_priority_group_stat_t *counter_ids,
+                                   uint64_t* counters)
 {
     sai_status_t sai_rc = SAI_STATUS_SUCCESS;
 

@@ -1585,14 +1585,10 @@ sai_qos_map_type_t sai_get_map_type_from_port_attr(sai_attr_id_t port_attr)
         return SAI_QOS_MAP_TYPE_DOT1P_TO_TC;
     }else if(port_attr == SAI_PORT_ATTR_QOS_DOT1P_TO_COLOR_MAP){
         return SAI_QOS_MAP_TYPE_DOT1P_TO_COLOR;
-    }else if(port_attr == SAI_PORT_ATTR_QOS_DOT1P_TO_TC_AND_COLOR_MAP){
-        return SAI_QOS_MAP_TYPE_DOT1P_TO_TC_AND_COLOR;
     }else if(port_attr == SAI_PORT_ATTR_QOS_DSCP_TO_TC_MAP){
         return SAI_QOS_MAP_TYPE_DSCP_TO_TC;
     }else if(port_attr == SAI_PORT_ATTR_QOS_DSCP_TO_COLOR_MAP){
         return SAI_QOS_MAP_TYPE_DSCP_TO_COLOR;
-    }else if(port_attr == SAI_PORT_ATTR_QOS_DSCP_TO_TC_AND_COLOR_MAP){
-        return SAI_QOS_MAP_TYPE_DSCP_TO_TC_AND_COLOR;
     }else if(port_attr == SAI_PORT_ATTR_QOS_TC_TO_QUEUE_MAP){
         return SAI_QOS_MAP_TYPE_TC_TO_QUEUE;
     }else if(port_attr == SAI_PORT_ATTR_QOS_TC_AND_COLOR_TO_DOT1P_MAP){

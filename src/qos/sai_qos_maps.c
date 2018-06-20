@@ -25,7 +25,7 @@
 #include "sai_common_infra.h"
 
 #include "sai.h"
-#include "saiqosmaps.h"
+#include "saiqosmap.h"
 
 #include "std_type_defs.h"
 #include "std_utils.h"
@@ -529,14 +529,12 @@ static sai_status_t sai_qos_map_list_default_set(dn_sai_qos_map_t *p_map_node)
         /* Fall through  */
         case SAI_QOS_MAP_TYPE_DOT1P_TO_TC:
         case SAI_QOS_MAP_TYPE_DOT1P_TO_COLOR:
-        case SAI_QOS_MAP_TYPE_DOT1P_TO_TC_AND_COLOR:
             sai_rc = sai_qos_map_dot1p_to_tc_and_color_default_set(p_map_node);
             break;
 
         /* Fall through  */
         case SAI_QOS_MAP_TYPE_DSCP_TO_TC:
         case SAI_QOS_MAP_TYPE_DSCP_TO_COLOR:
-        case SAI_QOS_MAP_TYPE_DSCP_TO_TC_AND_COLOR:
             sai_rc = sai_qos_map_dscp_to_tc_and_color_default_set(p_map_node);
             break;
 
@@ -586,14 +584,12 @@ dn_sai_qos_map_t *p_map_node, sai_qos_map_list_t map_list, dn_sai_operations_t o
 
         case SAI_QOS_MAP_TYPE_DOT1P_TO_TC:
         case SAI_QOS_MAP_TYPE_DOT1P_TO_COLOR:
-        case SAI_QOS_MAP_TYPE_DOT1P_TO_TC_AND_COLOR:
             sai_rc = sai_qos_map_dot1p_to_tc_and_color_map_value_set
                 (p_map_node, map_list, op_type);
             break;
 
         case SAI_QOS_MAP_TYPE_DSCP_TO_TC:
         case SAI_QOS_MAP_TYPE_DSCP_TO_COLOR:
-        case SAI_QOS_MAP_TYPE_DSCP_TO_TC_AND_COLOR:
             sai_rc = sai_qos_map_dscp_to_tc_and_color_map_value_set
                 (p_map_node, map_list, op_type);
             break;

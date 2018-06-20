@@ -322,6 +322,10 @@ static sai_status_t sai_bridge_port_validate_and_fill_attributes (dn_sai_bridge_
                 bridge_port_info->ingress_filtering = attr_list[attr_idx].value.booldata;
                 break;
 
+            case SAI_BRIDGE_PORT_ATTR_EGRESS_FILTERING:
+                bridge_port_info->egress_filtering = attr_list[attr_idx].value.booldata;
+                break;
+
             case SAI_BRIDGE_PORT_ATTR_PORT_ID:
                 sai_port_id = attr_list[attr_idx].value.oid;
                 if(!sai_bridge_port_is_valid_port(sai_port_id)) {

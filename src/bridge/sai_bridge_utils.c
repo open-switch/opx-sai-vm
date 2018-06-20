@@ -1168,6 +1168,10 @@ sai_status_t sai_bridge_port_get_attr_value_from_bridge_port_info (const dn_sai_
                 attr_list[attr_idx].value.booldata = bridge_port_info->ingress_filtering;
                 break;
 
+            case SAI_BRIDGE_PORT_ATTR_EGRESS_FILTERING:
+                attr_list[attr_idx].value.booldata = bridge_port_info->egress_filtering;
+                break;
+
             case SAI_BRIDGE_PORT_ATTR_TAGGING_MODE:
                 attr_list[attr_idx].value.s32 = bridge_port_info->egr_tagging_mode;
                 break;
@@ -1232,6 +1236,10 @@ sai_status_t sai_bridge_port_update_attr_value_in_cache (dn_sai_bridge_port_info
                 bridge_port_info->ingress_filtering = attr->value.booldata;
                 break;
 
+            case SAI_BRIDGE_PORT_ATTR_EGRESS_FILTERING:
+                bridge_port_info->egress_filtering = attr->value.booldata;
+                break;
+
             case SAI_BRIDGE_PORT_ATTR_TAGGING_MODE:
                 bridge_port_info->egr_tagging_mode = attr->value.s32;
                 break;
@@ -1272,6 +1280,9 @@ bool sai_bridge_port_is_duplicate_attr_val(const dn_sai_bridge_port_info_t *brid
 
             case SAI_BRIDGE_PORT_ATTR_INGRESS_FILTERING:
                 return (bridge_port_info->ingress_filtering == attr->value.booldata);
+
+            case SAI_BRIDGE_PORT_ATTR_EGRESS_FILTERING:
+                return (bridge_port_info->egress_filtering == attr->value.booldata);
 
             case SAI_BRIDGE_PORT_ATTR_TAGGING_MODE:
                 return (bridge_port_info->egr_tagging_mode == attr->value.s32);

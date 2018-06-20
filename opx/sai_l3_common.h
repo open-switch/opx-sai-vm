@@ -23,8 +23,8 @@
 #include "std_radix.h"
 #include "std_radical.h"
 
-#include "sairouter.h"
-#include "sairouterintf.h"
+#include "saivirtualrouter.h"
+#include "sairouterinterface.h"
 #include "sainexthop.h"
 #include "sainexthopgroup.h"
 #include "sairoute.h"

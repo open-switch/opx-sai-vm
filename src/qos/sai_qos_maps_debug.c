@@ -43,11 +43,6 @@ void sai_qos_maps_dump_map_list(sai_qos_map_type_t map_type, sai_qos_map_list_t 
         for(count = 0; count < map_list.count; count ++){
             SAI_DEBUG("Dot1p: %d  color: %d",map_list.list[count].key.dot1p, map_list.list[count].value.color);
         }
-    } else if(map_type == SAI_QOS_MAP_TYPE_DOT1P_TO_TC_AND_COLOR){
-        for(count = 0; count < map_list.count; count ++){
-            SAI_DEBUG("Dot1p: %d  Tc: %d color: %d",map_list.list[count].key.dot1p, map_list.list[count].value.tc,
-                      map_list.list[count].value.color);
-        }
     } else if(map_type == SAI_QOS_MAP_TYPE_DSCP_TO_TC){
         for(count = 0; count < map_list.count; count ++){
             SAI_DEBUG("Dscp: %d  Tc: %d ",map_list.list[count].key.dscp, map_list.list[count].value.tc);
@@ -55,11 +50,6 @@ void sai_qos_maps_dump_map_list(sai_qos_map_type_t map_type, sai_qos_map_list_t 
     } else if(map_type == SAI_QOS_MAP_TYPE_DSCP_TO_COLOR){
         for(count = 0; count < map_list.count; count ++){
             SAI_DEBUG("Dscp: %d color: %d",map_list.list[count].key.dscp, map_list.list[count].value.color);
-        }
-    } else if(map_type == SAI_QOS_MAP_TYPE_DSCP_TO_TC_AND_COLOR){
-        for(count = 0; count < map_list.count; count ++){
-            SAI_DEBUG("Dscp: %d  Tc: %d color: %d",map_list.list[count].key.dscp, map_list.list[count].value.tc,
-                      map_list.list[count].value.color);
         }
     }
     else if(map_type == SAI_QOS_MAP_TYPE_TC_TO_QUEUE){

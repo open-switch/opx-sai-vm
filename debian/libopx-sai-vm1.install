@@ -1,2 +1,4 @@
 usr/lib/*/lib*.so*
+usr/bin/vm_dn_rules.sh
 etc/opx/*
+lib/systemd/system/opx-vm.service

@@ -1391,6 +1391,18 @@ static sai_status_t sai_fib_next_hop_group_member_attribute_set (
                 status = SAI_STATUS_NOT_SUPPORTED;
                 break;
 
+            case SAI_NEXT_HOP_GROUP_MEMBER_ATTR_CONFIGURED_ROLE:
+                status = SAI_STATUS_NOT_SUPPORTED;
+                break;
+
+            case SAI_NEXT_HOP_GROUP_MEMBER_ATTR_OBSERVED_ROLE:
+                status = SAI_STATUS_NOT_SUPPORTED;
+                break;
+
+            case SAI_NEXT_HOP_GROUP_MEMBER_ATTR_MONITORED_OBJECT:
+                status = SAI_STATUS_NOT_SUPPORTED;
+                break;
+
             default:
                 SAI_NH_GROUP_LOG_ERR ("Invalid atttribute id: %d.",
                                       p_attr->id);
@@ -1460,6 +1472,18 @@ static sai_status_t sai_fib_next_hop_group_member_attribute_get (
                     status = SAI_STATUS_NOT_SUPPORTED;
                     break;
 
+                case SAI_NEXT_HOP_GROUP_MEMBER_ATTR_CONFIGURED_ROLE:
+                    status = SAI_STATUS_NOT_SUPPORTED;
+                    break;
+
+                case SAI_NEXT_HOP_GROUP_MEMBER_ATTR_OBSERVED_ROLE:
+                    status = SAI_STATUS_NOT_SUPPORTED;
+                    break;
+
+                case SAI_NEXT_HOP_GROUP_MEMBER_ATTR_MONITORED_OBJECT:
+                    status = SAI_STATUS_NOT_SUPPORTED;
+                    break;
+
                 default:
                     break;
             }
@@ -1487,7 +1511,7 @@ static sai_status_t sai_fib_next_hop_group_member_create_bulk (
                                           uint32_t                object_count,
                                           const uint32_t         *attr_count,
                                           const sai_attribute_t **attrs,
-                                          sai_bulk_op_type_t      type,
+                                          sai_bulk_op_error_mode_t type,
                                           sai_object_id_t        *object_id,
                                           sai_status_t           *object_statuses)
 {
@@ -1497,7 +1521,7 @@ static sai_status_t sai_fib_next_hop_group_member_create_bulk (
 static sai_status_t sai_fib_next_hop_group_member_remove_bulk (
                                           uint32_t               object_count,
                                           const sai_object_id_t *object_id,
-                                          sai_bulk_op_type_t     type,
+                                          sai_bulk_op_error_mode_t type,
                                           sai_status_t          *object_statuses)
 {
     return SAI_STATUS_NOT_IMPLEMENTED;

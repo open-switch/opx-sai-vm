@@ -252,9 +252,9 @@ TEST (saiQosQueueTest, queue_stats_get)
     for (counter_id = SAI_QUEUE_STAT_PACKETS;
          counter_id <= SAI_QUEUE_STAT_SHARED_WATERMARK_BYTES; counter_id++) {
 
-        sai_rc = p_sai_qos_queue_api_table->get_queue_stats(queue_id,
+        sai_rc = p_sai_qos_queue_api_table->get_queue_stats(queue_id, 1,
                                                            (const sai_queue_stat_t*)&counter_id,
-                                                           1, &counter_val);
+                                                            &counter_val);
         if(sai_rc == SAI_STATUS_SUCCESS) {
              printf("Counter ID %d is supported. Val:0x%" PRIx64 "\r\n",counter_id,counter_val);
         } else if( sai_rc == SAI_STATUS_NOT_SUPPORTED) {
@@ -287,12 +287,12 @@ TEST (saiQosQueueTest, clear_queue_stats)
     for (counter_id = SAI_QUEUE_STAT_PACKETS;
          counter_id <= SAI_QUEUE_STAT_SHARED_WATERMARK_BYTES; counter_id++) {
 
-        sai_rc = p_sai_qos_queue_api_table->clear_queue_stats(queue_id,
-                                                            (const sai_queue_stat_t*)&counter_id, 1);
+        sai_rc = p_sai_qos_queue_api_table->clear_queue_stats(queue_id, 1,
+                                                            (const sai_queue_stat_t*)&counter_id);
         if(sai_rc == SAI_STATUS_SUCCESS) {
-            sai_rc = p_sai_qos_queue_api_table->get_queue_stats (queue_id,
+            sai_rc = p_sai_qos_queue_api_table->get_queue_stats (queue_id, 1,
                                                                 (const sai_queue_stat_t*)&counter_id,
-                                                                 1, &counter_val);
+                                                                 &counter_val);
             if(sai_rc != SAI_STATUS_SUCCESS) {
                 printf("Counter ID %d can be cleared but not get. Error %d\r\n",
                        counter_id, sai_rc);

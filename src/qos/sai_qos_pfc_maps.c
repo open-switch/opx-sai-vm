@@ -23,7 +23,7 @@
 
 #include "sai.h"
 #include "saitypes.h"
-#include "saiqosmaps.h"
+#include "saiqosmap.h"
 
 #include "std_type_defs.h"
 #include "std_utils.h"

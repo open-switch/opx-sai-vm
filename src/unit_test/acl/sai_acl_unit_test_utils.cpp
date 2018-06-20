@@ -348,9 +348,9 @@ const char* sai_acl_test_table_attr_id_to_name_get (unsigned int attr_id) {
         return "ACL Table Group Id";
     } else if (SAI_ACL_TABLE_ATTR_SIZE == attr_id) {
         return "ACL Table Size";
-    } else if (SAI_ACL_TABLE_ATTR_FIELD_SRC_IPv6 == attr_id) {
+    } else if (SAI_ACL_TABLE_ATTR_FIELD_SRC_IPV6 == attr_id) {
         return "SRC IPv6 Field";
-    } else if (SAI_ACL_TABLE_ATTR_FIELD_DST_IPv6 == attr_id) {
+    } else if (SAI_ACL_TABLE_ATTR_FIELD_DST_IPV6 == attr_id) {
         return "DST IPv6 Field";
     } else if (SAI_ACL_TABLE_ATTR_FIELD_SRC_MAC == attr_id) {
         return "SRC Mac Field";
@@ -406,7 +406,7 @@ const char* sai_acl_test_table_attr_id_to_name_get (unsigned int attr_id) {
         return "IP Type Field";
     } else if (SAI_ACL_TABLE_ATTR_FIELD_ACL_IP_FRAG == attr_id) {
         return "IP Frag Field";
-    } else if (SAI_ACL_TABLE_ATTR_FIELD_IPv6_FLOW_LABEL == attr_id) {
+    } else if (SAI_ACL_TABLE_ATTR_FIELD_IPV6_FLOW_LABEL == attr_id) {
         return "IPv6 Flow Label";
     } else if (SAI_ACL_TABLE_ATTR_FIELD_TC == attr_id) {
         return "TC Field";
@@ -759,9 +759,9 @@ static const char* sai_acl_test_rule_attr_id_to_name_get (unsigned int attr_id) 
         return "ACL Rule Priority";
     } else if (SAI_ACL_ENTRY_ATTR_ADMIN_STATE == attr_id) {
         return "ACL Rule Admin State";
-    } else if (SAI_ACL_ENTRY_ATTR_FIELD_SRC_IPv6 == attr_id) {
+    } else if (SAI_ACL_ENTRY_ATTR_FIELD_SRC_IPV6 == attr_id) {
         return "SRC IPv6 Field";
-    } else if (SAI_ACL_ENTRY_ATTR_FIELD_DST_IPv6 == attr_id) {
+    } else if (SAI_ACL_ENTRY_ATTR_FIELD_DST_IPV6 == attr_id) {
         return "DST IPv6 Field";
     } else if (SAI_ACL_ENTRY_ATTR_FIELD_SRC_MAC == attr_id) {
         return "SRC Mac Field";
@@ -817,7 +817,7 @@ static const char* sai_acl_test_rule_attr_id_to_name_get (unsigned int attr_id) 
         return "IP Type Field";
     } else if (SAI_ACL_ENTRY_ATTR_FIELD_ACL_IP_FRAG == attr_id) {
         return "IP Frag Field";
-    } else if (SAI_ACL_ENTRY_ATTR_FIELD_IPv6_FLOW_LABEL == attr_id) {
+    } else if (SAI_ACL_ENTRY_ATTR_FIELD_IPV6_FLOW_LABEL == attr_id) {
         return "IPv6 Flow Label";
     } else if (SAI_ACL_ENTRY_ATTR_FIELD_TC == attr_id) {
         return "TC Field";
@@ -885,9 +885,9 @@ static const char* sai_acl_test_rule_attr_id_to_name_get (unsigned int attr_id) 
         return "Set SRC IP Action";
     } else if (SAI_ACL_ENTRY_ATTR_ACTION_SET_DST_IP == attr_id) {
         return "Set DST IP Action";
-    } else if (SAI_ACL_ENTRY_ATTR_ACTION_SET_SRC_IPv6 == attr_id) {
+    } else if (SAI_ACL_ENTRY_ATTR_ACTION_SET_SRC_IPV6 == attr_id) {
         return "Set SRC IPv6 Action";
-    } else if (SAI_ACL_ENTRY_ATTR_ACTION_SET_DST_IPv6 == attr_id) {
+    } else if (SAI_ACL_ENTRY_ATTR_ACTION_SET_DST_IPV6 == attr_id) {
         return "Set DST IPv6 Action";
     } else if (SAI_ACL_ENTRY_ATTR_ACTION_SET_DSCP == attr_id) {
         return "Set DSCP Action";
@@ -915,8 +915,8 @@ static const char* sai_acl_test_rule_attr_id_to_name_get (unsigned int attr_id) 
 static sai_test_acl_rule_attr_type sai_test_acl_rule_get_attr_type (unsigned int attr_id)
 {
     switch (attr_id) {
-        case SAI_ACL_ENTRY_ATTR_FIELD_SRC_IPv6:
-        case SAI_ACL_ENTRY_ATTR_FIELD_DST_IPv6:
+        case SAI_ACL_ENTRY_ATTR_FIELD_SRC_IPV6:
+        case SAI_ACL_ENTRY_ATTR_FIELD_DST_IPV6:
             return SAI_TEST_ACL_ENTRY_ATTR_IPv6;
         case SAI_ACL_ENTRY_ATTR_FIELD_SRC_IP:
         case SAI_ACL_ENTRY_ATTR_FIELD_DST_IP:
@@ -959,7 +959,7 @@ static sai_test_acl_rule_attr_type sai_test_acl_rule_get_attr_type (unsigned int
         case SAI_ACL_ENTRY_ATTR_ACTION_SET_L4_SRC_PORT:
         case SAI_ACL_ENTRY_ATTR_ACTION_SET_L4_DST_PORT:
             return SAI_TEST_ACL_ENTRY_ATTR_TWO_BYTES;
-        case SAI_ACL_ENTRY_ATTR_FIELD_IPv6_FLOW_LABEL:
+        case SAI_ACL_ENTRY_ATTR_FIELD_IPV6_FLOW_LABEL:
         case SAI_ACL_ENTRY_ATTR_FIELD_FDB_DST_USER_META:
         case SAI_ACL_ENTRY_ATTR_FIELD_ROUTE_DST_USER_META:
         case SAI_ACL_ENTRY_ATTR_FIELD_NEIGHBOR_DST_USER_META:

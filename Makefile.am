@@ -1,5 +1,8 @@
 subdirs=inc
 data_dbdir = $(sysconfdir)/opx
+bin_SCRIPTS = cfg/vm_dn_rules.sh
+systemdconfdir=/lib/systemd/system
+systemdconf_DATA = systemd/*.service
 data_db_DATA = cfg/sai_vm_db.cfg \
 cfg/sai-db/create_sai_acl_table.sql        cfg/sai-db/drop_sai_acl_table.sql \
 cfg/sai-db/create_sai_routing_table.sql    cfg/sai-db/drop_sai_routing_table.sql \

@@ -97,8 +97,8 @@ class wred : public ::testing::Test
 
             ASSERT_TRUE(sai_wred_api_table != NULL);
 
-            EXPECT_TRUE(sai_wred_api_table->create_wred_profile != NULL);
-            EXPECT_TRUE(sai_wred_api_table->remove_wred_profile  != NULL);
+            EXPECT_TRUE(sai_wred_api_table->create_wred != NULL);
+            EXPECT_TRUE(sai_wred_api_table->remove_wred  != NULL);
             EXPECT_TRUE(sai_wred_api_table->set_wred_attribute != NULL);
             EXPECT_TRUE(sai_wred_api_table->get_wred_attribute != NULL);
 
@@ -226,7 +226,7 @@ TEST_F(wred, wred_create_set)
     new_attr_list[attr_count].value.u32 = WRED_CREATE_MIN_VALUE;
 
     attr_count ++;
-    ASSERT_EQ(SAI_STATUS_MANDATORY_ATTRIBUTE_MISSING, sai_wred_api_table->create_wred_profile
+    ASSERT_EQ(SAI_STATUS_MANDATORY_ATTRIBUTE_MISSING, sai_wred_api_table->create_wred
               (&wred_id1, switch_id, attr_count, (const sai_attribute_t *)new_attr_list));
 
     /* Creating MAX value alone without enabling */
@@ -235,7 +235,7 @@ TEST_F(wred, wred_create_set)
     new_attr_list[attr_count].value.u32 = WRED_CREATE_MAX_VALUE;
 
     attr_count ++;
-    ASSERT_EQ(SAI_STATUS_MANDATORY_ATTRIBUTE_MISSING, sai_wred_api_table->create_wred_profile
+    ASSERT_EQ(SAI_STATUS_MANDATORY_ATTRIBUTE_MISSING, sai_wred_api_table->create_wred
             (&wred_id1, switch_id, attr_count, (const sai_attribute_t *)new_attr_list));
 
     /* Creating MIN and MAX value alone without enabling */
@@ -250,7 +250,7 @@ TEST_F(wred, wred_create_set)
 
     attr_count ++;
 
-    ASSERT_EQ(SAI_STATUS_MANDATORY_ATTRIBUTE_MISSING, sai_wred_api_table->create_wred_profile
+    ASSERT_EQ(SAI_STATUS_MANDATORY_ATTRIBUTE_MISSING, sai_wred_api_table->create_wred
               (&wred_id1, switch_id, attr_count, (const sai_attribute_t *)new_attr_list));
 
     /* Creating the WRED profile successfully */
@@ -270,7 +270,7 @@ TEST_F(wred, wred_create_set)
 
     attr_count ++;
 
-    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_wred_api_table->create_wred_profile
+    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_wred_api_table->create_wred
               (&wred_id1, switch_id, attr_count, (const sai_attribute_t *)new_attr_list));
 
     /* Associating with a queue */
@@ -311,7 +311,7 @@ TEST_F(wred, wred_create_set)
               (wred_id1,(const sai_attribute_t *)&set_attr));
 
     /* Removing the WRED profile when associated with queue */
-    ASSERT_EQ(SAI_STATUS_OBJECT_IN_USE, sai_wred_api_table->remove_wred_profile
+    ASSERT_EQ(SAI_STATUS_OBJECT_IN_USE, sai_wred_api_table->remove_wred
               (wred_id1));
 
     /* Disassociating from the queue */
@@ -322,7 +322,7 @@ TEST_F(wred, wred_create_set)
               (queue_id,(const sai_attribute_t *)&set_attr));
 
     /* Removing the WRED profile successfully */
-    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_wred_api_table->remove_wred_profile
+    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_wred_api_table->remove_wred
               (wred_id1));
 }
 
@@ -354,7 +354,7 @@ TEST_F(wred, yellow_profile_create)
 
     attr_count ++;
 
-    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_wred_api_table->create_wred_profile
+    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_wred_api_table->create_wred
               (&wred_id1, switch_id, attr_count, (const sai_attribute_t *)new_attr_list));
 
     set_attr.id = SAI_WRED_ATTR_YELLOW_DROP_PROBABILITY;
@@ -393,7 +393,7 @@ TEST_F(wred, yellow_profile_create)
     ASSERT_EQ(SAI_STATUS_SUCCESS, sai_queue_api_table->set_queue_attribute
               (queue_id1,(const sai_attribute_t *)&set_attr));
 
-    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_wred_api_table->remove_wred_profile
+    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_wred_api_table->remove_wred
               (wred_id1));
 }
 
@@ -425,7 +425,7 @@ TEST_F(wred, red_profile_create)
 
     attr_count ++;
 
-    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_wred_api_table->create_wred_profile
+    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_wred_api_table->create_wred
               (&wred_id1, switch_id, attr_count, (const sai_attribute_t *)new_attr_list));
 
     set_attr.id = SAI_WRED_ATTR_RED_DROP_PROBABILITY;
@@ -459,7 +459,7 @@ TEST_F(wred, red_profile_create)
     ASSERT_EQ(SAI_STATUS_SUCCESS, sai_queue_api_table->set_queue_attribute
               (queue_id,(const sai_attribute_t *)&set_attr));
 
-    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_wred_api_table->remove_wred_profile
+    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_wred_api_table->remove_wred
               (wred_id1));
 }
 
@@ -515,7 +515,7 @@ TEST_F(wred, two_profiles)
 
     attr_count ++;
 
-    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_wred_api_table->create_wred_profile
+    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_wred_api_table->create_wred
               (&wred_id1, switch_id, attr_count, (const sai_attribute_t *)new_attr_list));
 
     attr_count = 0;
@@ -535,7 +535,7 @@ TEST_F(wred, two_profiles)
 
     attr_count ++;
 
-    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_wred_api_table->create_wred_profile
+    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_wred_api_table->create_wred
               (&wred_id2, switch_id, attr_count, (const sai_attribute_t *)new_attr_list));
 
     set_attr.id = SAI_QUEUE_ATTR_WRED_PROFILE_ID;
@@ -564,7 +564,7 @@ TEST_F(wred, two_profiles)
     ASSERT_EQ(SAI_STATUS_SUCCESS, sai_queue_api_table->set_queue_attribute
               (queue_id[0],(const sai_attribute_t *)&set_attr));
 
-    ASSERT_EQ(SAI_STATUS_OBJECT_IN_USE, sai_wred_api_table->remove_wred_profile
+    ASSERT_EQ(SAI_STATUS_OBJECT_IN_USE, sai_wred_api_table->remove_wred
               (wred_id1));
 
     set_attr.id = SAI_QUEUE_ATTR_WRED_PROFILE_ID;
@@ -573,9 +573,9 @@ TEST_F(wred, two_profiles)
     ASSERT_EQ(SAI_STATUS_SUCCESS, sai_queue_api_table->set_queue_attribute
               (queue_id[1],(const sai_attribute_t *)&set_attr));
 
-    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_wred_api_table->remove_wred_profile
+    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_wred_api_table->remove_wred
               (wred_id1));
-    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_wred_api_table->remove_wred_profile
+    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_wred_api_table->remove_wred
               (wred_id2));
 }
 
@@ -660,7 +660,7 @@ TEST_F(wred, create_set_get)
     new_attr_list[attr_count].value.s32 = SAI_ECN_MARK_MODE_ALL;
     attr_count ++;
 
-    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_wred_api_table->create_wred_profile
+    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_wred_api_table->create_wred
               (&wred_id1, switch_id, attr_count, (const sai_attribute_t *)new_attr_list));
 
     attr_count = 0;
@@ -731,7 +731,7 @@ TEST_F(wred, create_set_get)
     ASSERT_EQ(SAI_STATUS_SUCCESS, sai_queue_api_table->set_queue_attribute
               (queue_id[1],(const sai_attribute_t *)&set_attr));
 
-    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_wred_api_table->remove_wred_profile
+    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_wred_api_table->remove_wred
               (wred_id1));
 }
 

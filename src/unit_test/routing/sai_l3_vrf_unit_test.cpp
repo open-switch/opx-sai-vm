@@ -23,8 +23,8 @@
 extern "C" {
 #include "saistatus.h"
 #include "saitypes.h"
-#include "sairouter.h"
-#include "sairouterintf.h"
+#include "saivirtualrouter.h"
+#include "sairouterinterface.h"
 #include <inttypes.h>
 #include <string.h>
 #include <stdio.h>

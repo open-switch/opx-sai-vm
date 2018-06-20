@@ -929,7 +929,7 @@ sai_status_t sai_l2_bulk_create_vlan_member(
         uint32_t object_count,
         const uint32_t *attr_count,
         const sai_attribute_t **attrs,
-        sai_bulk_op_type_t type,
+        sai_bulk_op_error_mode_t type,
         sai_object_id_t *object_id,
         sai_status_t *object_statuses)
 {
@@ -939,7 +939,7 @@ sai_status_t sai_l2_bulk_create_vlan_member(
 sai_status_t sai_l2_bulk_remove_vlan_member(
         uint32_t object_count,
         const sai_object_id_t *object_id,
-        sai_bulk_op_type_t type,
+        sai_bulk_op_error_mode_t type,
         sai_status_t *object_statuses)
 {
     return SAI_STATUS_NOT_SUPPORTED;

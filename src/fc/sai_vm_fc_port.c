@@ -57,6 +57,7 @@ static sai_status_t sai_fc_port_clear_stats(sai_object_id_t port_obj_id,
 }
 
 static sai_status_t sai_fc_port_create(sai_object_id_t *port_id,
+                                sai_object_id_t fc_switch_id,
                                 uint32_t attr_count,
                                 const sai_attribute_t *attr_list)
 

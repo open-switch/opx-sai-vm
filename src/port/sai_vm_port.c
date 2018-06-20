@@ -372,10 +372,8 @@ static sai_status_t sai_npu_port_get_attribute (sai_object_id_t port_id,
             case SAI_PORT_ATTR_QOS_DEFAULT_TC:
             case SAI_PORT_ATTR_QOS_DOT1P_TO_TC_MAP:
             case SAI_PORT_ATTR_QOS_DOT1P_TO_COLOR_MAP:
-            case SAI_PORT_ATTR_QOS_DOT1P_TO_TC_AND_COLOR_MAP:
             case SAI_PORT_ATTR_QOS_DSCP_TO_TC_MAP:
             case SAI_PORT_ATTR_QOS_DSCP_TO_COLOR_MAP:
-            case SAI_PORT_ATTR_QOS_DSCP_TO_TC_AND_COLOR_MAP:
             case SAI_PORT_ATTR_QOS_TC_TO_QUEUE_MAP:
             case SAI_PORT_ATTR_QOS_TC_AND_COLOR_TO_DOT1P_MAP:
             case SAI_PORT_ATTR_QOS_TC_AND_COLOR_TO_DSCP_MAP:

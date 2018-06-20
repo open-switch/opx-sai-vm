@@ -104,21 +104,21 @@ class qos_buffer : public ::testing::Test
                                                           sai_attr_set)));
 
 
-            ASSERT_EQ(SAI_STATUS_SUCCESS,sai_api_query(SAI_API_BUFFERS,
+            ASSERT_EQ(SAI_STATUS_SUCCESS,sai_api_query(SAI_API_BUFFER,
                         (static_cast<void**>(static_cast<void*>(&sai_buffer_api_table)))));
 
             ASSERT_TRUE(sai_buffer_api_table != NULL);
 
             EXPECT_TRUE(sai_buffer_api_table->create_buffer_pool != NULL);
             EXPECT_TRUE(sai_buffer_api_table->remove_buffer_pool != NULL);
-            EXPECT_TRUE(sai_buffer_api_table->set_buffer_pool_attr != NULL);
-            EXPECT_TRUE(sai_buffer_api_table->get_buffer_pool_attr != NULL);
-            EXPECT_TRUE(sai_buffer_api_table->set_ingress_priority_group_attr != NULL);
-            EXPECT_TRUE(sai_buffer_api_table->get_ingress_priority_group_attr != NULL);
+            EXPECT_TRUE(sai_buffer_api_table->set_buffer_pool_attribute != NULL);
+            EXPECT_TRUE(sai_buffer_api_table->get_buffer_pool_attribute != NULL);
+            EXPECT_TRUE(sai_buffer_api_table->set_ingress_priority_group_attribute != NULL);
+            EXPECT_TRUE(sai_buffer_api_table->get_ingress_priority_group_attribute != NULL);
             EXPECT_TRUE(sai_buffer_api_table->create_buffer_profile != NULL);
             EXPECT_TRUE(sai_buffer_api_table->remove_buffer_profile != NULL);
-            EXPECT_TRUE(sai_buffer_api_table->set_buffer_profile_attr != NULL);
-            EXPECT_TRUE(sai_buffer_api_table->get_buffer_profile_attr != NULL);
+            EXPECT_TRUE(sai_buffer_api_table->set_buffer_profile_attribute != NULL);
+            EXPECT_TRUE(sai_buffer_api_table->get_buffer_profile_attribute != NULL);
 
             ASSERT_EQ(NULL,sai_api_query(SAI_API_PORT,
                         (static_cast<void**>(static_cast<void*>(&sai_port_api_table)))));
@@ -264,13 +264,13 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_pg_tile_test)
     ASSERT_EQ(SAI_STATUS_SUCCESS, sai_qos_buffer_get_first_pg(sai_port_api_table, port_id, &pg_obj[0]));
     set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     set_attr.value.oid = profile_id;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_obj[0], (const sai_attribute_t *)&set_attr));
 
     memset(get_attr, 0, sizeof(get_attr));
     get_attr[0].id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->
-               get_ingress_priority_group_attr (pg_obj[0], 1, get_attr));
+               get_ingress_priority_group_attribute (pg_obj[0], 1, get_attr));
 
     EXPECT_EQ (get_attr[0].value.oid, profile_id);
 
@@ -292,7 +292,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_pg_tile_test)
 
     set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     set_attr.value.oid = profile_id;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_obj[1], (const sai_attribute_t *)&set_attr));
 
     /*  Max resevred size in pool = 4 * sum(tiles reserved size )
@@ -311,7 +311,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_pg_tile_test)
 
     set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     set_attr.value.oid = profile_id;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_obj[2], (const sai_attribute_t *)&set_attr));
 
     /*  Max resevred size in pool = 4 * sum(tiles reserved size )
@@ -330,7 +330,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_pg_tile_test)
 
     set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     set_attr.value.oid = profile_id;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_obj[3], (const sai_attribute_t *)&set_attr));
 
     /*  Max resevred size in pool = 4 * sum(tiles reserved size )
@@ -349,7 +349,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_pg_tile_test)
 
     set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     set_attr.value.oid = profile_id;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_obj[4], (const sai_attribute_t *)&set_attr));
 
     /*  Max resevred size in pool = 4 * sum(tiles reserved size )
@@ -368,7 +368,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_pg_tile_test)
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_BUFFER_SIZE;
     set_attr.value.u32 = sai_buffer_profile_test_size_1;
     ASSERT_EQ (SAI_STATUS_SUCCESS,
-               sai_buffer_api_table->set_buffer_profile_attr (profile_id,
+               sai_buffer_api_table->set_buffer_profile_attribute (profile_id,
                                               (const sai_attribute_t *)&set_attr));
     /*  Max resevred size in pool = 4 * sum(tiles reserved size )
      *  Shared Size per tile = ( Pool Size - (Max resevred size in pool)/max tiles.
@@ -384,7 +384,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_pg_tile_test)
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_BUFFER_SIZE;
     set_attr.value.u32 = sai_buffer_profile_test_size_1 * 3; // 0.75 MB
     ASSERT_EQ (SAI_STATUS_SUCCESS,
-               sai_buffer_api_table->set_buffer_profile_attr (profile_id,
+               sai_buffer_api_table->set_buffer_profile_attribute (profile_id,
                                               (const sai_attribute_t *)&set_attr));
 
     /*  Max resevred size in pool = 4 * sum(tiles reserved size )
@@ -401,7 +401,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_pg_tile_test)
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_XOFF_TH;
     set_attr.value.u32 = sai_buffer_profile_test_size_1 * 2;
     ASSERT_EQ (SAI_STATUS_SUCCESS,
-               sai_buffer_api_table->set_buffer_profile_attr (profile_id,
+               sai_buffer_api_table->set_buffer_profile_attribute (profile_id,
                                               (const sai_attribute_t *)&set_attr));
 
     /*  Max resevred size in pool = 4 * sum(tiles reserved size )
@@ -418,7 +418,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_pg_tile_test)
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_XOFF_TH;
     set_attr.value.u32 = sai_buffer_profile_test_size_1 * 3;
     ASSERT_EQ (SAI_STATUS_INSUFFICIENT_RESOURCES,
-               sai_buffer_api_table->set_buffer_profile_attr (profile_id,
+               sai_buffer_api_table->set_buffer_profile_attribute (profile_id,
                                               (const sai_attribute_t *)&set_attr));
 
     /*  Max resevred size in pool = 4 * sum(tiles reserved size )
@@ -434,7 +434,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_pg_tile_test)
     // update tile 0 port 2 with new profile id of size 1.25MB reserved size
     set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     set_attr.value.oid = profile_id_1;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_obj[4], (const sai_attribute_t *)&set_attr));
 
     /*  Max resevred size in pool = 4 * sum(tiles reserved size )
@@ -454,7 +454,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_pg_tile_test)
         set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
         set_attr.value.oid = SAI_NULL_OBJECT_ID;
         if (pg_obj[idx]) {
-            ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+            ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                        (pg_obj[idx], (const sai_attribute_t *)&set_attr));
         }
     }
@@ -474,13 +474,13 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_pg_tile_test)
     ASSERT_EQ(SAI_STATUS_SUCCESS, sai_qos_buffer_get_first_pg(sai_port_api_table, port_id, &pg_obj[0]));
     set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     set_attr.value.oid = profile_id_2;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_obj[0], (const sai_attribute_t *)&set_attr));
 
     memset(get_attr, 0, sizeof(get_attr));
     get_attr[0].id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->
-               get_ingress_priority_group_attr (pg_obj[0], 1, get_attr));
+               get_ingress_priority_group_attribute (pg_obj[0], 1, get_attr));
 
     EXPECT_EQ (get_attr[0].value.oid, profile_id_2);
 
@@ -502,7 +502,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_pg_tile_test)
 
     set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     set_attr.value.oid = profile_id_2;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_obj[1], (const sai_attribute_t *)&set_attr));
 
     /*  Max resevred size in pool = 4 * sum(tiles reserved size )
@@ -521,7 +521,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_pg_tile_test)
         set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
         set_attr.value.oid = SAI_NULL_OBJECT_ID;
         if (pg_obj[idx]) {
-            ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+            ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                        (pg_obj[idx], (const sai_attribute_t *)&set_attr));
         }
     }
@@ -596,7 +596,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_xoff_size_tile_test)
     set_attr.id = SAI_BUFFER_POOL_ATTR_XOFF_SIZE;
     set_attr.value.u32 = sai_buffer_pool_xoff_size;
 
-    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_pool_attr(pool_id_1,
+    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_pool_attribute(pool_id_1,
                                                   (const sai_attribute_t *)&set_attr));
 
     // profile_id = reserved size 1MB, static - 0 hdrm - 0.25MB
@@ -624,13 +624,13 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_xoff_size_tile_test)
     // tile 0
     set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     set_attr.value.oid = profile_id;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_obj[0], (const sai_attribute_t *)&set_attr));
 
     memset(get_attr, 0, sizeof(get_attr));
     get_attr[0].id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->
-               get_ingress_priority_group_attr (pg_obj[0], 1, get_attr));
+               get_ingress_priority_group_attribute (pg_obj[0], 1, get_attr));
 
     EXPECT_EQ (get_attr[0].value.oid, profile_id);
 
@@ -648,7 +648,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_xoff_size_tile_test)
 
     set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     set_attr.value.oid = SAI_NULL_OBJECT_ID;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                (pg_obj[0], (const sai_attribute_t *)&set_attr));
 
     /*  Max resevred size in pool = 4 * sum(tiles reserved size )
@@ -663,7 +663,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_xoff_size_tile_test)
     // tile 0
     set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     set_attr.value.oid = profile_id;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                (pg_obj[0], (const sai_attribute_t *)&set_attr));
 
     /*  Max resevred size in pool = 4 * sum(tiles reserved size )
@@ -683,7 +683,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_xoff_size_tile_test)
 
     set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     set_attr.value.oid = profile_id;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_obj[1], (const sai_attribute_t *)&set_attr));
 
     /*  Max resevred size in pool = 4 * sum(tiles reserved size )
@@ -702,7 +702,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_xoff_size_tile_test)
 
     set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     set_attr.value.oid = profile_id;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_obj[2], (const sai_attribute_t *)&set_attr));
 
     /*  Max resevred size in pool = 4 * sum(tiles reserved size )
@@ -721,7 +721,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_xoff_size_tile_test)
 
     set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     set_attr.value.oid = profile_id;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_obj[3], (const sai_attribute_t *)&set_attr));
 
     /*  Max resevred size in pool = 4 * sum(tiles reserved size )
@@ -741,7 +741,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_xoff_size_tile_test)
 
     set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
     set_attr.value.oid = profile_id;
-    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+    ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                                                (pg_obj[4], (const sai_attribute_t *)&set_attr));
 
     /*  Max resevred size in pool = 4 * sum(tiles reserved size )
@@ -759,7 +759,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_xoff_size_tile_test)
     set_attr.id = SAI_BUFFER_POOL_ATTR_XOFF_SIZE;
     set_attr.value.u32 = sai_buffer_pool_xoff_size/2;
 
-    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_pool_attr(pool_id_1,
+    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_pool_attribute(pool_id_1,
                                                   (const sai_attribute_t *)&set_attr));
 
     /*  Max resevred size in pool = 4 * sum(tiles reserved size )
@@ -776,7 +776,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_xoff_size_tile_test)
     set_attr.id = SAI_BUFFER_POOL_ATTR_XOFF_SIZE;
     set_attr.value.u32 = (sai_buffer_pool_xoff_size * 2);
 
-    ASSERT_EQ(SAI_STATUS_INSUFFICIENT_RESOURCES, sai_buffer_api_table->set_buffer_pool_attr(pool_id_1,
+    ASSERT_EQ(SAI_STATUS_INSUFFICIENT_RESOURCES, sai_buffer_api_table->set_buffer_pool_attribute(pool_id_1,
                                                   (const sai_attribute_t *)&set_attr));
 
     /*  Max resevred size in pool = 4 * sum(tiles reserved size )
@@ -793,7 +793,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_xoff_size_tile_test)
     set_attr.id = SAI_BUFFER_POOL_ATTR_XOFF_SIZE;
     set_attr.value.u32 = sai_buffer_pool_xoff_size;
 
-    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_pool_attr(pool_id_1,
+    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_pool_attribute(pool_id_1,
                                                   (const sai_attribute_t *)&set_attr));
 
     /*  Max resevred size in pool = 4 * sum(tiles reserved size )
@@ -811,7 +811,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_xoff_size_tile_test)
     set_attr.id = SAI_BUFFER_POOL_ATTR_XOFF_SIZE;
     set_attr.value.u32 = 0;
 
-    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_pool_attr(pool_id_1,
+    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_pool_attribute(pool_id_1,
                                                   (const sai_attribute_t *)&set_attr));
 
     /*  Max resevred size in pool = 4 * sum(tiles reserved size )
@@ -828,7 +828,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_xoff_size_tile_test)
     set_attr.id = SAI_BUFFER_POOL_ATTR_XOFF_SIZE;
     set_attr.value.u32 = sai_buffer_pool_xoff_size;
 
-    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_pool_attr(pool_id_1,
+    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_pool_attribute(pool_id_1,
                                                   (const sai_attribute_t *)&set_attr));
 
 
@@ -847,7 +847,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_xoff_size_tile_test)
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_XOFF_TH;
     set_attr.value.u32 = sai_buffer_profile_test_size_2;
     ASSERT_EQ (SAI_STATUS_SUCCESS,
-               sai_buffer_api_table->set_buffer_profile_attr (profile_id,
+               sai_buffer_api_table->set_buffer_profile_attribute (profile_id,
                                               (const sai_attribute_t *)&set_attr));
     /*  Max resevred size in pool = 4 * sum(tiles reserved size )
      *  Shared Size per tile = ( Pool Size - (Max resevred size in pool)/max tiles.
@@ -863,7 +863,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_xoff_size_tile_test)
     set_attr.id = SAI_BUFFER_POOL_ATTR_XOFF_SIZE;
     set_attr.value.u32 = 0;
 
-    ASSERT_EQ(SAI_STATUS_INSUFFICIENT_RESOURCES, sai_buffer_api_table->set_buffer_pool_attr(pool_id_1,
+    ASSERT_EQ(SAI_STATUS_INSUFFICIENT_RESOURCES, sai_buffer_api_table->set_buffer_pool_attribute(pool_id_1,
                                                   (const sai_attribute_t *)&set_attr));
 
 
@@ -882,7 +882,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_xoff_size_tile_test)
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_BUFFER_SIZE;
     set_attr.value.u32 = sai_buffer_profile_test_size_1;
     ASSERT_EQ (SAI_STATUS_SUCCESS,
-               sai_buffer_api_table->set_buffer_profile_attr (profile_id,
+               sai_buffer_api_table->set_buffer_profile_attribute (profile_id,
                                               (const sai_attribute_t *)&set_attr));
     /*  Max resevred size in pool = 4 * sum(tiles reserved size )
      *  Shared Size per tile = ( Pool Size - (Max resevred size in pool)/max tiles.
@@ -899,7 +899,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_xoff_size_tile_test)
     set_attr.id = SAI_BUFFER_POOL_ATTR_XOFF_SIZE;
     set_attr.value.u32 = 0;
 
-    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_pool_attr(pool_id_1,
+    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_pool_attribute(pool_id_1,
                                                   (const sai_attribute_t *)&set_attr));
 
 
@@ -918,7 +918,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_xoff_size_tile_test)
     set_attr.id = SAI_BUFFER_POOL_ATTR_XOFF_SIZE;
     set_attr.value.u32 = sai_buffer_pool_xoff_size;
 
-    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_pool_attr(pool_id_1,
+    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_pool_attribute(pool_id_1,
                                                   (const sai_attribute_t *)&set_attr));
     /*  Max resevred size in pool = 4 * sum(tiles reserved size )
      *  Shared Size per tile = ( Pool Size - (Max resevred size in pool)/max tiles.
@@ -933,7 +933,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_xoff_size_tile_test)
     printf("Decrease Buffer pool size by 2MB\r\n");
     set_attr.id = SAI_BUFFER_POOL_ATTR_SIZE;
     set_attr.value.u32 = (sai_buffer_pool_test_size_1 - ((2 * sai_buffer_profile_test_size_2))); //size - 2MB
-    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_pool_attr(pool_id_1,
+    ASSERT_EQ(SAI_STATUS_SUCCESS, sai_buffer_api_table->set_buffer_pool_attribute(pool_id_1,
                                                                              (const sai_attribute_t *)&set_attr));
     /*  Max resevred size in pool = 4 * sum(tiles reserved size )
      *  Shared Size per tile = ( Pool Size - (Max resevred size in pool)/max tiles.
@@ -951,7 +951,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_xoff_size_tile_test)
         set_attr.id = SAI_INGRESS_PRIORITY_GROUP_ATTR_BUFFER_PROFILE;
         set_attr.value.oid = SAI_NULL_OBJECT_ID;
         if (pg_obj[idx]) {
-            ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attr
+            ASSERT_EQ (SAI_STATUS_SUCCESS, sai_buffer_api_table->set_ingress_priority_group_attribute
                        (pg_obj[idx], (const sai_attribute_t *)&set_attr));
         }
     }
@@ -1119,7 +1119,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_queue_tile_test)
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_BUFFER_SIZE;
     set_attr.value.u32 = sai_buffer_profile_test_size_1;
     ASSERT_EQ (SAI_STATUS_SUCCESS,
-               sai_buffer_api_table->set_buffer_profile_attr (profile_id,
+               sai_buffer_api_table->set_buffer_profile_attribute (profile_id,
                                               (const sai_attribute_t *)&set_attr));
     /*  Max resevred size in pool = 4 * sum(tiles reserved size )
      *  Shared Size per tile = ( Pool Size - (Max resevred size in pool)/max tiles.
@@ -1135,7 +1135,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_queue_tile_test)
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_BUFFER_SIZE;
     set_attr.value.u32 = sai_buffer_profile_test_size_1 * 3; // 0.75 MB
     ASSERT_EQ (SAI_STATUS_SUCCESS,
-               sai_buffer_api_table->set_buffer_profile_attr (profile_id,
+               sai_buffer_api_table->set_buffer_profile_attribute (profile_id,
                                               (const sai_attribute_t *)&set_attr));
 
     /*  Max resevred size in pool = 4 * sum(tiles reserved size )
@@ -1150,7 +1150,7 @@ TEST_F(qos_buffer, sai_qos_buffer_profile_queue_tile_test)
     set_attr.id = SAI_BUFFER_PROFILE_ATTR_XOFF_TH;
     set_attr.value.u32 = sai_buffer_profile_test_size_1 * 2;
     ASSERT_EQ (SAI_STATUS_INVALID_ATTRIBUTE_0,
-               sai_buffer_api_table->set_buffer_profile_attr (profile_id,
+               sai_buffer_api_table->set_buffer_profile_attribute (profile_id,
                                      (const sai_attribute_t *)&set_attr));
 
     /*  Max resevred size in pool = 4 * sum(tiles reserved size )

@@ -65,7 +65,7 @@ static inline bool sai_acl_table_valid_attr_range(sai_attr_id_t id)
 static inline bool sai_acl_table_field_attr_range(sai_attr_id_t id)
 {
     if ((id >= SAI_ACL_TABLE_ATTR_FIELD_START) &&
-        (id <= SAI_ACL_TABLE_ATTR_FIELD_END)) {
+        (id <= SAI_ACL_TABLE_ATTR_CUSTOM_RANGE_END)) {
         return true;
     }
     return false;

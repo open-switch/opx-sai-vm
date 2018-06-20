@@ -30,8 +30,8 @@
 #include "sai_l3_common.h"
 #include "sai_l3_util.h"
 
-#include "sairouter.h"
-#include "sairouterintf.h"
+#include "saivirtualrouter.h"
+#include "sairouterinterface.h"
 #include "saineighbor.h"
 #include "sainexthop.h"
 #include "sainexthopgroup.h"

@@ -32,7 +32,7 @@
 #include "sai_oid_utils.h"
 #include "sai_vm_vport.h"
 
-#include "sairouter.h"
+#include "saivirtualrouter.h"
 #include "saitypes.h"
 #include "saistatus.h"
 #include "ds_common_types.h"

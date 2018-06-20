@@ -1115,8 +1115,8 @@ sai_status_t sai_qos_queue_id_list_get (sai_object_id_t port_id,
 }
 
 static sai_status_t sai_qos_queue_stats_get (sai_object_id_t queue_id,
-                                             const sai_queue_stat_t *counter_ids,
                                              uint32_t number_of_counters,
+                                             const sai_queue_stat_t *counter_ids,
                                              uint64_t* counters)
 {
 
@@ -1173,8 +1173,8 @@ static sai_status_t sai_qos_queue_stats_get (sai_object_id_t queue_id,
 }
 
 static sai_status_t sai_qos_queue_stats_clear (sai_object_id_t queue_id,
-                                               const sai_queue_stat_t *counter_ids,
-                                               uint32_t number_of_counters)
+                                               uint32_t number_of_counters,
+                                               const sai_queue_stat_t *counter_ids)
 {
 
     sai_status_t                sai_rc = SAI_STATUS_SUCCESS;

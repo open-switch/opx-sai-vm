@@ -370,7 +370,13 @@ static sai_status_t sai_fib_next_hop_info_fill (sai_fib_nh_t *p_nh_info,
                 tunnel_id_attr_index = attr_index;
                 status               = SAI_STATUS_SUCCESS;
                 break;
-
+            case SAI_NEXT_HOP_ATTR_SEGMENTROUTE_SIDLIST_ID:
+            case SAI_NEXT_HOP_ATTR_SEGMENTROUTE_ENDPOINT_TYPE:
+            case SAI_NEXT_HOP_ATTR_SEGMENTROUTE_ENDPOINT_POP_TYPE:
+            case SAI_NEXT_HOP_ATTR_LABELSTACK:
+                status = SAI_STATUS_NOT_SUPPORTED;
+                SAI_NEXTHOP_LOG_ERR ("unsupported atttribute id: %d.", p_attr->id);
+                break;
             default:
                 SAI_NEXTHOP_LOG_ERR ("Invalid atttribute id: %d.", p_attr->id);
                 break;

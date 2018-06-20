@@ -1044,7 +1044,7 @@ sai_status_t sai_qos_sched_group_and_child_nodes_update (
  * @brief   SAI maps specific trace logging function
  */
 #define SAI_MAPS_LOG(level, msg, ...) \
-        if (sai_is_log_enabled (SAI_API_QOS_MAPS, level)) { \
+        if (sai_is_log_enabled (SAI_API_QOS_MAP, level)) { \
             SAI_LOG_UTIL(ev_log_t_SAI_MAPS, level, msg, ##__VA_ARGS__); \
        }
 
@@ -1052,13 +1052,13 @@ sai_status_t sai_qos_sched_group_and_child_nodes_update (
  * @brief   SAI Qos Initialization specific trace logging function
  */
 #define SAI_QOS_LOG(level, msg, ...) \
-        if (sai_is_log_enabled (SAI_API_QOS_MAPS, level) || \
+        if (sai_is_log_enabled (SAI_API_QOS_MAP, level) || \
             (sai_is_log_enabled (SAI_API_QUEUE, level)) || \
             (sai_is_log_enabled (SAI_API_WRED, level)) || \
             (sai_is_log_enabled (SAI_API_POLICER, level))|| \
             (sai_is_log_enabled (SAI_API_SCHEDULER, level))|| \
             (sai_is_log_enabled (SAI_API_SCHEDULER_GROUP, level)) || \
-            (sai_is_log_enabled (SAI_API_BUFFERS, level))) { \
+            (sai_is_log_enabled (SAI_API_BUFFER, level))) { \
             SAI_LOG_UTIL(ev_log_t_SAI_QOS, level, msg, ##__VA_ARGS__); \
        }
 

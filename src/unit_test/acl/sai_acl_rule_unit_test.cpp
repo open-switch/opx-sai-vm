@@ -199,7 +199,7 @@ void saiACLRuleTest ::SetUpTestCase (void)
                                         SAI_ACL_TABLE_ATTR_FIELD_SRC_PORT,
                                         SAI_ACL_TABLE_ATTR_FIELD_DSCP,
                                         SAI_ACL_TABLE_ATTR_FIELD_ECN,
-                                        SAI_ACL_TABLE_ATTR_FIELD_IPv6_FLOW_LABEL,
+                                        SAI_ACL_TABLE_ATTR_FIELD_IPV6_FLOW_LABEL,
                                         SAI_ACL_TABLE_ATTR_FIELD_IN_PORTS);
     ASSERT_EQ (SAI_STATUS_SUCCESS, sai_rc);
 
@@ -250,7 +250,7 @@ void saiACLRuleTest ::SetUpTestCase (void)
                                         SAI_ACL_TABLE_ATTR_FIELD_IN_PORTS,
                                         SAI_ACL_TABLE_ATTR_FIELD_ICMP_TYPE,
                                         SAI_ACL_TABLE_ATTR_FIELD_ICMP_CODE,
-                                        SAI_ACL_TABLE_ATTR_FIELD_IPv6_FLOW_LABEL);
+                                        SAI_ACL_TABLE_ATTR_FIELD_IPV6_FLOW_LABEL);
     ASSERT_EQ (SAI_STATUS_SUCCESS, sai_rc);
 
     if (sai_rc == SAI_STATUS_SUCCESS) {
@@ -278,8 +278,8 @@ void saiACLRuleTest ::SetUpTestCase (void)
                                         SAI_ACL_TABLE_ATTR_ACL_STAGE,
                                         SAI_ACL_STAGE_INGRESS,
                                         SAI_ACL_TABLE_ATTR_PRIORITY, 3,
-                                        SAI_ACL_TABLE_ATTR_FIELD_SRC_IPv6,
-                                        SAI_ACL_TABLE_ATTR_FIELD_DST_IPv6,
+                                        SAI_ACL_TABLE_ATTR_FIELD_SRC_IPV6,
+                                        SAI_ACL_TABLE_ATTR_FIELD_DST_IPV6,
                                         SAI_ACL_TABLE_ATTR_FIELD_L4_SRC_PORT,
                                         SAI_ACL_TABLE_ATTR_FIELD_L4_DST_PORT,
                                         SAI_ACL_TABLE_ATTR_FIELD_TTL,
@@ -291,7 +291,7 @@ void saiACLRuleTest ::SetUpTestCase (void)
                                         SAI_ACL_TABLE_ATTR_FIELD_IN_PORTS,
                                         SAI_ACL_TABLE_ATTR_FIELD_ACL_IP_FRAG,
                                         SAI_ACL_TABLE_ATTR_FIELD_ICMP_TYPE,
-                                        SAI_ACL_TABLE_ATTR_FIELD_IPv6_FLOW_LABEL);
+                                        SAI_ACL_TABLE_ATTR_FIELD_IPV6_FLOW_LABEL);
     ASSERT_EQ (SAI_STATUS_SUCCESS, sai_rc);
 
     if (sai_rc == SAI_STATUS_SUCCESS) {
@@ -397,7 +397,7 @@ sai_object_id_t saiACLRuleTest ::sai_test_acl_rule_entry_create (
                                        1, 1, port_id_1,
                                        SAI_ACL_ENTRY_ATTR_FIELD_ECN,
                                        1, 1, standard_mask,
-                                       SAI_ACL_ENTRY_ATTR_FIELD_IPv6_FLOW_LABEL,
+                                       SAI_ACL_ENTRY_ATTR_FIELD_IPV6_FLOW_LABEL,
                                        1, 100, standard_mask,
                                        SAI_ACL_ENTRY_ATTR_ACTION_PACKET_ACTION, true,
                                        SAI_PACKET_ACTION_TRAP,
@@ -430,7 +430,7 @@ sai_object_id_t saiACLRuleTest ::sai_test_acl_rule_entry_create (
                                        SAI_ACL_ENTRY_ATTR_FIELD_ACL_IP_FRAG,
                                        1, (unsigned long) SAI_ACL_IP_FRAG_NON_FRAG,
                                        standard_mask,
-                                       SAI_ACL_ENTRY_ATTR_FIELD_IPv6_FLOW_LABEL,
+                                       SAI_ACL_ENTRY_ATTR_FIELD_IPV6_FLOW_LABEL,
                                        1, 200, standard_mask,
                                        SAI_ACL_ENTRY_ATTR_FIELD_ICMP_TYPE,
                                        1, 8, standard_mask,
@@ -448,10 +448,10 @@ sai_object_id_t saiACLRuleTest ::sai_test_acl_rule_entry_create (
                                        SAI_ACL_ENTRY_ATTR_TABLE_ID, ipv6_table_id,
                                        SAI_ACL_ENTRY_ATTR_PRIORITY, 25,
                                        SAI_ACL_ENTRY_ATTR_ADMIN_STATE, true,
-                                       SAI_ACL_ENTRY_ATTR_FIELD_SRC_IPv6,
+                                       SAI_ACL_ENTRY_ATTR_FIELD_SRC_IPV6,
                                        1, &src_ipv6_data,
                                        &src_ipv6_mask,
-                                       SAI_ACL_ENTRY_ATTR_FIELD_DST_IPv6,
+                                       SAI_ACL_ENTRY_ATTR_FIELD_DST_IPV6,
                                        1, &dst_ipv6_data,
                                        &dst_ipv6_mask,
                                        SAI_ACL_ENTRY_ATTR_FIELD_ETHER_TYPE,
@@ -471,7 +471,7 @@ sai_object_id_t saiACLRuleTest ::sai_test_acl_rule_entry_create (
                                        standard_mask,
                                        SAI_ACL_ENTRY_ATTR_FIELD_IN_PORTS,
                                        1, 1, port_id_1,
-                                       SAI_ACL_ENTRY_ATTR_FIELD_IPv6_FLOW_LABEL,
+                                       SAI_ACL_ENTRY_ATTR_FIELD_IPV6_FLOW_LABEL,
                                        1, 300, standard_mask,
                                        SAI_ACL_ENTRY_ATTR_FIELD_ICMP_TYPE,
                                        1, 0x86, standard_mask,
@@ -637,8 +637,8 @@ void saiACLRuleTest ::sai_test_acl_rule_free_attr_list(
             }
          }
 
-         if ((acl_attr_id >= SAI_ACL_ENTRY_ATTR_USER_DEFINED_FIELD_MIN) &&
-             (acl_attr_id <= SAI_ACL_ENTRY_ATTR_USER_DEFINED_FIELD_MAX)) {
+         if ((acl_attr_id >= SAI_ACL_ENTRY_ATTR_USER_DEFINED_FIELD_GROUP_MIN) &&
+             (acl_attr_id <= SAI_ACL_ENTRY_ATTR_USER_DEFINED_FIELD_GROUP_MAX)) {
              /* Clean up the uint8_t list memory for ACL Field */
              if (p_attr_list[attr_cnt].value.aclfield.data.u8list.list &&
                  (p_attr_list[attr_cnt].value.aclfield.data.u8list.count != 0)) {
@@ -1238,10 +1238,10 @@ TEST_F(saiACLRuleTest, rule_create_with_defaults)
     /* Create ACL Rule with Default Attributes */
     sai_rc = sai_test_acl_rule_create (&acl_rule_id, 3,
                                        SAI_ACL_ENTRY_ATTR_TABLE_ID, ipv6_table_id,
-                                       SAI_ACL_ENTRY_ATTR_FIELD_SRC_IPv6,
+                                       SAI_ACL_ENTRY_ATTR_FIELD_SRC_IPV6,
                                        1, &src_ipv6_data,
                                        &src_ipv6_mask,
-                                       SAI_ACL_ENTRY_ATTR_FIELD_DST_IPv6,
+                                       SAI_ACL_ENTRY_ATTR_FIELD_DST_IPV6,
                                        1, &dst_ipv6_data,
                                        &dst_ipv6_mask);
 
@@ -1288,10 +1288,10 @@ TEST_F(saiACLRuleTest, rule_create_with_port_list)
     /* Create ACL Rule without In Port List */
     sai_rc = sai_test_acl_rule_create (&rule_id, 3,
                                        SAI_ACL_ENTRY_ATTR_TABLE_ID, ipv6_table_id,
-                                       SAI_ACL_ENTRY_ATTR_FIELD_SRC_IPv6,
+                                       SAI_ACL_ENTRY_ATTR_FIELD_SRC_IPV6,
                                        1, &src_ipv6_data,
                                        &src_ipv6_mask,
-                                       SAI_ACL_ENTRY_ATTR_FIELD_DST_IPv6,
+                                       SAI_ACL_ENTRY_ATTR_FIELD_DST_IPV6,
                                        1, &dst_ipv6_data,
                                        &dst_ipv6_mask);
 
@@ -1769,13 +1769,13 @@ TEST_F(saiACLRuleTest, rule_set_with_ipv6_fields_and_actions)
 
     /* ACL Rule Field Set */
     sai_rc = sai_test_acl_rule_set (ipv6_rule_id, 1,
-                                    SAI_ACL_TABLE_ATTR_FIELD_SRC_IPv6,
+                                    SAI_ACL_TABLE_ATTR_FIELD_SRC_IPV6,
                                     1, &new_src_ipv6,
                                     &src_ipv6_mask);
     EXPECT_EQ (SAI_STATUS_SUCCESS, sai_rc);
 
     sai_rc = sai_test_acl_rule_set (ipv6_rule_id, 1,
-                                    SAI_ACL_TABLE_ATTR_FIELD_DST_IPv6,
+                                    SAI_ACL_TABLE_ATTR_FIELD_DST_IPV6,
                                     1, &new_dst_ipv6,
                                     &dst_ipv6_mask);
     EXPECT_EQ (SAI_STATUS_SUCCESS, sai_rc);
@@ -1785,8 +1785,8 @@ TEST_F(saiACLRuleTest, rule_set_with_ipv6_fields_and_actions)
     ASSERT_TRUE (SAI_STATUS_SUCCESS == sai_rc);
 
     sai_rc = sai_test_acl_rule_get (ipv6_rule_id, p_attr_list_get, test_attr_count,
-                                    SAI_ACL_TABLE_ATTR_FIELD_SRC_IPv6,
-                                    SAI_ACL_TABLE_ATTR_FIELD_DST_IPv6);
+                                    SAI_ACL_TABLE_ATTR_FIELD_SRC_IPV6,
+                                    SAI_ACL_TABLE_ATTR_FIELD_DST_IPV6);
 
 
     EXPECT_EQ (p_attr_list_get[0].value.aclfield.enable, true);

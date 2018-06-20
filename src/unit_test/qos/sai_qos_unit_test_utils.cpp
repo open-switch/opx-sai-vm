@@ -375,7 +375,7 @@ sai_status_t sai_test_scheduler_create (sai_object_id_t *p_sched_id,
 
     va_end (varg_list);
 
-    sai_rc = p_sai_scheduler_api_table->create_scheduler_profile (p_sched_id,switch_id,
+    sai_rc = p_sai_scheduler_api_table->create_scheduler(p_sched_id,switch_id,
                                           attr_count,(attr_count ? &attr_list[0] : NULL));
 
     if (sai_rc != SAI_STATUS_SUCCESS) {
@@ -395,7 +395,7 @@ sai_status_t sai_test_scheduler_remove (sai_object_id_t sched_id)
 {
     sai_status_t sai_rc;
 
-    sai_rc = p_sai_scheduler_api_table->remove_scheduler_profile (sched_id);
+    sai_rc = p_sai_scheduler_api_table->remove_scheduler(sched_id);
     if (sai_rc != SAI_STATUS_SUCCESS) {
         printf ("SAI Scheduler Remove failed with error: %d.\n", sai_rc);
     } else {

@@ -101,7 +101,7 @@ void kv_populate(void)
  */
 TEST(sai_unit_test, api_init)
 {
-    service_method_table_t  sai_service_method_table;
+    sai_service_method_table_t  sai_service_method_table;
     kv_populate();
 
     sai_service_method_table.profile_get_value = profile_get_value;
@@ -158,7 +158,7 @@ void  sai_switch_shutdown_callback()
 void sdkinit()
 {
     sai_switch_api_t* sai_switch_api = NULL;
-    service_method_table_t  sai_service_method_table;
+    sai_service_method_table_t  sai_service_method_table;
     kv_populate();
 
     sai_service_method_table.profile_get_value = profile_get_value;

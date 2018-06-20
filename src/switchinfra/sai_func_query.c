@@ -24,11 +24,11 @@
 #include "std_assert.h"
 #include <dlfcn.h>
 
-static service_method_table_t sai_service_method_table;
+static sai_service_method_table_t sai_service_method_table;
 static sai_npu_api_t *sai_npu_api_method_table = NULL;
 static void *npu_api_lib_handle = NULL;
 
-sai_status_t sai_api_initialize(uint64_t flags, const service_method_table_t* services)
+sai_status_t sai_api_initialize(uint64_t flags, const sai_service_method_table_t* services)
 {
 
     SAI_SWITCH_LOG_TRACE("SAI Initialization with service method table");
@@ -48,7 +48,7 @@ sai_status_t sai_api_initialize(uint64_t flags, const service_method_table_t* se
 
 }
 
-const service_method_table_t *sai_service_method_table_get(void)
+const sai_service_method_table_t *sai_service_method_table_get(void)
 {
     return &sai_service_method_table;
 }
@@ -108,7 +108,7 @@ sai_status_t sai_api_query(sai_api_t sai_api_id, void** api_method_table)
             *api_method_table = sai_mirror_api_query();
             break;
 
-        case SAI_API_HOST_INTERFACE:
+        case SAI_API_HOSTIF:
             *api_method_table = sai_hostif_api_query();
             break;
 
@@ -120,7 +120,7 @@ sai_status_t sai_api_query(sai_api_t sai_api_id, void** api_method_table)
             *api_method_table = sai_lag_api_query();
             break;
 
-        case SAI_API_QOS_MAPS:
+        case SAI_API_QOS_MAP:
             *api_method_table = sai_qosmaps_api_query();
             break;
 
@@ -148,7 +148,7 @@ sai_status_t sai_api_query(sai_api_t sai_api_id, void** api_method_table)
             *api_method_table = sai_wred_api_query();
             break;
 
-        case SAI_API_BUFFERS:
+        case SAI_API_BUFFER:
             *api_method_table = sai_qos_buffer_api_query();
              break;
 

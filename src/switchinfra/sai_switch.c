@@ -43,7 +43,9 @@
 #include "sai_bridge_main.h"
 
 static const dn_sai_attribute_entry_t dn_sai_switch_attr[] = {
+    {SAI_SWITCH_ATTR_NUMBER_OF_ACTIVE_PORTS, false, false, false, false, false, false },
     {SAI_SWITCH_ATTR_PORT_NUMBER, false, false, false, true, true, true },
+    {SAI_SWITCH_ATTR_MAX_NUMBER_OF_SUPPORTED_PORTS, false, false, false, false, false, false },
     {SAI_SWITCH_ATTR_PORT_LIST, false, false, false, true, true, true },
     {SAI_SWITCH_ATTR_PORT_MAX_MTU, false, false, false, true, true, true },
     {SAI_SWITCH_ATTR_CPU_PORT, false, false, false, true, true, true },
@@ -83,6 +85,19 @@ static const dn_sai_attribute_entry_t dn_sai_switch_attr[] = {
     {SAI_SWITCH_ATTR_TOTAL_BUFFER_SIZE, false, false, false, true, true, true },
     {SAI_SWITCH_ATTR_INGRESS_BUFFER_POOL_NUM, false, false, false, true, true, true },
     {SAI_SWITCH_ATTR_EGRESS_BUFFER_POOL_NUM, false, false, false, true, true, true },
+    {SAI_SWITCH_ATTR_AVAILABLE_IPV4_ROUTE_ENTRY, false, false, false, false, false, false },
+    {SAI_SWITCH_ATTR_AVAILABLE_IPV6_ROUTE_ENTRY, false, false, false, false, false, false },
+    {SAI_SWITCH_ATTR_AVAILABLE_IPV4_NEXTHOP_ENTRY, false, false, false, false, false, false },
+    {SAI_SWITCH_ATTR_AVAILABLE_IPV6_NEXTHOP_ENTRY, false, false, false, false, false, false },
+    {SAI_SWITCH_ATTR_AVAILABLE_IPV4_NEIGHBOR_ENTRY, false, false, false, false, false, false },
+    {SAI_SWITCH_ATTR_AVAILABLE_IPV6_NEIGHBOR_ENTRY, false, false, false, false, false, false },
+    {SAI_SWITCH_ATTR_AVAILABLE_NEXT_HOP_GROUP_ENTRY, false, false, false, false, false, false },
+    {SAI_SWITCH_ATTR_AVAILABLE_NEXT_HOP_GROUP_MEMBER_ENTRY, false, false, false, false, false, false },
+    {SAI_SWITCH_ATTR_AVAILABLE_FDB_ENTRY, false, false, false, false, false, false },
+    {SAI_SWITCH_ATTR_AVAILABLE_L2MC_ENTRY, false, false, false, false, false, false },
+    {SAI_SWITCH_ATTR_AVAILABLE_IPMC_ENTRY, false, false, false, false, false, false },
+    {SAI_SWITCH_ATTR_AVAILABLE_ACL_TABLE, false, false, false, false, false, false },
+    {SAI_SWITCH_ATTR_AVAILABLE_ACL_TABLE_GROUP, false, false, false, false, false, false },
     {SAI_SWITCH_ATTR_DEFAULT_TRAP_GROUP, false, false, false, true, true, true },
     {SAI_SWITCH_ATTR_ECMP_HASH, false, false, false, true, true, true },
     {SAI_SWITCH_ATTR_LAG_HASH, false, false, false, true, true, true },
@@ -91,6 +106,7 @@ static const dn_sai_attribute_entry_t dn_sai_switch_attr[] = {
     {SAI_SWITCH_ATTR_MIN_PLANNED_RESTART_INTERVAL, false, false, false, true, true, true },
     {SAI_SWITCH_ATTR_NV_STORAGE_SIZE, false, false, false, true, true, true },
     {SAI_SWITCH_ATTR_MAX_ACL_ACTION_COUNT, false, false, false, true, true, true },
+    {SAI_SWITCH_ATTR_MAX_ACL_RANGE_COUNT, false, false, false, true, true, true },
     {SAI_SWITCH_ATTR_ACL_CAPABILITY, false, false, false, true, true, true },
     {SAI_SWITCH_ATTR_SWITCHING_MODE, false, true, true, true, true, true },
     {SAI_SWITCH_ATTR_BCAST_CPU_FLOOD_ENABLE, false, true, true, true, true, true },
@@ -132,7 +148,23 @@ static const dn_sai_attribute_entry_t dn_sai_switch_attr[] = {
     {SAI_SWITCH_ATTR_FDB_EVENT_NOTIFY, false, true, true, true, true, true },
     {SAI_SWITCH_ATTR_PORT_STATE_CHANGE_NOTIFY, false, true, true, true, true, true },
     {SAI_SWITCH_ATTR_PACKET_EVENT_NOTIFY, false, true, true, true, true, true },
+    {SAI_SWITCH_ATTR_TAM_EVENT_NOTIFY, false, false, false, false, false, false },
     {SAI_SWITCH_ATTR_FAST_API_ENABLE, false, true, true, true, true, true },
+    {SAI_SWITCH_ATTR_MIRROR_TC, false, false, false, false, false, false },
+    {SAI_SWITCH_ATTR_ACL_STAGE_INGRESS, false, false, false, false, false, false },
+    {SAI_SWITCH_ATTR_ACL_STAGE_EGRESS, false, false, false, false, false, false },
+    {SAI_SWITCH_ATTR_SEGMENTROUTE_MAX_SID_DEPTH, false, false, false, false, false, false },
+    {SAI_SWITCH_ATTR_SEGMENTROUTE_TLV_TYPE, false, false, false, false, false, false },
+    {SAI_SWITCH_ATTR_QOS_NUM_LOSSLESS_QUEUES, false, false, false, false, false, false },
+    {SAI_SWITCH_ATTR_QUEUE_PFC_DEADLOCK_NOTIFY, false, false, false, false, false, false },
+    {SAI_SWITCH_ATTR_PFC_DLR_PACKET_ACTION, false, false, false, false, false, false },
+    {SAI_SWITCH_ATTR_PFC_TC_DLD_INTERVAL_RANGE, false, false, false, false, false, false },
+    {SAI_SWITCH_ATTR_PFC_TC_DLD_INTERVAL, false, false, false, false, false, false },
+    {SAI_SWITCH_ATTR_PFC_TC_DLR_INTERVAL_RANGE, false, false, false, false, false, false },
+    {SAI_SWITCH_ATTR_PFC_TC_DLR_INTERVAL, false, false, false, false, false, false },
+    {SAI_SWITCH_ATTR_SUPPORTED_PROTECTED_OBJECT_TYPE, false, false, false, false, false, false },
+    {SAI_SWITCH_ATTR_TPID_OUTER_VLAN, false, false, false, false, false, false },
+    {SAI_SWITCH_ATTR_TPID_INNER_VLAN, false, false, false, false, false, false },
     {SAI_SWITCH_ATTR_INGRESS_ACL, false, true, true, true, true, true },
     {SAI_SWITCH_ATTR_EGRESS_ACL, false, true, true, true, true, true },
 };
@@ -855,7 +887,7 @@ static sai_status_t sai_switch_attribute_config(sai_switch_profile_id_t profile_
     const char *value_str = NULL;
     int ret = 0;
 
-    const service_method_table_t *service_method_table = sai_service_method_table_get();
+    const sai_service_method_table_t *service_method_table = sai_service_method_table_get();
     if (service_method_table == NULL) {
         return SAI_STATUS_NOT_SUPPORTED;
     }
@@ -916,7 +948,7 @@ static sai_status_t sai_switch_attribute_config(sai_switch_profile_id_t profile_
 
 static const char *sai_switch_init_config_file_get(sai_switch_profile_id_t profile_id)
 {
-    const service_method_table_t *service_method_table = sai_service_method_table_get();
+    const sai_service_method_table_t *service_method_table = sai_service_method_table_get();
     if (service_method_table == NULL) {
         return NULL;
     }

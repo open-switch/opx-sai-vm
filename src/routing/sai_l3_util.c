@@ -22,7 +22,7 @@
 #include "sai_port_utils.h"
 #include "sairoute.h"
 #include "saiswitch.h"
-#include "sairouterintf.h"
+#include "sairouterinterface.h"
 #include "saitypes.h"
 #include "saistatus.h"
 #include "ds_common_types.h"

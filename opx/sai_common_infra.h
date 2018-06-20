@@ -40,7 +40,7 @@
 /*
  * Get SAI service method table
  */
-const service_method_table_t *sai_service_method_table_get(void);
+const sai_service_method_table_t *sai_service_method_table_get(void);
 
 /*
  * Stub functions for sai_api_query for respective API Ids.

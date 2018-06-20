@@ -18,7 +18,7 @@
 #define __SAI_QOS_COMMON_H__
 
 #include "saipolicer.h"
-#include "saiqosmaps.h"
+#include "saiqosmap.h"
 #include "saiqueue.h"
 #include "saischeduler.h"
 #include "saibuffer.h"

@@ -575,16 +575,6 @@ bool sai_qos_buffer_profile_is_valid_threshold_applied (dn_sai_qos_buffer_profil
                 (attr->id == SAI_BUFFER_PROFILE_ATTR_SHARED_DYNAMIC_TH)) {
             return true;
 
-        } else if (p_profile_node->threshold_mode ==
-                                 SAI_BUFFER_PROFILE_THRESHOLD_MODE_INHERIT_BUFFER_POOL_MODE) {
-            if ((p_pool_node->threshold_mode == SAI_BUFFER_POOL_THRESHOLD_MODE_STATIC) &&
-                       (attr->id == SAI_BUFFER_PROFILE_ATTR_SHARED_STATIC_TH)) {
-                 return true;
-            } else if ((p_pool_node->threshold_mode == SAI_BUFFER_POOL_THRESHOLD_MODE_DYNAMIC) &&
-                             (attr->id == SAI_BUFFER_PROFILE_ATTR_SHARED_DYNAMIC_TH)) {
-                 return true;
-            }
-
         }
     } else {
         if ((p_pool_node->threshold_mode == SAI_BUFFER_POOL_THRESHOLD_MODE_STATIC) &&
@@ -648,26 +638,8 @@ sai_status_t sai_qos_buffer_profile_is_mandatory_th_attr_present(uint32_t attr_c
     }
 
     if (!profile_th_setting) {
-        if (p_pool_node->threshold_mode == SAI_BUFFER_POOL_THRESHOLD_MODE_STATIC){
-            if(!is_static) {
-                return SAI_STATUS_MANDATORY_ATTRIBUTE_MISSING;
-            }
-
-        } else if (p_pool_node->threshold_mode == SAI_BUFFER_POOL_THRESHOLD_MODE_DYNAMIC) {
-            if(!is_dynamic) {
-                return SAI_STATUS_MANDATORY_ATTRIBUTE_MISSING;
-            }
-        }
+        return SAI_STATUS_MANDATORY_ATTRIBUTE_MISSING;
     } else {
-        if (buffer_profile_th_mode == SAI_BUFFER_PROFILE_THRESHOLD_MODE_INHERIT_BUFFER_POOL_MODE) {
-            if (p_pool_node->threshold_mode == SAI_BUFFER_POOL_THRESHOLD_MODE_STATIC) {
-                buffer_profile_th_mode = SAI_BUFFER_PROFILE_THRESHOLD_MODE_STATIC;
-
-            } else if (p_pool_node->threshold_mode == SAI_BUFFER_POOL_THRESHOLD_MODE_DYNAMIC) {
-                buffer_profile_th_mode =  SAI_BUFFER_PROFILE_THRESHOLD_MODE_DYNAMIC;
-
-            }
-        }
         if (buffer_profile_th_mode == SAI_BUFFER_PROFILE_THRESHOLD_MODE_STATIC){
             if(!is_static) {
                 return SAI_STATUS_MANDATORY_ATTRIBUTE_MISSING;

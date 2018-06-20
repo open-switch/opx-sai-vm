@@ -259,7 +259,7 @@ sai_status_t sai_qos_buffer_pool_get_wred_queue_ids(sai_object_id_t pool_id,
 
 /** Logging utility for SAI Buffer API */
 #define SAI_BUFFER_LOG(level, msg, ...) \
-        if (sai_is_log_enabled (SAI_API_BUFFERS, level)) { \
+        if (sai_is_log_enabled (SAI_API_BUFFER, level)) { \
             SAI_LOG_UTIL(ev_log_t_SAI_BUFFER, level, msg, ##__VA_ARGS__); \
         }
 

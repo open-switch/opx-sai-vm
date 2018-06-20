@@ -45,7 +45,6 @@ static std_thread_create_param_t _thread;
 static int sai_fdb_fd[SAI_FDB_MAX_FD];
 static sai_fdb_event_notification_fn sai_l2_fdb_notification_fn = NULL;
 static sai_fdb_event_notification_data_t valid_notification_data[SAI_FDB_MAX_MACS_PER_CALLBACK];
-static bool sai_fdb_delete_entry_by_entry_on_flush = true;
 
 static void * _sai_fdb_internal_notif(void * param) {
     int len = 0;
@@ -153,22 +152,19 @@ static void sai_delete_all_fdb_entry_nodes (bool delete_all, sai_fdb_flush_entry
                sizeof(sai_fdb_entry_key_t));
         if ((delete_all == true) ||
             (entry_type == fdb_entry_node->entry_type)) {
-            if(sai_fdb_delete_entry_by_entry_on_flush) {
-                fdb_entry.bv_id = fdb_entry_node->fdb_key.bv_id;
-                memcpy(fdb_entry.mac_address, fdb_entry_node->fdb_key.mac_address,
-                       sizeof(sai_mac_t));
-                sai_rc = sai_fdb_npu_api_get()->flush_fdb_entry(&fdb_entry, false);
+            fdb_entry.bv_id = fdb_entry_node->fdb_key.bv_id;
+            memcpy(fdb_entry.mac_address, fdb_entry_node->fdb_key.mac_address,
+                    sizeof(sai_mac_t));
+            sai_rc = sai_fdb_npu_api_get()->flush_fdb_entry(&fdb_entry, false);
 
-                if(sai_rc != SAI_STATUS_SUCCESS) {
-                    SAI_FDB_LOG_TRACE ("Delete failed for for MAC:%s vlan:0x%"PRIx64""
-                                       " Error code %d", std_mac_to_string((const sai_mac_t *)
-                                       &(fdb_entry.mac_address), mac_str,
-                                       sizeof(mac_str)), fdb_entry.bv_id, sai_rc);
-                    remove_fdb_from_cache = false;
-                } else {
-                    remove_fdb_from_cache = true;
-                }
-
+            if(sai_rc != SAI_STATUS_SUCCESS) {
+                SAI_FDB_LOG_TRACE ("Delete failed for for MAC:%s vlan:0x%"PRIx64""
+                                   " Error code %d", std_mac_to_string((const sai_mac_t *)
+                                   &(fdb_entry.mac_address), mac_str,
+                                   sizeof(mac_str)), fdb_entry.bv_id, sai_rc);
+                remove_fdb_from_cache = false;
+            } else {
+                remove_fdb_from_cache = true;
             }
             if(remove_fdb_from_cache) {
                 sai_remove_fdb_entry_node(fdb_entry_node);
@@ -198,22 +194,19 @@ static void sai_delete_fdb_entry_nodes_per_port (sai_object_id_t bridge_port_id,
         if(fdb_entry_node->bridge_port_id == bridge_port_id){
             if ((delete_all == true) ||
                 (entry_type == fdb_entry_node->entry_type)) {
-                if(sai_fdb_delete_entry_by_entry_on_flush) {
-                    fdb_entry.bv_id = fdb_entry_node->fdb_key.bv_id;
-                    memcpy(fdb_entry.mac_address, fdb_entry_node->fdb_key.mac_address,
-                           sizeof(sai_mac_t));
-                    sai_rc = sai_fdb_npu_api_get()->flush_fdb_entry(&fdb_entry, true);
+                fdb_entry.bv_id = fdb_entry_node->fdb_key.bv_id;
+                memcpy(fdb_entry.mac_address, fdb_entry_node->fdb_key.mac_address,
+                        sizeof(sai_mac_t));
+                sai_rc = sai_fdb_npu_api_get()->flush_fdb_entry(&fdb_entry, true);
 
-                    if(sai_rc != SAI_STATUS_SUCCESS) {
-                        SAI_FDB_LOG_TRACE ("Delete failed for for MAC:%s vlan:0x%"PRIx64""
-                                           " Error code %d", std_mac_to_string((const sai_mac_t *)
-                                           &(fdb_entry.mac_address), mac_str,
-                                           sizeof(mac_str)), fdb_entry.bv_id, sai_rc);
-                        remove_fdb_from_cache = false;
-                    } else {
-                        remove_fdb_from_cache = true;
-                    }
-
+                if(sai_rc != SAI_STATUS_SUCCESS) {
+                    SAI_FDB_LOG_TRACE ("Delete failed for for MAC:%s vlan:0x%"PRIx64""
+                                       " Error code %d", std_mac_to_string((const sai_mac_t *)
+                                       &(fdb_entry.mac_address), mac_str,
+                                       sizeof(mac_str)), fdb_entry.bv_id, sai_rc);
+                    remove_fdb_from_cache = false;
+                } else {
+                    remove_fdb_from_cache = true;
                 }
                 if(remove_fdb_from_cache) {
                     sai_remove_fdb_entry_node(fdb_entry_node);
@@ -250,22 +243,19 @@ static void sai_delete_fdb_entry_nodes_per_vlan (sai_object_id_t bv_id, bool del
             break;
         }
         if(delete_all == true || entry_type == fdb_entry_node->entry_type) {
-            if(sai_fdb_delete_entry_by_entry_on_flush) {
-                fdb_entry.bv_id = fdb_entry_node->fdb_key.bv_id;
-                memcpy(fdb_entry.mac_address, fdb_entry_node->fdb_key.mac_address,
-                       sizeof(sai_mac_t));
-                sai_rc = sai_fdb_npu_api_get()->flush_fdb_entry(&fdb_entry, false);
+            fdb_entry.bv_id = fdb_entry_node->fdb_key.bv_id;
+            memcpy(fdb_entry.mac_address, fdb_entry_node->fdb_key.mac_address,
+                    sizeof(sai_mac_t));
+            sai_rc = sai_fdb_npu_api_get()->flush_fdb_entry(&fdb_entry, false);
 
-                if(sai_rc != SAI_STATUS_SUCCESS) {
-                    SAI_FDB_LOG_TRACE ("Delete failed for for MAC:%s vlan:0x%"PRIx64" Error code %d",
-                                       std_mac_to_string((const sai_mac_t *)
-                                       &(fdb_entry.mac_address), mac_str,
-                                       sizeof(mac_str)), fdb_entry.bv_id, sai_rc);
-                    remove_fdb_from_cache = false;
-                } else {
-                    remove_fdb_from_cache = true;
-                }
-
+            if(sai_rc != SAI_STATUS_SUCCESS) {
+                SAI_FDB_LOG_TRACE ("Delete failed for for MAC:%s vlan:0x%"PRIx64" Error code %d",
+                                   std_mac_to_string((const sai_mac_t *)
+                                   &(fdb_entry.mac_address), mac_str,
+                                   sizeof(mac_str)), fdb_entry.bv_id, sai_rc);
+                remove_fdb_from_cache = false;
+            } else {
+                remove_fdb_from_cache = true;
             }
             if(remove_fdb_from_cache) {
                 sai_remove_fdb_entry_node(fdb_entry_node);
@@ -301,22 +291,19 @@ static void sai_delete_fdb_entry_nodes_per_port_vlan (sai_object_id_t bridge_por
         }
         if ((fdb_entry_node->bridge_port_id == bridge_port_id)){
             if ((delete_all == true) || (entry_type == fdb_entry_node->entry_type)) {
-                if(sai_fdb_delete_entry_by_entry_on_flush) {
-                    fdb_entry.bv_id = fdb_entry_node->fdb_key.bv_id;
-                    memcpy(fdb_entry.mac_address, fdb_entry_node->fdb_key.mac_address,
-                           sizeof(sai_mac_t));
-                    sai_rc = sai_fdb_npu_api_get()->flush_fdb_entry(&fdb_entry, true);
+                fdb_entry.bv_id = fdb_entry_node->fdb_key.bv_id;
+                memcpy(fdb_entry.mac_address, fdb_entry_node->fdb_key.mac_address,
+                        sizeof(sai_mac_t));
+                sai_rc = sai_fdb_npu_api_get()->flush_fdb_entry(&fdb_entry, true);
 
-                    if(sai_rc != SAI_STATUS_SUCCESS) {
-                        SAI_FDB_LOG_TRACE ("Delete failed for for MAC:%s vlan:0x%"PRIx64""
-                                           " Error code %d", std_mac_to_string((const sai_mac_t *)
-                                           &(fdb_entry.mac_address), mac_str,
-                                           sizeof(mac_str)), fdb_entry.bv_id, sai_rc);
-                        remove_fdb_from_cache = false;
-                    } else {
-                        remove_fdb_from_cache = true;
-                    }
-
+                if(sai_rc != SAI_STATUS_SUCCESS) {
+                    SAI_FDB_LOG_TRACE ("Delete failed for for MAC:%s vlan:0x%"PRIx64""
+                                       " Error code %d", std_mac_to_string((const sai_mac_t *)
+                                       &(fdb_entry.mac_address), mac_str,
+                                       sizeof(mac_str)), fdb_entry.bv_id, sai_rc);
+                    remove_fdb_from_cache = false;
+                } else {
+                    remove_fdb_from_cache = true;
                 }
                 if(remove_fdb_from_cache) {
                     sai_remove_fdb_entry_node(fdb_entry_node);
@@ -328,13 +315,24 @@ static void sai_delete_fdb_entry_nodes_per_port_vlan (sai_object_id_t bridge_por
     force_flush_fdb_all(bridge_port_id, bv_id, flush_entry_type);
 }
 
+static bool sai_is_valid_bv_id(sai_object_id_t bv_id)
+{
+    sai_vlan_id_t vlan_id = VLAN_UNDEF;
+
+    if(sai_is_obj_id_bridge(bv_id)) {
+        return sai_is_bridge_created(bv_id);
+    } else if(sai_is_obj_id_vlan(bv_id)) {
+        vlan_id = sai_vlan_obj_id_to_vlan_id(bv_id);
+        return sai_is_valid_vlan_id(vlan_id);
+    }
+    return false;
+}
 
 static sai_status_t sai_l2_flush_fdb_entry (sai_object_id_t switch_id, unsigned int attr_count,
                                             const sai_attribute_t *attr_list)
 {
     sai_object_id_t            bridge_port_id = 0;
     sai_object_id_t            bv_id = 0;
-    sai_vlan_id_t              vlan_id = VLAN_UNDEF;
     unsigned int               attr_idx = 0;
     sai_status_t               ret_val = SAI_STATUS_SUCCESS;
     bool                       delete_all = true;
@@ -351,6 +349,10 @@ static sai_status_t sai_l2_flush_fdb_entry (sai_object_id_t switch_id, unsigned 
             bridge_port_id = attr_list[attr_idx].value.oid;
         } else if(attr_list[attr_idx].id == SAI_FDB_FLUSH_ATTR_BV_ID) {
             bv_id = attr_list[attr_idx].value.oid;
+            if(!sai_is_valid_bv_id(bv_id)) {
+                SAI_FDB_LOG_ERR("Invalid bv_id id 0x%"PRIx64"", bv_id);
+                return SAI_STATUS_INVALID_PARAMETER;
+            }
         } else if(attr_list[attr_idx].id == SAI_FDB_FLUSH_ATTR_ENTRY_TYPE) {
             flush_type = attr_list[attr_idx].value.s32;
             delete_all = false;
@@ -365,13 +367,7 @@ static sai_status_t sai_l2_flush_fdb_entry (sai_object_id_t switch_id, unsigned 
             return SAI_STATUS_INVALID_OBJECT_ID;
         }
     }
-    if(vlan_id != VLAN_UNDEF) {
-        vlan_id = sai_vlan_obj_id_to_vlan_id(bv_id);
-        if(!sai_is_valid_vlan_id(vlan_id)) {
-            SAI_FDB_LOG_ERR("Invalid vlan id %d", vlan_id);
-            return SAI_STATUS_INVALID_VLAN_ID;
-        }
-    }
+
     switch(flush_type) {
         case SAI_FDB_FLUSH_ENTRY_TYPE_DYNAMIC:
         case SAI_FDB_FLUSH_ENTRY_TYPE_STATIC:
@@ -384,13 +380,6 @@ static sai_status_t sai_l2_flush_fdb_entry (sai_object_id_t switch_id, unsigned 
     sai_bridge_lock();
 
     do {
-        if(!sai_fdb_delete_entry_by_entry_on_flush) {
-            ret_val = sai_fdb_npu_api_get()->flush_all_fdb_entries (bridge_port_id, bv_id,
-                                                                    delete_all, flush_type);
-            if(ret_val != SAI_STATUS_SUCCESS) {
-                break;
-            }
-        }
         if((bridge_port_id == SAI_NULL_OBJECT_ID) && (bv_id == SAI_NULL_OBJECT_ID)) {
             SAI_FDB_LOG_TRACE("Flushing all FDB entries");
             sai_delete_all_fdb_entry_nodes (delete_all, flush_type);
@@ -416,18 +405,6 @@ static sai_status_t sai_l2_flush_fdb_entry (sai_object_id_t switch_id, unsigned 
     return ret_val;
 }
 
-static bool sai_is_valid_bv_id(sai_object_id_t bv_id)
-{
-    sai_vlan_id_t vlan_id = VLAN_UNDEF;
-
-    if(sai_is_obj_id_bridge(bv_id)) {
-        return sai_is_bridge_created(bv_id);
-    } else if(sai_is_obj_id_vlan(bv_id)) {
-        vlan_id = sai_vlan_obj_id_to_vlan_id(bv_id);
-        return sai_is_valid_vlan_id(vlan_id);
-    }
-    return false;
-}
 static sai_status_t sai_l2_remove_fdb_entry(const sai_fdb_entry_t *fdb_entry)
 {
     char mac_str[SAI_MAC_STR_LEN] = {0};

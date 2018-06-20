@@ -20,10 +20,10 @@
 
 #include "sai_db_api.h"
 #include "saitypes.h"
-#include "sairouter.h"
+#include "saivirtualrouter.h"
 #include "saistatus.h"
 #include "sainexthop.h"
-#include "sairouterintf.h"
+#include "sairouterinterface.h"
 #include "gtest/gtest.h"
 
 #include <stdint.h>
