@@ -1,3 +1,9 @@
+opx-sai-vm (17.1.0+opx7) unstable; urgency=medium
+
+  * Update: Add dh_systemd to enable systemd service file
+
+ -- Dell EMC <ops-dev@lists.openswitch.net>  Thu, 31 May 2018  11:00:00 -0800
+
 opx-sai-vm (17.1.0+opx6) unstable; urgency=medium
 
   * Bugfix: Add service unit to execute vm_dn_rules.sh for proper packet forwarding
