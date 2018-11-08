@@ -137,6 +137,8 @@ sai_fib_router_interface_t *p_rif_node, sai_object_id_t vr_id)
 static sai_status_t sai_fib_rif_type_attr_set (
 sai_fib_router_interface_t *p_rif_node, uint_t type)
 {
+    sai_mac_t mac = {0};
+
     if (!(sai_fib_is_rif_type_valid (type))) {
         SAI_RIF_LOG_ERR ("%d is not a valid Router Interface type.", type);
 
@@ -145,6 +147,15 @@ sai_fib_router_interface_t *p_rif_node, uint_t type)
          * caller of this function.
          */
         return SAI_STATUS_INVALID_ATTR_VALUE_0;
+    }
+
+    sai_switch_mac_address_get (&mac);
+
+    /* For loopback rif reset the mac to zero from the switch mac address which
+     * was set during initialization of the rif node*/
+    if((type == SAI_ROUTER_INTERFACE_TYPE_LOOPBACK) &&
+       (memcmp(p_rif_node->src_mac, mac, sizeof (sai_mac_t)) == 0)) {
+        memset(p_rif_node->src_mac, 0, sizeof (sai_mac_t));
     }
 
     if((!sai_fib_is_mac_address_zero((const sai_mac_t *)&p_rif_node->src_mac)) &&

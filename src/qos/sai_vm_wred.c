@@ -152,4 +152,3 @@ sai_npu_wred_api_t* sai_vm_wred_api_query (void)
 {
     return &sai_vm_wred_api_table;
 }
-

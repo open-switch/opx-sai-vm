@@ -61,6 +61,10 @@ static const dn_sai_attribute_entry_t sai_bridge_port_type_sub_port_attr[] =  {
                                , false, true , true , true , true , false},
     { SAI_BRIDGE_PORT_ATTR_EGRESS_FILTERING
                                , false, true , true , true , true , false},
+    { SAI_BRIDGE_PORT_ATTR_INGRESS_SPLIT_HORIZON_ID
+                               , false, true , true , true , true , true },
+    { SAI_BRIDGE_PORT_ATTR_EGRESS_SPLIT_HORIZON_ID
+                               , false, true , true , true , true , true },
 };
 
 static const dn_sai_attribute_entry_t sai_bridge_port_type_port_attr[] =  {
@@ -121,6 +125,10 @@ static const dn_sai_attribute_entry_t sai_bridge_port_type_tunnel_attr[] =  {
                                , false, true , true , true , true , false},
     { SAI_BRIDGE_PORT_ATTR_EGRESS_FILTERING
                                , false, true , true , true , true , false},
+    { SAI_BRIDGE_PORT_ATTR_INGRESS_SPLIT_HORIZON_ID
+                               , false, true , true , true , true , true },
+    { SAI_BRIDGE_PORT_ATTR_EGRESS_SPLIT_HORIZON_ID
+                               , false, true , true , true , true , true },
 };
 
 /**
@@ -431,3 +439,4 @@ sai_npu_bridge_api_t* sai_vm_bridge_api_query (void)
 {
     return &sai_vm_bridge_api_table;
 }
+

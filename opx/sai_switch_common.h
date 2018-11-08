@@ -186,6 +186,9 @@ typedef struct _sai_switch_info_t {
     /** Max tile buffer size */
     uint_t                   max_tile_buffer_size;
 
+    /** Max tiles in the switch */
+    uint_t                   max_tiles;
+
     /** Applicaton info on the ports */
     rbtree_handle            port_applications_tree;
 
@@ -298,6 +301,9 @@ typedef struct _sai_switch_init_config_t {
 
     /** Max tiles per service pools */
     uint_t                   tiles_per_buf_pool;
+
+    /** Max tiles in the switch */
+    uint_t                   max_tiles;
 
     /** Max tile buffer size */
     uint_t                   max_tile_buffer_size;

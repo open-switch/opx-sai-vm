@@ -65,4 +65,8 @@ sai_status_t sai_npu_set_acl_range(sai_acl_range_t *acl_range, uint_t attr_count
                                    const sai_attribute_t *p_attr);
 sai_status_t sai_npu_get_acl_range(sai_acl_range_t *acl_range, uint_t attr_count,
                                    sai_attribute_t *p_attr_list);
+sai_status_t sai_npu_get_acl_slice_attribute(sai_object_id_t acl_slice_id,
+                                             uint32_t attr_count,
+                                             sai_attribute_t *attr_list);
+
 #endif /* __SAI_VM_ACL_UTIL_H__ */

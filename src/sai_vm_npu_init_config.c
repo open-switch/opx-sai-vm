@@ -46,7 +46,6 @@ static void sai_vm_port_info_node_handler (std_config_node_t port_node,
 
     /* Set port info defaults */
     port_info->eee_support = false;
-
     for (sai_node = std_config_get_child (port_node);
          sai_node != NULL;
          sai_node = std_config_next_node (sai_node)) {
@@ -73,11 +72,11 @@ static void sai_vm_port_info_node_handler (std_config_node_t port_node,
 
             size_t speed_map_sz;
             uint32_t index;
-            speed_desc_t* speed_map= get_speed_map(&speed_map_sz);
+            const speed_desc_t* speed_map= get_speed_map(&speed_map_sz);
             port_info->port_speed_capb = 0;
-            speed_desc_t *map_entry = NULL;
+            const speed_desc_t *map_entry = speed_map;
 
-            for (map_entry=speed_map, index=0; index < speed_map_sz; ++index) {
+            for (index=0; index < speed_map_sz; ++index) {
                 sai_std_config_attr_uint_update(sai_node, map_entry->speed,
                                                 &port_info->port_speed_capb,
                                                 map_entry->speed_cap_bit);

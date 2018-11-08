@@ -319,7 +319,6 @@ typedef struct _sai_port_info_t
 
     /** Number of VLANs that the port is part of */
     uint_t                num_vlans;
-
     /*EEE support on port */
     bool                  eee_support;
 } sai_port_info_t;

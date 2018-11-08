@@ -538,6 +538,64 @@
 #define SAI_NODE_NAME_FULLDUPLEX           "FULLDUPLEX"
 
 /**
+ * @def SAI_NODE_NAME_ACL_CONFIG
+ * Node for representing ACL configurations
+ */
+#define SAI_NODE_NAME_ACL_CONFIG           "ACL_CONFIG"
+/**
+ * @def SAI_NODE_NAME_ACL_PRIO
+ * Node for representing ACL priority configurations
+ */
+#define SAI_NODE_NAME_ACL_PRIO             "ACL_PRIO"
+
+#define SAI_NODE_NAME_ACL_INGRESS_FP       "ACL_INGRESS_FP"
+
+#define SAI_NODE_NAME_ACL_EGRESS_FP        "ACL_EGRESS_FP"
+
+#define SAI_NODE_NAME_ACL_FP_SLICE         "FP_SLICE"
+
+/**
+ * @def SAI_ATTR_ACL_XXX
+ * Attribute for representing ACL group names
+ */
+#define SAI_ATTR_ACL_INGRESS_SYS_FLOW      "system-flow"
+#define SAI_ATTR_ACL_INGRESS_OPENFLOW      "openflow"
+#define SAI_ATTR_ACL_INGRESS_VLT           "vlt"
+#define SAI_ATTR_ACL_INGRESS_ISCSI         "iscsi"
+#define SAI_ATTR_ACL_INGRESS_FCOE          "fcoe"
+#define SAI_ATTR_ACL_INGRESS_FCOE_FPORT    "fcoe_fport"
+#define SAI_ATTR_ACL_INGRESS_FEDGOV        "fedgov"
+#define SAI_ATTR_ACL_INGRESS_L2_ACL        "l2_acl"
+#define SAI_ATTR_ACL_INGRESS_V4_ACL        "v4_acl"
+#define SAI_ATTR_ACL_INGRESS_V6_ACL        "v6_acl"
+#define SAI_ATTR_ACL_INGRESS_V4_PBR        "v4_pbr"
+#define SAI_ATTR_ACL_INGRESS_V6_PBR        "v6_pbr"
+#define SAI_ATTR_ACL_INGRESS_L2_QOS        "l2_qos"
+#define SAI_ATTR_ACL_INGRESS_V4_QOS        "v4_qos"
+#define SAI_ATTR_ACL_INGRESS_V6_QOS        "v6_qos"
+#define SAI_ATTR_ACL_EGRESS_L2_ACL         "egr_l2_acl"
+#define SAI_ATTR_ACL_EGRESS_V4_ACL         "egr_v4_acl"
+#define SAI_ATTR_ACL_EGRESS_V6_ACL         "egr_v6_acl"
+
+/**
+ * @def SAI_ATTR_ACL_MAX_IFP_SLICE
+ * Attribute used for representing the max ifp slice
+ */
+#define SAI_ATTR_ACL_MAX_IFP_SLICE          "max_ifp_slice"
+
+/**
+ * @def SAI_ATTR_ACL_MAX_EFP_SLICE
+ * Attribute used for representing the max efp slice
+ */
+#define SAI_ATTR_ACL_MAX_EFP_SLICE          "max_efp_slice"
+
+#define SAI_ATTR_ACL_FP_SLICE_ID            "slice_id"
+
+#define SAI_ATTR_ACL_FP_SLICE_DEPTH         "slice_depth"
+
+#define SAI_ATTR_ACL_DEPTH_PER_ENTRY        "depth_per_entry"
+
+/**
  * @def SAI_MAX_NAME_LEN
  * MAX SAI Configuration name length
  */
@@ -554,6 +612,23 @@
  * MAX SAI Port MTU default
  */
 #define SAI_MAX_PORT_MTU_DEFAULT (12000)
+
+/**
+ * @def SAI_SWITCH_DEFAULT_MAX_TILES
+ * MAX SAI switch default max tiles
+ */
+#define SAI_SWITCH_DEFAULT_MAX_TILES (1)
+
+/**
+ * @def SAI_SWITCH_DEFAULT_MAX_IFP_SLICE
+ * MAX SAI switch default max ifp slice
+ */
+#define SAI_SWITCH_DEFAULT_MAX_IFP_SLICE (12)
+/**
+ * @def SAI_SWITCH_DEFAULT_MAX_EFP_SLICE
+ * MAX SAI switch default max efp slice
+ */
+#define SAI_SWITCH_DEFAULT_MAX_EFP_SLICE (4)
 
 /**
  * @brief This api takes a config node and attribute to be looked in that node;

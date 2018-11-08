@@ -27,6 +27,7 @@
 #include "sai_acl_npu_api.h"
 #include "sai_acl_type_defs.h"
 #include "sai_acl_utils.h"
+#include "sai_common_acl.h"
 #include "sai_qos_common.h"
 #include "saitypes.h"
 #include "saistatus.h"
@@ -154,6 +155,9 @@ sai_status_t sai_npu_get_acl_attribute(sai_attribute_t *attr)
             attr->value.u32range.min = SAI_VM_ACL_USER_META_DATA_MIN;
             attr->value.u32range.max = SAI_VM_ACL_USER_META_DATA_MAX;
             break;
+        case SAI_SWITCH_ATTR_EXTENSIONS_ACL_SLICE_LIST:
+            sai_rc = sai_get_acl_slice_objects(attr);
+            break;
        default:
             SAI_ACL_LOG_ERR("Invalid acl switch attribute %d", attr->id);
             sai_rc = SAI_STATUS_INVALID_ATTRIBUTE_0;
@@ -190,6 +194,7 @@ static sai_npu_acl_api_t sai_vm_acl_api_table = {
     sai_npu_range_attribute_table_get,
     sai_npu_acl_dump_all_counters,
     sai_npu_acl_dump_counter_per_entry,
+    sai_npu_get_acl_slice_attribute,
 };
 
 sai_npu_acl_api_t* sai_vm_acl_api_query (void)

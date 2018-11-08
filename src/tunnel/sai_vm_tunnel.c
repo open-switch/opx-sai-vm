@@ -131,6 +131,7 @@ static void sai_vm_tunnel_map_entry_attr_table_get(
     *p_attr_count = (sizeof(dn_tunnel_map_entry_attrs)) /
                     (sizeof(dn_tunnel_map_entry_attrs[0]));
 }
+
 static void sai_vm_tunnel_attr_id_table_get (
                           sai_object_type_t obj_type,
                           const dn_sai_attribute_entry_t **p_attr_table,
@@ -141,6 +142,7 @@ static void sai_vm_tunnel_attr_id_table_get (
 
     } else if (obj_type == SAI_OBJECT_TYPE_TUNNEL_TERM_TABLE_ENTRY) {
         sai_vm_tunnel_term_obj_attr_table_get (p_attr_table, p_attr_count);
+
     } else if (obj_type == SAI_OBJECT_TYPE_TUNNEL_MAP) {
         sai_vm_tunnel_map_attr_table_get (p_attr_table, p_attr_count);
 

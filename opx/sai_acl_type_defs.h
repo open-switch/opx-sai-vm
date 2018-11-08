@@ -21,6 +21,7 @@
 #include "sai_oid_utils.h"
 
 #include "saiacl.h"
+#include "saiextensions.h"
 
 #include "std_type_defs.h"
 #include "std_rbtree.h"
@@ -39,6 +40,31 @@
 /** ACL Rule Default Admin State */
 #define SAI_ACL_RULE_DEFAULT_ADMIN_STATE 2
 
+typedef enum _sai_bcm_acl_app_table_indexes
+{
+    SAI_ACL_INGRESS_SYSTEM_FLOW = 0,
+    SAI_ACL_INGRESS_OPENFLOW,
+    SAI_ACL_INGRESS_VLT,
+    SAI_ACL_INGRESS_ISCSI,
+    SAI_ACL_INGRESS_FCOE,
+    SAI_ACL_INGRESS_FCOE_FPORT,
+    SAI_ACL_INGRESS_FEDGOV,
+    SAI_ACL_INGRESS_L2_ACL,
+    SAI_ACL_INGRESS_V4_ACL,
+    SAI_ACL_INGRESS_V6_ACL,
+    SAI_ACL_INGRESS_V4_PBR,
+    SAI_ACL_INGRESS_V6_PBR,
+    SAI_ACL_INGRESS_L2_QOS,
+    SAI_ACL_INGRESS_V4_QOS,
+    SAI_ACL_INGRESS_V6_QOS,
+    SAI_ACL_EGRESS_L2_ACL,
+    SAI_ACL_EGRESS_V4_ACL,
+    SAI_ACL_EGRESS_V6_ACL,
+    /** If any new application gets added in policy table
+     * add equivalent index in this table on the need basis */
+    SAI_ACL_GROUP_END
+}sai_bcm_acl_app_table_indexes;
+
 /**
  * @brief SAI ACL Table ID generator Data Structure
  *
@@ -52,6 +78,23 @@ typedef struct _sai_acl_table_id_node_t {
     /** Table Id generated during SAI ACL module initialization */
     uint_t table_id;
 } sai_acl_table_id_node_t;
+
+typedef struct _sai_acl_table_static_config_t {
+
+    /** ACL table application static priority */
+    uint_t priority[SAI_ACL_GROUP_END];
+
+    uint_t max_ifp_slice;
+
+    uint_t max_efp_slice;
+
+    uint_t *ifp_slice_depth_list;
+
+    uint_t *efp_slice_depth_list;
+
+    /**In Tomohawk, non-single wide mode takes 2 entry space*/
+    uint_t  depth_per_entry;
+} sai_acl_table_static_config_t;
 
 /**
  * @brief SAI ACL Node Data Structure
@@ -77,6 +120,12 @@ typedef struct _sai_acl_node_t {
 
     /** Nodes of type sai_acl_range_t */
     rbtree_handle sai_acl_range_tree;
+
+    /** Nodes of type sai_acl_slice_t */
+    rbtree_handle sai_acl_slice_tree;
+
+    /** Acl table static priorities */
+    sai_acl_table_static_config_t sai_acl_table_config;
 } sai_acl_node_t, *acl_node_pt;
 
 /**
@@ -423,4 +472,34 @@ typedef struct _sai_acl_range_t {
     int ref_count;
 } sai_acl_range_t;
 
+/**
+ * @brief SAI ACL Slice ACL table Data Structure
+ *
+ * Contains the SAI ACL Slice ACL table info Attributes.
+ */
+typedef struct _sai_acl_slice_acl_table_t {
+
+    /** Link to the next ACL table info sharing the same slice */
+    std_dll                 acl_table_link;
+    /** Object ID of the ACL table present in the current slice */
+    sai_object_id_t         acl_table_object_id;
+
+}sai_acl_slice_acl_table_t;
+
+typedef struct _sai_acl_slice_t {
+    /** Key to sai_acl_slice_tree */
+    sai_object_id_t acl_slice_id;
+
+    /** Slice id */
+    sai_uint32_t    slice_id;
+
+    /** Pipe id */
+    sai_uint32_t    pipe_id;
+
+    /** Stage */
+    sai_acl_stage_t acl_stage;
+
+    /** Free entries in the current slice */
+    sai_uint32_t    slice_depth;
+} sai_acl_slice_t;
 #endif /* _SAI_ACL_TYPE_DEFS_H_ */

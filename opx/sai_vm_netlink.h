@@ -18,10 +18,8 @@
 #ifndef __SAI_VM_NETLINK_H__
 #define __SAI_VM_NETLINK_H__
 
-/**
- * This function initializes a thread that listens to netlink events relevant to the SAI VM implementation.
- */
-void sai_vm_netlink_thread_start(void);
+sai_status_t sai_get_bridge_port_for_fdb_entry (const sai_fdb_entry_t *fdb_entry,
+                                                sai_object_id_t *bridge_port_id);
 
 
 #endif /* __SAI_VM_NETLINK_H__ */

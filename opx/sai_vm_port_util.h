@@ -65,7 +65,6 @@ typedef struct _sai_vm_port_init_info_t {
 
     /** Port supported speed [sai_port_speed_capability_t] */
     uint_t                       port_speed_capb;
-
     /** Maximum  Lanes support per port */
     uint_t                       max_lanes_per_port;
 
@@ -73,7 +72,6 @@ typedef struct _sai_vm_port_init_info_t {
     uint64_t                     port_lane_bmap;
 
     bool                         eee_support;
-
 } sai_vm_port_init_info_t;
 
 /**

@@ -147,10 +147,12 @@ static inline void sai_fib_neighbor_entry_log_trace (
 
     STD_ASSERT (p_neighbor_entry != NULL);
 
-    SAI_NEIGHBOR_LOG_TRACE ("%s Neighbor entry. IP Address: %s, RIF Id: 0x%"PRIx64".",
+    SAI_NEIGHBOR_LOG_TRACE ("%s Neighbor entry. IP Address: %s, VR Id: 0x%"PRIx64","
+                            " RIF Id: 0x%"PRIx64".",
                             p_trace_str, sai_ip_addr_to_str (
                             &p_neighbor_entry->ip_address, ip_addr_str,
-                            SAI_FIB_MAX_BUFSZ), p_neighbor_entry->rif_id);
+                            SAI_FIB_MAX_BUFSZ), p_neighbor_entry->vr_id,
+                            p_neighbor_entry->rif_id);
 }
 
 static sai_status_t sai_fib_neighbor_info_fill (sai_fib_nh_t *p_nh_info,
@@ -272,6 +274,7 @@ static sai_status_t sai_fib_neighbor_entry_validate (
 {
     sai_status_t  status;
     sai_fib_router_interface_t *p_rif_node = NULL;
+    sai_fib_vrf_t *p_vrf_node = NULL;
 
     STD_ASSERT (neighbor_entry != NULL);
 
@@ -280,6 +283,16 @@ static sai_status_t sai_fib_neighbor_entry_validate (
 
         SAI_NEIGHBOR_LOG_ERR ("Invalid Neighbor RIF id: 0x%"PRIx64".",
                               neighbor_entry->rif_id);
+
+        return SAI_STATUS_INVALID_OBJECT_ID;
+    }
+
+    p_vrf_node = sai_fib_vrf_node_get (neighbor_entry->vr_id);
+
+    if (p_vrf_node == NULL) {
+
+        SAI_NEIGHBOR_LOG_ERR ("SAI Neighbor VR Id: 0x%"PRIx64" not found.",
+                              neighbor_entry->vr_id);
 
         return SAI_STATUS_INVALID_OBJECT_ID;
     }
@@ -348,12 +361,12 @@ static sai_status_t sai_fib_neighbor_key_validate_and_fill (
     }
 
     /* Validate and fill the VRF Id */
-    p_vrf_node = sai_fib_get_vrf_node_for_rif (neighbor_entry->rif_id);
+    p_vrf_node = sai_fib_vrf_node_get (neighbor_entry->vr_id);
 
     if ((!p_vrf_node)) {
 
-        SAI_NEIGHBOR_LOG_ERR ("SAI Neighbor RIF Id: 0x%"PRIx64", VRF node not found.",
-                              neighbor_entry->rif_id);
+        SAI_NEIGHBOR_LOG_ERR ("SAI Neighbor VR Id: 0x%"PRIx64", VRF node not found.",
+                              neighbor_entry->vr_id);
 
         return SAI_STATUS_ITEM_NOT_FOUND;
     }
@@ -635,6 +648,22 @@ static sai_status_t sai_fib_neighbor_mac_entry_remove (sai_fib_nh_t *p_neighbor)
     return SAI_STATUS_SUCCESS;
 }
 
+static sai_fib_nh_t* sai_fib_neighbor_node_get (sai_object_id_t vr_id,
+                                                sai_fib_nh_key_t *nh_key)
+{
+    sai_fib_vrf_t *p_vrf_node = sai_fib_vrf_node_get (vr_id);
+
+    if (p_vrf_node != NULL) {
+
+        return ((sai_fib_nh_t *)
+                std_radix_getexact (p_vrf_node->sai_nh_tree,
+                                    (uint8_t *) nh_key,
+                                    SAI_FIB_NH_IP_ADDR_TREE_KEY_LEN));
+    }
+
+    return NULL;
+}
+
 static sai_status_t sai_fib_neighbor_node_create (sai_fib_nh_t *nh_info,
                                                   sai_fib_nh_t **node)
 {
@@ -645,10 +674,7 @@ static sai_status_t sai_fib_neighbor_node_create (sai_fib_nh_t *nh_info,
     STD_ASSERT (node != NULL);
 
     /* Check if there is an existing next hop node */
-    p_nh_node = sai_fib_ip_next_hop_node_get (SAI_NEXT_HOP_TYPE_IP,
-                                              nh_info->key.rif_id,
-                                              sai_fib_next_hop_ip_addr (nh_info),
-                                              SAI_FIB_TUNNEL_TYPE_NONE);
+    p_nh_node = sai_fib_neighbor_node_get (nh_info->vrf_id, &nh_info->key);
     if (p_nh_node) {
 
         if (sai_fib_is_owner_neighbor (p_nh_node)) {
@@ -792,7 +818,6 @@ static sai_status_t sai_fib_neighbor_remove (
     sai_fib_nh_t      *p_nh_node = NULL;
     sai_fib_nh_t       nh_node_copy;
     sai_fib_nh_key_t   nh_key;
-    sai_ip_address_t  *p_ip_addr = NULL;
 
     SAI_NEIGHBOR_LOG_TRACE ("SAI Neighbor remove.");
 
@@ -814,13 +839,8 @@ static sai_status_t sai_fib_neighbor_remove (
         /* Fill the neighbor IP address key */
         sai_fib_neighbor_ip_next_hop_node_key_fill (neighbor_entry, &nh_key);
 
-        p_ip_addr = &nh_key.info.ip_nh.ip_addr;
-
         /* Get the neighbor node */
-        p_nh_node = sai_fib_ip_next_hop_node_get (SAI_NEXT_HOP_TYPE_IP,
-                                                  neighbor_entry->rif_id,
-                                                  p_ip_addr,
-                                                  SAI_FIB_TUNNEL_TYPE_NONE);
+        p_nh_node = sai_fib_neighbor_node_get (neighbor_entry->vr_id, &nh_key);
 
         if ((!p_nh_node)) {
 
@@ -898,7 +918,6 @@ static sai_status_t sai_fib_neighbor_attribute_set (
     uint_t             attr_count = 1;
     sai_fib_nh_key_t   nh_key;
     uint_t             attr_flag = 0;
-    sai_ip_address_t  *p_ip_addr = NULL;
     bool               is_mac_entry_resolved = false;
 
     SAI_NEIGHBOR_LOG_TRACE ("SAI Neighbor Set Attribute, attr_count: %d.",
@@ -923,13 +942,8 @@ static sai_status_t sai_fib_neighbor_attribute_set (
         /* Fill the neighbor IP address key */
         sai_fib_neighbor_ip_next_hop_node_key_fill (neighbor_entry, &nh_key);
 
-        p_ip_addr = &nh_key.info.ip_nh.ip_addr;
-
         /* Get the neighbor node */
-        p_nh_node = sai_fib_ip_next_hop_node_get (SAI_NEXT_HOP_TYPE_IP,
-                                                  neighbor_entry->rif_id,
-                                                  p_ip_addr,
-                                                  SAI_FIB_TUNNEL_TYPE_NONE);
+        p_nh_node = sai_fib_neighbor_node_get (neighbor_entry->vr_id, &nh_key);
 
         if ((!p_nh_node)) {
 
@@ -1025,7 +1039,6 @@ static sai_status_t sai_fib_neighbor_attribute_get (
     sai_status_t       status = SAI_STATUS_FAILURE;
     sai_fib_nh_t      *p_nh_node = NULL;
     sai_fib_nh_key_t   nh_key;
-    sai_ip_address_t  *p_ip_addr = NULL;
 
     SAI_NEIGHBOR_LOG_TRACE ("SAI Neighbor Get Attribute, attr_count: %d.",
                             attr_count);
@@ -1050,14 +1063,8 @@ static sai_status_t sai_fib_neighbor_attribute_get (
         /* Fill the neighbor IP address key */
         sai_fib_neighbor_ip_next_hop_node_key_fill (neighbor_entry, &nh_key);
 
-        p_ip_addr = &nh_key.info.ip_nh.ip_addr;
-
         /* Get the neighbor node */
-        p_nh_node = sai_fib_ip_next_hop_node_get (SAI_NEXT_HOP_TYPE_IP,
-                                                  neighbor_entry->rif_id,
-                                                  p_ip_addr,
-                                                  SAI_FIB_TUNNEL_TYPE_NONE);
-
+        p_nh_node = sai_fib_neighbor_node_get (neighbor_entry->vr_id, &nh_key);
         if ((!p_nh_node)) {
 
             SAI_NEIGHBOR_LOG_ERR ("SAI Neighbor Get Attribute. "

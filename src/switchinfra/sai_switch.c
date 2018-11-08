@@ -16,6 +16,7 @@
 
 #include "std_type_defs.h"
 #include "sai.h"
+#include "saiextensions.h"
 #include "std_utils.h"
 #include "sai_modules_init.h"
 #include "sai_infra_api.h"
@@ -167,6 +168,7 @@ static const dn_sai_attribute_entry_t dn_sai_switch_attr[] = {
     {SAI_SWITCH_ATTR_TPID_INNER_VLAN, false, false, false, false, false, false },
     {SAI_SWITCH_ATTR_INGRESS_ACL, false, true, true, true, true, true },
     {SAI_SWITCH_ATTR_EGRESS_ACL, false, true, true, true, true, true },
+    {SAI_SWITCH_ATTR_SPLIT_HORIZON_ID_RANGE, false, false, false, true, true, true }
 };
 
 /**
@@ -410,6 +412,13 @@ static sai_status_t sai_switch_get_gen_attribute(sai_attribute_t *attr)
         case SAI_SWITCH_ATTR_COUNTER_REFRESH_INTERVAL:
             ret_val = sai_switch_common_counter_refresh_interval_get(&attr->value);
             break;
+
+        case SAI_SWITCH_ATTR_SPLIT_HORIZON_ID_RANGE:
+            ret_val = sai_switch_npu_api_get()->vxlan_split_horizon_range_get(&attr->value.u32range.min,
+                                                                              &attr->value.u32range.max);
+            ret_val = SAI_STATUS_SUCCESS;
+            break;
+
         default:
             SAI_SWITCH_LOG_TRACE("Invalid Attribute Id %d in list", attr->id);
             return SAI_STATUS_INVALID_ATTRIBUTE_0;
@@ -1342,6 +1351,7 @@ sai_status_t sai_switch_get_attribute(sai_object_id_t switch_id,
             case SAI_SWITCH_ATTR_SWITCHING_MODE:
             case SAI_SWITCH_ATTR_SRC_MAC_ADDRESS:
             case SAI_SWITCH_ATTR_COUNTER_REFRESH_INTERVAL:
+            case SAI_SWITCH_ATTR_SPLIT_HORIZON_ID_RANGE:
                 sai_rc = sai_switch_get_gen_attribute(p_attr);
                 break;
 
@@ -1399,6 +1409,7 @@ sai_status_t sai_switch_get_attribute(sai_object_id_t switch_id,
             case SAI_SWITCH_ATTR_PORT_USER_META_DATA_RANGE:
             case SAI_SWITCH_ATTR_VLAN_USER_META_DATA_RANGE:
             case SAI_SWITCH_ATTR_ACL_USER_META_DATA_RANGE:
+            case SAI_SWITCH_ATTR_EXTENSIONS_ACL_SLICE_LIST:
                 sai_rc = sai_switch_get_acl_attribute(p_attr);
                 break;
 

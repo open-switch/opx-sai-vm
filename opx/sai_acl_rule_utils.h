@@ -18,6 +18,7 @@
 #ifndef _SAI_ACL_RULE_UTILS_H
 #define _SAI_ACL_RULE_UTILS_H
 
+#include "std_config_node.h"
 #include "sai_acl_type_defs.h"
 #include "sai_samplepacket_defs.h"
 #include "saistatus.h"
@@ -112,4 +113,6 @@ sai_status_t sai_acl_rule_validate_update_samplepacket (sai_acl_rule_t *acl_rule
                                                                sai_acl_rule_t *orig_rule,
                                                                bool validate,
                                                                bool update);
+sai_status_t sai_acl_config_handler(std_config_node_t acl_xml_node,
+                                    acl_node_pt acl_node);
 #endif

@@ -354,6 +354,10 @@ static sai_status_t sai_l2mc_create_group_member(sai_object_id_t *l2mc_member_id
                     l2mc_member_node.bridge_port_id = attr_list[attr_idx].value.oid;
                     port_id_attr_present = true;
                     break;
+
+                case SAI_L2MC_GROUP_MEMBER_ATTR_L2MC_ENDPOINT_IP:
+                    break;
+
                 default:
                     sai_rc = sai_get_indexed_ret_val(SAI_STATUS_UNKNOWN_ATTRIBUTE_0, attr_idx);
             }

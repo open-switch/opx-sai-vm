@@ -59,6 +59,11 @@ static inline bool sai_acl_table_valid_attr_range(sai_attr_id_t id)
         (id <= SAI_ACL_TABLE_ATTR_CUSTOM_RANGE_END)) {
         return true;
     }
+    /* Included extension attribute under valid range */
+    if ((id >= SAI_ACL_TABLE_ATTR_EXTENSIONS_RANGE_START) &&
+        (id <= SAI_ACL_TABLE_ATTR_EXTENSIONS_RANGE_END)) {
+        return true;
+    }
     return false;
 }
 
@@ -66,6 +71,11 @@ static inline bool sai_acl_table_field_attr_range(sai_attr_id_t id)
 {
     if ((id >= SAI_ACL_TABLE_ATTR_FIELD_START) &&
         (id <= SAI_ACL_TABLE_ATTR_CUSTOM_RANGE_END)) {
+        return true;
+    }
+    /* Included extension attribute under valid range */
+    if ((id >= SAI_ACL_TABLE_ATTR_EXTENSIONS_RANGE_START) &&
+        (id <= SAI_ACL_TABLE_ATTR_EXTENSIONS_RANGE_END)) {
         return true;
     }
     return false;
@@ -133,6 +143,12 @@ static inline sai_acl_table_group_t *sai_acl_table_group_node_alloc()
     return ((sai_acl_table_group_t*) calloc(1,sizeof (sai_acl_table_group_t)));
 }
 
+static inline sai_acl_slice_t *sai_acl_slice_node_alloc()
+{
+        return ((sai_acl_slice_t *)
+                    calloc(1,sizeof (sai_acl_slice_t)));
+}
+
 static inline void sai_acl_range_free(sai_acl_range_t *p_acl_range_node)
 {
     free ((void *)p_acl_range_node);
@@ -147,6 +163,11 @@ static inline void sai_acl_table_group_member_free
     (sai_acl_table_group_member_t *p_acl_table_group_member_node)
 {
     free ((void *)p_acl_table_group_member_node);
+}
+
+static inline void sai_acl_slice_free(sai_acl_slice_t *p_acl_slice_node)
+{
+    free ((void *)p_acl_slice_node);
 }
 /**************************************************************************
  *                     Function Prototypes
@@ -231,4 +252,10 @@ void sai_acl_dump_table(sai_object_id_t table_id);
 void sai_acl_dump_rule(sai_object_id_t rule_id);
 void sai_acl_dump_counters();
 void sai_acl_dump_counter_per_entry(int eid);
+sai_status_t sai_acl_slice_attribute_get(sai_object_id_t acl_slice_id,
+                                            uint32_t attr_count,
+                                            sai_attribute_t *attr_list);
+void sai_acl_slice_init(void);
+sai_status_t sai_acl_slice_create_objects(void);
+sai_status_t sai_get_acl_slice_objects(sai_attribute_t *attr);
 #endif  /* _SAI_COMMON_ACL_H */

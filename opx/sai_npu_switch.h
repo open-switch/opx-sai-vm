@@ -254,6 +254,18 @@ typedef sai_status_t (*sai_npu_switch_hash_fields_set_fn) (
                                         sai_attr_id_t attr_id,
                                         const sai_s32_list_t *native_field_list,
                                         const sai_object_list_t *udf_list);
+
+/**
+ * brief Get the min and max split horizon id range.
+ *
+ * @param[out] min_value The minimum split horizon range value.
+ * @param[out] max_value The maximum split horizon range value.
+ * @return SAI_STATUS_SUCCESS if operation is successful otherwise a different
+ *  error code is returned.
+ */
+typedef sai_status_t (*sai_npu_switch_vxlan_split_horizon_range_get_fn)(
+                                                           uint32_t *min_value,
+                                                           uint32_t *max_value);
 /**
  * @brief Switch NPU API table.
  */
@@ -277,6 +289,7 @@ typedef struct _sai_npu_switch_api_t {
     sai_npu_lag_max_members_get_fn                    lag_max_members_get;
     sai_npu_lag_max_number_get_fn                     lag_max_number_get;
     sai_npu_switch_hash_fields_set_fn                 switch_hash_fields_set;
+    sai_npu_switch_vxlan_split_horizon_range_get_fn   vxlan_split_horizon_range_get;
 } sai_npu_switch_api_t;
 
 /**

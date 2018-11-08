@@ -308,6 +308,7 @@ static sai_status_t sai_vm_buffer_pool_attr_get (const dn_sai_qos_buffer_pool_t 
     }
     return SAI_STATUS_SUCCESS;
 }
+
 static sai_status_t sai_vm_buffer_profile_create (dn_sai_qos_buffer_profile_t
                                                    *p_buffer_profile_node,
                                                    sai_object_id_t *buffer_profile_id)

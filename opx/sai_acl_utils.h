@@ -338,6 +338,47 @@ static inline bool sai_acl_rule_udf_field_attr_range(
     return false;
 }
 
+uint_t sai_acl_max_ifp_slice_get (void);
+uint_t sai_acl_entry_depth_get (void);
+uint_t sai_acl_max_efp_slice_get (void);
+uint_t sai_acl_fp_slice_depth_get (sai_acl_stage_t stage, sai_uint32_t slice_id);
+
+/**
+ * @brief return the slice node for given slice tree.
+ *
+ * @param[in] sai_acl_slice_tree Pointer to the slice tree.
+ * @param[in] acl_slice_id slice object id.
+ *
+ * @return Pointer to the slice node if found in tree.
+ */
+static inline sai_acl_slice_t *sai_acl_slice_find(rbtree_handle sai_acl_slice_tree,
+        sai_object_id_t acl_slice_id)
+{
+    sai_acl_slice_t acl_slice;
+    acl_slice.acl_slice_id = acl_slice_id;
+
+    STD_ASSERT(sai_acl_slice_tree != NULL);
+    return ((sai_acl_slice_t *)std_rbtree_getexact(sai_acl_slice_tree, &acl_slice));
+}
+
+/**
+ * @brief insert slice node into tree.
+ *
+ * @param[in] sai_acl_slice_tree pointer to slice tree
+ * @param[in] acl_slice_node pointer to slice node
+ *
+ * @return SAI_STATUS_SUCCESS on successful insert.
+ */
+static inline sai_status_t sai_acl_slice_insert(rbtree_handle sai_acl_slice_tree,
+        sai_acl_slice_t *acl_slice_node)
+{
+    STD_ASSERT(sai_acl_slice_tree != NULL);
+    STD_ASSERT(acl_slice_node != NULL);
+
+    return (std_rbtree_insert(sai_acl_slice_tree, acl_slice_node)
+            == STD_ERR_OK ? SAI_STATUS_SUCCESS: SAI_STATUS_FAILURE);
+}
+
 /**
  * \}
  */

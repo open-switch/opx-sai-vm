@@ -128,3 +128,48 @@ sai_acl_rule_attr_type sai_acl_rule_get_attr_type (sai_attr_id_t attribute_id)
 
     return SAI_ACL_ENTRY_ATTR_INVALID;
 }
+
+uint_t sai_acl_max_ifp_slice_get (void)
+{
+    sai_acl_table_static_config_t *sai_acl_config = NULL;
+    sai_acl_config = &acl_node.sai_acl_table_config;
+    STD_ASSERT(sai_acl_config != NULL);
+
+    return (sai_acl_config->max_ifp_slice);
+}
+
+uint_t sai_acl_entry_depth_get (void)
+{
+    sai_acl_table_static_config_t *sai_acl_config = NULL;
+    sai_acl_config = &acl_node.sai_acl_table_config;
+    STD_ASSERT(sai_acl_config != NULL);
+
+    return (sai_acl_config->depth_per_entry);
+}
+
+uint_t sai_acl_max_efp_slice_get (void)
+{
+    sai_acl_table_static_config_t *sai_acl_config = NULL;
+    sai_acl_config = &acl_node.sai_acl_table_config;
+    STD_ASSERT(sai_acl_config != NULL);
+
+    return (sai_acl_config->max_efp_slice);
+}
+
+uint_t sai_acl_fp_slice_depth_get (sai_acl_stage_t stage, sai_uint32_t slice_id)
+{
+    sai_acl_table_static_config_t *sai_acl_config = NULL;
+    sai_acl_config = &acl_node.sai_acl_table_config;
+    STD_ASSERT(sai_acl_config != NULL);
+
+    if ((stage == SAI_ACL_STAGE_INGRESS) &&
+        (slice_id<sai_acl_config->max_ifp_slice))
+        return (sai_acl_config->ifp_slice_depth_list[slice_id]);
+
+    if ((stage == SAI_ACL_STAGE_EGRESS) &&
+        (slice_id<sai_acl_config->max_efp_slice))
+        return (sai_acl_config->efp_slice_depth_list[slice_id]);
+
+    return 0;
+}
+

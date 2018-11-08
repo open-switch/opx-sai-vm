@@ -160,3 +160,4 @@ sai_npu_l2mc_api_t* sai_vm_l2mc_api_query (void)
 {
     return &sai_vm_l2mc_api_table;
 }
+

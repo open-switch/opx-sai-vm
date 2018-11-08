@@ -142,6 +142,7 @@ static sai_status_t sai_port_attr_internal_loopback_set (sai_object_id_t port_id
                            " sai_port_info is %p", port_id,attr,sai_port_info);
         return SAI_STATUS_INVALID_PARAMETER;
     }
+
     memset (&sai_attr_set, 0, sizeof(sai_attribute_t));
     memset(&port_oper_state_change, 0, sizeof(sai_port_oper_status_notification_t));
 
@@ -156,6 +157,7 @@ static sai_status_t sai_port_attr_internal_loopback_set (sai_object_id_t port_id
                           "with err %d", sai_attr_set.value.s32, port_id, ret);
         return ret;
     }
+
 
     port_oper_state_change.port_id = port_id;
     port_oper_state_change.port_state = sai_attr_set.value.s32;
@@ -177,7 +179,6 @@ static sai_status_t sai_npu_port_set_attribute (sai_object_id_t port_id,
 
     switch(attr->id)
     {
-
         case SAI_PORT_ATTR_INTERNAL_LOOPBACK_MODE:
             return sai_port_attr_internal_loopback_set (port_id, sai_port_info, attr);
 
@@ -241,7 +242,7 @@ static sai_status_t sai_port_attr_supported_speed_get(sai_object_id_t port,
     uint32_t index;
 
     size_t speed_map_sz;
-    speed_desc_t* speed_map= get_speed_map(&speed_map_sz);
+    const speed_desc_t* speed_map= get_speed_map(&speed_map_sz);
     sai_status_t ret_code = SAI_STATUS_SUCCESS;
     sai_uint32_t sai_port_supported_speed_list[SAI_MAX_SUPPORTED_SPEEDS] = {0};
 
@@ -257,9 +258,9 @@ static sai_status_t sai_port_attr_supported_speed_get(sai_object_id_t port,
         return SAI_STATUS_INVALID_OBJECT_ID;
     }
 
-    speed_desc_t *map_entry = NULL;
+    const speed_desc_t *map_entry = speed_map;
 
-    for (map_entry=speed_map, index=0; index < speed_map_sz; ++index) {
+    for (index=0; index < speed_map_sz; ++index) {
 
     if ((map_entry->speed_cap_bit & sai_port_info->port_speed_capb) != 0) {
         sai_port_supported_speed_list[count++] = map_entry->speed_value;
@@ -309,6 +310,7 @@ static sai_status_t sai_npu_port_get_attribute (sai_object_id_t port_id,
 
     if (port_attr_info == NULL) {
         SAI_PORT_LOG_ERR ("Port attr info not found for port 0x%"PRIx64"",port_id);
+        return SAI_STATUS_FAILURE;
     }
 
     for(attr_idx = 0; attr_idx < attr_count; attr_idx++) {
@@ -367,7 +369,6 @@ static sai_status_t sai_npu_port_get_attribute (sai_object_id_t port_id,
             case SAI_PORT_ATTR_EEE_WAKE_TIME:
                 ret_code= sai_port_attr_eee_get(port_id, &attr_list[attr_idx].value);
                 break;
-
             case SAI_PORT_ATTR_POLICER_ID:
             case SAI_PORT_ATTR_QOS_DEFAULT_TC:
             case SAI_PORT_ATTR_QOS_DOT1P_TO_TC_MAP:
@@ -416,10 +417,8 @@ static sai_status_t sai_npu_port_get_stats (sai_object_id_t port_id,
         SAI_PORT_LOG_TRACE("Get stats port 0x%"PRIx64" counter_ids is %p counters is %p"
                            " sai_port_info is %p number_of_counters is %d", port_id,
                            counter_ids, counters,sai_port_info,number_of_counters);
-
         return SAI_STATUS_INVALID_PARAMETER;
     }
-
 
     return SAI_STATUS_SUCCESS;
 }
@@ -445,7 +444,6 @@ static sai_status_t sai_npu_port_clear_stats(sai_object_id_t port_id,
 static sai_status_t sai_npu_port_clear_all_stats(sai_object_id_t port_id,
                                                  const sai_port_info_t *sai_port_info)
 {
-
     return SAI_STATUS_SUCCESS;
 }
 
@@ -517,6 +515,7 @@ static sai_status_t sai_npu_port_create (sai_object_id_t *port_id,uint32_t attr_
         SAI_PORT_LOG_TRACE("VM Npu port create attr_list is %p port_id is %p",attr_list, port_id);
         return SAI_STATUS_INVALID_PARAMETER;
     }
+
     for (attr_idx = 0; attr_idx < attr_count; attr_idx++) {
         if (attr_list[attr_idx].id == SAI_PORT_ATTR_SPEED) {
             breakout_speed = attr_list[attr_idx].value.u32;

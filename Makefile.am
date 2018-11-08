@@ -135,8 +135,11 @@ src/switching/sai_vm_mcast.c \
         src/samplepacket/sai_samplepacket_common.c \
         src/udf/sai_udf.c \
         src/udf/sai_udf_group.c \
-        src/udf/sai_udf_utils.c
+        src/udf/sai_udf_utils.c \
+        src/acl/sai_acl_slice.c \
+        src/acl/sai_vm_acl_slice.c
 
-libsai_0_9_6_la_LDFLAGS = -lopx_logging -lopx_common -lopx_db_sql -version-info 1:0:0 
+
+libsai_0_9_6_la_LDFLAGS = -lopx_logging -lopx_common -lopx_db_sql -version-info 1:0:0
 libsai_0_9_6_la_CFLAGS = -I$(top_srcdir)/opx -I$(includedir)/opx
 libsai_0_9_6_la_CXXFLAGS = -I$(top_srcdir)/opx -std=c++11  -I$(includedir)/opx

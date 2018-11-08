@@ -468,6 +468,18 @@ static inline uint_t sai_switch_max_tile_buffer_size_get (void)
 }
 
 /**
+ * @brief Get the maximum number of tiles in the switch
+ *
+ * @return Maximum number of tiles in the switch
+ */
+static inline uint_t sai_switch_max_tiles_get (void)
+{
+    sai_switch_info_t *sai_switch_info_ptr = sai_switch_info_get();
+
+    return (sai_switch_info_ptr->max_tiles);
+}
+
+/**
  * @brief Check if tiles per buffer pool supported or not in the switch
  *
  * @return true if supported else false

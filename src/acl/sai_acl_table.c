@@ -19,7 +19,7 @@
 #include "sai_acl_npu_api.h"
 #include "sai_common_acl.h"
 #include "sai_acl_utils.h"
-
+#include "sai_switch_init_config.h"
 #include "saitypes.h"
 #include "saiacl.h"
 #include "saistatus.h"
@@ -842,6 +842,13 @@ sai_status_t sai_get_acl_table(sai_object_id_t table_id,
                  case SAI_ACL_TABLE_ATTR_ACL_ACTION_TYPE_LIST:
                      SAI_ACL_LOG_TRACE ("Nothing to get for ACL Table Actions");
                      break;
+                 case SAI_ACL_TABLE_ATTR_EXTENSIONS_USED_ACL_ENTRY_LIST:
+                 case SAI_ACL_TABLE_ATTR_EXTENSIONS_AVAILABLE_ACL_ENTRY_LIST:
+                    attr_list[attribute_count].value.u32list.count =
+                                            SAI_SWITCH_DEFAULT_MAX_TILES;
+                    SAI_ACL_LOG_TRACE("Number of entries used and available is"
+                                        "NPU specific info,Not applicable for VM");
+                    break;
                  default:
                      if (sai_acl_table_field_attr_range(attribute_id)) {
                          if (sai_acl_table_udf_field_attr_range(attribute_id)) {

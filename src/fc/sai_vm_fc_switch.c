@@ -1,4 +1,3 @@
-
 /************************************************************************
 * LEGALESE:   "Copyright (c) 2017, Dell Inc. All rights reserved."
 *
@@ -73,3 +72,4 @@ sai_fc_switch_api_t *sai_fc_switch_api_query()
 
     return (&sai_fc_switch_method_table);
 }
+

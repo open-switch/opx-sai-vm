@@ -47,3 +47,4 @@ sai_npu_mcast_api_t* sai_vm_mcast_api_query (void)
 {
     return &sai_vm_mcast_api_table;
 }
+

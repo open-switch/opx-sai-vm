@@ -84,8 +84,7 @@ static bool sai_is_acl_rule_fields_in_table (sai_acl_table_t *acl_table,
         SAI_ACL_TABLE_ATTR_FIELD_ACL_RANGE_TYPE,
         SAI_ACL_TABLE_ATTR_ACL_ACTION_TYPE_LIST,
         SAI_ACL_TABLE_ATTR_FIELD_IPV6_NEXT_HEADER,
-
-
+        SAI_ACL_TABLE_ATTR_FIELD_BRIDGE_TYPE,
     };
 
     STD_ASSERT (acl_table != NULL);

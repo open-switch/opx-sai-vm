@@ -98,6 +98,9 @@ extern "C" {
                                             (1 << SAI_HASH_L4_SOURCE_PORT) | \
                                             (1 << SAI_HASH_L4_DEST_PORT))
 
+#define SAI_VM_SWITCH_MIN_SPLIT_HORIZON_ID  (1)
+#define SAI_VM_SWITCH_MAX_SPLIT_HORIZON_ID  (1)
+
 typedef struct _sai_vm_tcb_t {
     /* Bit set indicates object ID is available for use */
     sai_switch_id_t  switch_id;

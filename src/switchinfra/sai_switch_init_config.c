@@ -26,6 +26,8 @@
 #include "sai_switch_utils.h"
 #include "sai_common_infra.h"
 #include "sai_qos_api_utils.h"
+#include "sai_acl_utils.h"
+#include "sai_acl_rule_utils.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -96,6 +98,7 @@ static sai_status_t sai_generic_switch_info_handler(std_config_node_t switch_nod
     memset(&init_info, 0, sizeof(sai_switch_init_config_t));
 
     init_info.max_port_mtu = SAI_MAX_PORT_MTU_DEFAULT;
+    init_info.max_tiles = SAI_SWITCH_DEFAULT_MAX_TILES;
 
     for (sai_node = std_config_get_child(switch_node);
          sai_node != NULL;
@@ -167,6 +170,16 @@ static sai_status_t sai_generic_info_handler(std_config_node_t generic_node)
             sai_rc = sai_qos_hierarchy_handler(sai_node, sai_qos_default_cpu_hqos_get());
             if(sai_rc != SAI_STATUS_SUCCESS) {
                 SAI_SWITCH_LOG_ERR("Default CPU hierarchy handling failed with err %d", sai_rc);
+                return sai_rc;
+            }
+        } else if(strncmp(std_config_name_get(sai_node),
+                          SAI_NODE_NAME_ACL_CONFIG, SAI_MAX_NAME_LEN) == 0) {
+
+            SAI_SWITCH_LOG_TRACE("ACL_USAGE: Process ACL config");
+            /**Read ACL config and update local data structure*/
+            sai_rc = sai_acl_config_handler(sai_node, sai_acl_get_acl_node());
+            if(sai_rc != SAI_STATUS_SUCCESS) {
+                SAI_SWITCH_LOG_ERR("Default ACL config handling failed with err %d", sai_rc);
                 return sai_rc;
             }
         }

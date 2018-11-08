@@ -285,6 +285,15 @@ typedef void (*sai_npu_dump_counters) (void);
 typedef void (*sai_npu_dump_counter_per_entry) (int entry_id);
 
 /**
+ * @brief Get ACL slice attribute
+ *
+ * @param[in] acl_slice Pointer to the ACL Slice node
+ * @param[in] p_attr    Pointer to the attribute list
+ */
+typedef sai_status_t (*sai_npu_attribute_acl_slice_get_fn)(sai_object_id_t acl_slice_id,
+                                                            uint32_t attr_count,
+                                                            sai_attribute_t *attr_list);
+/**
  * @brief ACL NPU API table.
  */
 typedef struct _sai_npu_acl_api_t {
@@ -314,6 +323,7 @@ typedef struct _sai_npu_acl_api_t {
     sai_npu_attribute_table_get_fn            attribute_table_get;
     sai_npu_dump_counters                     dump_all_counters;
     sai_npu_dump_counter_per_entry            dump_entry_counter;
+    sai_npu_attribute_acl_slice_get_fn        get_acl_slice_attribute;
 } sai_npu_acl_api_t;
 
 /**

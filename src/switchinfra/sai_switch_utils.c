@@ -117,6 +117,7 @@ void sai_switch_info_initialize(const sai_switch_init_config_t *switch_info)
     sai_switch_info_ptr->egr_max_buf_pools = switch_info->egr_max_buf_pools;
     sai_switch_info_ptr->tiles_per_buf_pool = switch_info->tiles_per_buf_pool;
     sai_switch_info_ptr->max_tile_buffer_size = switch_info->max_tile_buffer_size;
+    sai_switch_info_ptr->max_tiles = switch_info->max_tiles;
 
     sai_switch_info_ptr->max_uc_queues_per_cpu_port =
         switch_info->max_uc_queues_per_cpu_port;

@@ -386,6 +386,14 @@ static sai_status_t sai_npu_lag_max_members_get(uint32_t *max_members)
     *max_members = SAI_VM_SWITCH_MAX_LAG_MEMBERS;
     return SAI_STATUS_SUCCESS;
 }
+
+static sai_status_t sai_npu_switch_vxlan_split_horizon_range_get(uint32_t *min_range,
+                                                                 uint32_t *max_range){
+    *min_range = SAI_VM_SWITCH_MIN_SPLIT_HORIZON_ID;
+    *max_range = SAI_VM_SWITCH_MAX_SPLIT_HORIZON_ID;
+    return SAI_STATUS_SUCCESS;
+}
+
 static sai_npu_switch_api_t sai_vm_switch_api_table = {
     sai_npu_switch_init,
     sai_npu_switch_init_config,
@@ -406,6 +414,7 @@ static sai_npu_switch_api_t sai_vm_switch_api_table = {
     sai_npu_lag_max_members_get,
     sai_npu_lag_max_number_get,
     sai_npu_switch_hash_field_set,
+    sai_npu_switch_vxlan_split_horizon_range_get
 };
 
 sai_status_t sai_npu_switching_mode_get (sai_switch_switching_mode_t *mode)
