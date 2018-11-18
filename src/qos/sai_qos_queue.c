@@ -1224,12 +1224,21 @@ static sai_status_t sai_qos_queue_stats_clear (sai_object_id_t queue_id,
     return sai_rc;
 }
 
+static sai_status_t sai_qos_queue_stats_extn_get (sai_object_id_t queue_id,
+                                                  uint32_t number_of_counters,
+                                                  const sai_queue_stat_t *counter_ids,
+                                                  sai_stats_mode_t mode, uint64_t* counters)
+{
+    return SAI_STATUS_SUCCESS;
+}
+
 static sai_queue_api_t sai_qos_queue_method_table = {
     sai_qos_queue_create,
     sai_qos_queue_remove,
     sai_qos_queue_attribute_set,
     sai_qos_queue_attribute_get,
     sai_qos_queue_stats_get,
+    sai_qos_queue_stats_extn_get,
     sai_qos_queue_stats_clear
 };
 

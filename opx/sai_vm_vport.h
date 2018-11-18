@@ -65,6 +65,11 @@ sai_status_t sai_vport_get_npu_port(int if_index, sai_npu_port_id_t *port);
 bool sai_vport_set_admin_state(sai_npu_port_id_t port_id, bool enable);
 
 /***************************************************************************
+ *  Set the MTU size for a virtual port, given the associated HW NPU Port Id
+ ****************************************************************************/
+bool sai_vport_set_mtu_size(sai_npu_port_id_t port_id, unsigned int mtu_sz);
+
+/***************************************************************************
  *  Get operational state of a virtual port, given the associated HW NPU Port Id
  ****************************************************************************/
 sai_port_oper_status_t sai_vport_get_oper_status(sai_npu_port_id_t port_id);

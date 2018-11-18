@@ -1,3 +1,9 @@
+opx-sai-vm (17.1.0+opx9) unstable; urgency=medium
+
+  * Feature: Buffer statisics support
+
+ -- Dell EMC <ops-dev@lists.openswitch.net>  Sun, 18 Nov 2018  11:00:00 -0800
+
 opx-sai-vm (17.1.0+opx8) unstable; urgency=medium
 
   * Feature: Handle new VXLAN SAI attributes

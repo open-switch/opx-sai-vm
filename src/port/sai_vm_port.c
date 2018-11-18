@@ -117,11 +117,22 @@ sai_status_t sai_port_attr_oper_status_set(const sai_npu_port_id_t npu_port_id,
     return sai_status;
 }
 
-sai_status_t sai_port_attr_admin_state_set(sai_object_id_t sai_port_id,
+static sai_status_t sai_port_attr_admin_state_set(sai_object_id_t sai_port_id,
                                            const sai_port_info_t *sai_port_info,
                                            const const sai_attribute_t *attr)
 {
     if (!sai_vport_set_admin_state(sai_port_info->phy_port_id, attr->value.booldata)) {
+        return SAI_STATUS_FAILURE;
+    }
+
+    return SAI_STATUS_SUCCESS;
+}
+
+static sai_status_t sai_port_attr_mtu_size_set(sai_object_id_t sai_port_id,
+                                           const sai_port_info_t *sai_port_info,
+                                           const const sai_attribute_t *attr)
+{
+    if (!sai_vport_set_mtu_size(sai_port_info->phy_port_id, attr->value.u32)) {
         return SAI_STATUS_FAILURE;
     }
 
@@ -171,9 +182,15 @@ static sai_status_t sai_npu_port_set_attribute (sai_object_id_t port_id,
                                                 const sai_attribute_t *attr)
 {
     /*NULL check is not required for sai_port_info as cpu port will not have port info structure*/
-    if(attr == NULL ) {
-        SAI_PORT_LOG_TRACE("VM Npu set attribute 0x%"PRIx64" attr is %p sai_port_info is %p",
-                           port_id, attr,sai_port_info);
+    if(NULL == attr) {
+        SAI_PORT_LOG_TRACE("VM Npu set attribute 0x%"PRIx64" attr is NULL sai_port_info is %p",
+                           port_id, sai_port_info);
+        return SAI_STATUS_INVALID_PARAMETER;
+    }
+
+    if(NULL == sai_port_info) {
+        SAI_PORT_LOG_TRACE("VM Npu set attribute 0x%"PRIx64" attr id=%u sai_port_info is NULL",
+                           port_id, (unsigned int)attr->id);
         return SAI_STATUS_INVALID_PARAMETER;
     }
 
@@ -184,6 +201,9 @@ static sai_status_t sai_npu_port_set_attribute (sai_object_id_t port_id,
 
         case SAI_PORT_ATTR_ADMIN_STATE:
             return sai_port_attr_admin_state_set(port_id, sai_port_info, attr);
+
+        case SAI_PORT_ATTR_MTU:
+            return sai_port_attr_mtu_size_set(port_id, sai_port_info, attr);
 
         default:
             return SAI_STATUS_SUCCESS;

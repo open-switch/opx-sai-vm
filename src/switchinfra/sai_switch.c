@@ -772,6 +772,15 @@ static sai_status_t sai_switch_get_qos_attribute(sai_attribute_t *attr)
             attr->value.u32 = sai_switch_num_cpu_queues_get();
             break;
 
+        case SAI_SWITCH_ATTR_EXTENSIONS_BST_TRACKING_MODE:
+            attr->value.s32 = SAI_SWITCH_BST_TRACKING_MODE_CURRENT;
+            break;
+
+        case SAI_SWITCH_ATTR_EXTENSIONS_BST_TRACKING_ENABLE:
+            attr->value.booldata = false;
+            ret_val = SAI_STATUS_SUCCESS;
+            break;
+
         default:
             SAI_SWITCH_LOG_TRACE("Invalid qos switch attribute %d", attr->id);
             ret_val = SAI_STATUS_INVALID_ATTRIBUTE_0;
@@ -1299,6 +1308,11 @@ sai_status_t sai_switch_set_attribute(sai_object_id_t switch_id,const sai_attrib
             sai_rc = sai_shell_set(attr->value.booldata);
             break;
 
+        case SAI_SWITCH_ATTR_EXTENSIONS_BST_TRACKING_MODE:
+        case SAI_SWITCH_ATTR_EXTENSIONS_BST_TRACKING_ENABLE:
+            sai_rc = SAI_STATUS_SUCCESS;
+            break;
+
         default:
             SAI_SWITCH_LOG_TRACE("Invalid Attribute Id %d in list", attr->id);
             return SAI_STATUS_INVALID_ATTRIBUTE_0;
@@ -1396,6 +1410,8 @@ sai_status_t sai_switch_get_attribute(sai_object_id_t switch_id,
             case SAI_SWITCH_ATTR_NUMBER_OF_MULTICAST_QUEUES:
             case SAI_SWITCH_ATTR_NUMBER_OF_QUEUES:
             case SAI_SWITCH_ATTR_NUMBER_OF_CPU_QUEUES:
+            case SAI_SWITCH_ATTR_EXTENSIONS_BST_TRACKING_MODE:
+            case SAI_SWITCH_ATTR_EXTENSIONS_BST_TRACKING_ENABLE:
                 sai_rc = sai_switch_get_qos_attribute(p_attr);
                 break;
 

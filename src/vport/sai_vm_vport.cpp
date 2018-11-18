@@ -113,6 +113,7 @@ public:
     sai_status_t static set_mac_address (const sai_mac_t *mac_address);
 
     bool set_admin_state(bool enable);
+    bool set_mtu_size(unsigned int mtu_sz);
     sai_port_oper_status_t get_oper_status();
     bool update_mac_address(const sai_mac_t *mac_address);
 
@@ -410,7 +411,7 @@ bool sai_vport::set_admin_state(bool enable)
             safestrncpy(ifr.ifr_ifrn.ifrn_name,vnic_name.c_str(),sizeof(ifr.ifr_ifrn.ifrn_name));
 
             if (ioctl(sock, SIOCGIFFLAGS, &ifr) != 0) {
-                EV_LOGGING(SAI_SWITCH,ERR,"SAI-VM-VFPP","ifname=%s ioctl GET errno=%s(%d)",
+                EV_LOGGING(SAI_SWITCH,ERR,"SAI-VM-VFPP","ifname=%s ioctl GET IFFFLAGS errno=%s(%d)",
                         if_name.c_str(), strerror(errno), errno);
                 break;
             }
@@ -420,13 +421,38 @@ bool sai_vport::set_admin_state(bool enable)
                 ifr.ifr_flags &= ~IFF_UP;
             }
             if (ioctl(sock, SIOCSIFFLAGS, &ifr) != 0) {
-                EV_LOGGING(SAI_SWITCH,ERR,"SAI-VM-VFPP","ifname=%s ioctl SET errno=%s(%d)",
+                EV_LOGGING(SAI_SWITCH,ERR,"SAI-VM-VFPP","ifname=%s ioctl SET IFFFLAGS errno=%s(%d)",
                         if_name.c_str(), strerror(errno), errno);
                 break;
             }
             res = true;
         }
         while (0);
+    }
+
+    finish_ctl_oper(sock, crt_ns_handle);
+    return res;
+}
+
+bool sai_vport::set_mtu_size(unsigned int mtu_sz)
+{
+    bool res = false;
+    int sock = STD_INVALID_FD;
+    int crt_ns_handle = STD_INVALID_FD;
+    t_std_error rc = start_ctl_oper(&sock, &crt_ns_handle);
+    if (STD_ERR_OK == rc) {
+
+        struct ifreq  ifr;
+        safestrncpy(ifr.ifr_ifrn.ifrn_name,vnic_name.c_str(),sizeof(ifr.ifr_ifrn.ifrn_name));
+
+        ifr.ifr_mtu = mtu_sz;
+        if (ioctl(sock, SIOCSIFMTU, &ifr) != 0) {
+            EV_LOGGING(SAI_SWITCH,ERR,"SAI-VM-VFPP","ifname=%s ioctl SET MTU errno=%s(%d)",
+                       if_name.c_str(), strerror(errno), errno);
+        }
+        else {
+            res = true;
+        }
     }
 
     finish_ctl_oper(sock, crt_ns_handle);
@@ -566,6 +592,17 @@ extern "C" bool sai_vport_set_admin_state(sai_npu_port_id_t port_id, bool enable
         return true;
     }
     return vfpp->set_admin_state(enable);
+}
+
+extern "C" bool sai_vport_set_mtu_size(sai_npu_port_id_t port_id, unsigned int mtu_sz)
+{
+    sai_vport *vfpp = sai_vport::find_interface_by_hwport((unsigned int)port_id);
+    if (NULL == vfpp) {
+        // This is not an error - we do not have such an interface in the VM
+        EV_LOGGING(SAI_SWITCH,INFO,"SAI-VM-VFPP","Set MTU Size - No such HW port = %u SZ=%u", (unsigned int)port_id, mtu_sz);
+        return true;
+    }
+    return vfpp->set_mtu_size(mtu_sz);
 }
 
 extern "C" sai_status_t sai_vport_set_switch_mac_address (const sai_mac_t *mac_address)

@@ -283,6 +283,13 @@ sai_status_t sai_qos_pg_stats_get (sai_object_id_t pg_id, uint32_t number_of_cou
     return sai_rc;
 }
 
+sai_status_t sai_qos_pg_stats_extn_get (sai_object_id_t pg_id, uint32_t number_of_counters,
+                                        const sai_ingress_priority_group_stat_t *counter_ids,
+                                        sai_stats_mode_t mode, uint64_t* counters)
+{
+    return SAI_STATUS_SUCCESS;
+}
+
 sai_status_t sai_qos_pg_stats_clear (sai_object_id_t pg_id, uint32_t number_of_counters,
                                      const sai_ingress_priority_group_stat_t *counter_ids)
 {

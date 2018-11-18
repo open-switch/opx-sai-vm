@@ -1121,6 +1121,13 @@ sai_status_t sai_qos_buffer_pool_stats_get (sai_object_id_t pool_id, uint32_t nu
                                                            number_of_counters, counters);
 }
 
+static sai_status_t sai_qos_buffer_pool_stats_extn_get (sai_object_id_t pool_id, uint32_t number_of_counters,
+                                                        const sai_buffer_pool_stat_t *counter_ids,
+                                                        sai_stats_mode_t mode, uint64_t* counters)
+{
+    return SAI_STATUS_SUCCESS;
+}
+
 sai_status_t sai_qos_buffer_pool_stats_clear (sai_object_id_t pool_id,
                                               _In_ uint32_t number_of_counters,
                                               _In_ const sai_buffer_pool_stat_t *counter_ids)
@@ -1135,12 +1142,14 @@ static sai_buffer_api_t sai_qos_buffer_method_table = {
     sai_qos_buffer_pool_attr_set,
     sai_qos_buffer_pool_attr_get,
     sai_qos_buffer_pool_stats_get,
+    sai_qos_buffer_pool_stats_extn_get,
     sai_qos_buffer_pool_stats_clear,
     NULL,
     NULL,
     sai_qos_pg_attr_set,
     sai_qos_pg_attr_get,
     sai_qos_pg_stats_get,
+    sai_qos_pg_stats_extn_get,
     sai_qos_pg_stats_clear,
     sai_qos_create_buffer_profile,
     sai_qos_remove_buffer_profile,
