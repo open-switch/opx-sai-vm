@@ -1,13 +1,19 @@
-/************************************************************************
- * LEGALESE:   "Copyright (c) 2017, Dell Inc. All rights reserved."
+/*
+ * Copyright (c) 2018 Dell Inc.
  *
- * This source code is confidential, proprietary, and contains trade
- * secrets that are the sole property of Dell Inc.
- * Copy and/or distribution of this source code or disassembly or reverse
- * engineering of the resultant object code are strictly forbidden without
- * the written consent of Dell Inc.
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License. You may obtain
+ * a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
  *
- ************************************************************************/
+ * THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT
+ * LIMITATION ANY IMPLIED WARRANTIES OR CONDITIONS OF TITLE, FITNESS
+ * FOR A PARTICULAR PURPOSE, MERCHANTABLITY OR NON-INFRINGEMENT.
+ *
+ * See the Apache Version 2.0 License for specific language governing
+ * permissions and limitations under the License.
+ */
+
 /*
  * @file sai_vm_cfg.c
  *
@@ -51,8 +57,8 @@ static std_dll_head head;
 
 /***************************************************************************
  * Function:    sai_vm_cfg_find_interface()
- * 
- * Description: Scans the interface linked list searching for the match.  
+ *
+ * Description: Scans the interface linked list searching for the match.
  *              Returns the port number, or (-1) if not found.
  **************************************************************************/
 sai_status_t sai_vm_cfg_find_interface(const char *name, sai_npu_port_id_t *port)
@@ -61,7 +67,7 @@ sai_status_t sai_vm_cfg_find_interface(const char *name, sai_npu_port_id_t *port
     std_dll      *walk = NULL;
 
     for(walk = std_dll_getfirst(&head);
-            walk != NULL; 
+            walk != NULL;
             walk = std_dll_getnext(&head, walk)) {
         interface_map_entry_t *entry = (interface_map_entry_t*)walk;
 
@@ -77,7 +83,7 @@ sai_status_t sai_vm_cfg_find_interface(const char *name, sai_npu_port_id_t *port
 
 /***************************************************************************
  * Function:    sai_vm_cfg_add_interface_entry()
- * 
+ *
  * Description: Adds an interface : port pair to the mapping.
  *
  **************************************************************************/
@@ -97,7 +103,7 @@ static void sai_vm_cfg_add_interface_entry(const char *name, int port)
 
 /***************************************************************************
  * Function:    sai_vm_cfg_load_interface_cfg()
- * 
+ *
  * Description: Loads XML configuration information for port mapping.
  *
  **************************************************************************/
@@ -124,7 +130,7 @@ void sai_vm_cfg_load_interface_cfg(void) {
      * the FIRST hwport entry.  At this time, we are not interested in
      * the additional (breakout) ports available to that interface name
      */
-    for (panel_node = std_config_get_child(root_node); panel_node != 0; 
+    for (panel_node = std_config_get_child(root_node); panel_node != 0;
             panel_node = std_config_next_node(panel_node)) {
 
         std_config_node_t entry_node = NULL;
