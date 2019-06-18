@@ -48,9 +48,19 @@ static inline uint_t sai_vm_lag_rif_id_end_get (void)
     return ((sai_vm_lag_rif_id_start_get ()) + SAI_VM_MAX_LAGS - 1);
 }
 
-static inline uint_t sai_vm_port_rif_id_start_get (void)
+static inline uint_t sai_vm_bridge_rif_id_start_get (void)
 {
     return ((sai_vm_lag_rif_id_end_get ()) + 1);
+}
+
+static inline uint_t sai_vm_bridge_rif_id_end_get (void)
+{
+    return ((sai_vm_bridge_rif_id_start_get ()) + SAI_VM_MAX_BRIDGE_RIFS - 1);
+}
+
+static inline uint_t sai_vm_port_rif_id_start_get (void)
+{
+    return ((sai_vm_bridge_rif_id_end_get ()) + 1);
 }
 
 static inline sai_npu_object_id_t sai_vm_vlan_rif_id_get (sai_vlan_id_t vlan_id)

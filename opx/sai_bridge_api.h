@@ -612,6 +612,14 @@ bool sai_is_bridge_port_type_port(sai_object_id_t bridge_port_id);
 bool sai_is_bridge_port_type_sub_port(sai_object_id_t bridge_port_id);
 
 /**
+ * @brief Check if attachment is of type tunnel
+ *
+ * @param[in] bridge_port_id Bridge port SAI Object identifier
+ * @return true if attachment is of type tunnel, false otherwise
+ */
+bool sai_is_bridge_port_type_tunnel(sai_object_id_t bridge_port_id);
+
+/**
  * @brief Create a mapping from port,vlan to bridge port id
  *
  * @param[in] port_id SAI Port Object identifier

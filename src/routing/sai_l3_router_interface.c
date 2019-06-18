@@ -43,7 +43,8 @@ static inline bool sai_fib_is_rif_type_valid (uint_t type)
 {
     return ((type == SAI_ROUTER_INTERFACE_TYPE_PORT) ||
             (type == SAI_ROUTER_INTERFACE_TYPE_VLAN) ||
-            (type == SAI_ROUTER_INTERFACE_TYPE_LOOPBACK));
+            (type == SAI_ROUTER_INTERFACE_TYPE_LOOPBACK) ||
+            (type == SAI_ROUTER_INTERFACE_TYPE_BRIDGE));
 }
 
 static inline bool sai_fib_rif_is_admin_state_valid (bool state)
@@ -57,12 +58,13 @@ static inline bool sai_fib_rif_is_port_valid (sai_object_id_t port_id)
             (port_id != sai_switch_cpu_port_obj_id_get ()));
 }
 
-static inline bool sai_fib_rif_is_attr_mandatory_for_create (uint_t attr_id)
+static inline bool sai_fib_rif_is_attr_create_only(uint_t attr_id)
 {
     if ((SAI_ROUTER_INTERFACE_ATTR_VIRTUAL_ROUTER_ID == attr_id) ||
         (SAI_ROUTER_INTERFACE_ATTR_TYPE == attr_id) ||
         (SAI_ROUTER_INTERFACE_ATTR_PORT_ID == attr_id) ||
-        (SAI_ROUTER_INTERFACE_ATTR_VLAN_ID == attr_id)) {
+        (SAI_ROUTER_INTERFACE_ATTR_VLAN_ID == attr_id) ||
+        (SAI_ROUTER_INTERFACE_ATTR_IS_VIRTUAL == attr_id)) {
         return true;
     } else {
         return false;
@@ -327,6 +329,9 @@ static sai_status_t sai_fib_rif_create_attr_validate (sai_attr_id_t id,
                                                       bool *is_vrf_set)
 {
     sai_status_t sai_rc = SAI_STATUS_SUCCESS;
+    bool is_rif_type_logical = (type == SAI_ROUTER_INTERFACE_TYPE_LOOPBACK) ||
+        (type == SAI_ROUTER_INTERFACE_TYPE_BRIDGE) ? true : false;
+    bool is_rif_physical_attr_set = (*is_port_set || *is_vlan_set) ? true : false;
 
     SAI_RIF_LOG_TRACE ("Validating Attribute id: %d, type: %d, is_port_set: %d,"
                        " is_vlan_set: %d, is_vrf_set: %d", id, type,
@@ -340,13 +345,15 @@ static sai_status_t sai_fib_rif_create_attr_validate (sai_attr_id_t id,
 
         case SAI_ROUTER_INTERFACE_ATTR_TYPE:
             if (((*is_port_set) && (type == SAI_ROUTER_INTERFACE_TYPE_VLAN)) ||
-                ((*is_vlan_set) && (type == SAI_ROUTER_INTERFACE_TYPE_PORT)) ||
-                (((*is_port_set || *is_vlan_set) &&
-                  (type == SAI_ROUTER_INTERFACE_TYPE_LOOPBACK)))) {
+                ((*is_vlan_set) && (type == SAI_ROUTER_INTERFACE_TYPE_PORT))) {
                 /*
                  * Attribute index based return code will be recalculated by
                  * the caller of this function.
                  */
+                sai_rc = SAI_STATUS_INVALID_ATTRIBUTE_0;
+            } else if(is_rif_type_logical && is_rif_physical_attr_set) {
+                /* For logical rif types, physical rif attributes should not be
+                 * set. */
                 sai_rc = SAI_STATUS_INVALID_ATTRIBUTE_0;
             }
 
@@ -354,7 +361,8 @@ static sai_status_t sai_fib_rif_create_attr_validate (sai_attr_id_t id,
 
         case SAI_ROUTER_INTERFACE_ATTR_PORT_ID:
             if ((*is_vlan_set) || (type == SAI_ROUTER_INTERFACE_TYPE_VLAN) ||
-                (type == SAI_ROUTER_INTERFACE_TYPE_LOOPBACK)) {
+                (type == SAI_ROUTER_INTERFACE_TYPE_LOOPBACK) ||
+                (type == SAI_ROUTER_INTERFACE_TYPE_BRIDGE)) {
                 sai_rc = SAI_STATUS_INVALID_ATTRIBUTE_0;
             } else {
                 *is_port_set = true;
@@ -364,12 +372,15 @@ static sai_status_t sai_fib_rif_create_attr_validate (sai_attr_id_t id,
 
         case SAI_ROUTER_INTERFACE_ATTR_VLAN_ID:
             if ((*is_port_set) || (type == SAI_ROUTER_INTERFACE_TYPE_PORT) ||
-                (type == SAI_ROUTER_INTERFACE_TYPE_LOOPBACK)) {
+                (type == SAI_ROUTER_INTERFACE_TYPE_LOOPBACK) ||
+                (type == SAI_ROUTER_INTERFACE_TYPE_BRIDGE)) {
                 sai_rc = SAI_STATUS_INVALID_ATTRIBUTE_0;
             } else {
                 *is_vlan_set = true;
             }
+            break;
 
+        case SAI_ROUTER_INTERFACE_ATTR_IS_VIRTUAL:
             break;
 
         default:
@@ -411,6 +422,10 @@ sai_fib_router_interface_t *p_rif_node, const sai_attribute_t *p_attr)
         case SAI_ROUTER_INTERFACE_ATTR_VLAN_ID:
             sai_rc = sai_fib_rif_vlan_id_set (p_rif_node, p_attr->value.oid);
 
+            break;
+
+        case SAI_ROUTER_INTERFACE_ATTR_IS_VIRTUAL:
+            p_rif_node->is_virtual = p_attr->value.booldata;
             break;
 
         default:
@@ -564,7 +579,8 @@ static bool sai_fib_rif_is_duplicate (sai_fib_router_interface_t *p_rif_node)
 
     STD_ASSERT(p_rif_node != NULL);
 
-    if(p_rif_node->type == SAI_ROUTER_INTERFACE_TYPE_LOOPBACK) {
+    if((p_rif_node->type == SAI_ROUTER_INTERFACE_TYPE_LOOPBACK)||
+       (p_rif_node->type == SAI_ROUTER_INTERFACE_TYPE_BRIDGE)) {
         return false;
     }
 
@@ -625,7 +641,7 @@ const sai_attribute_t *attr_list)
         SAI_RIF_LOG_TRACE ("Parsing attr_list [%d], Attribute id: %d.",
                            list_idx, p_attr->id);
 
-        if (sai_fib_rif_is_attr_mandatory_for_create (p_attr->id)) {
+        if (sai_fib_rif_is_attr_create_only(p_attr->id)) {
             SAI_RIF_LOG_TRACE ("Mandatory attribute for Router Interface "
                                "create.");
 
@@ -638,7 +654,7 @@ const sai_attribute_t *attr_list)
                                                   &is_vrf_set);
 
             if (sai_rc != SAI_STATUS_SUCCESS) {
-                SAI_RIF_LOG_ERR ("Router Interface Type/Port/Vlan/Loopback attribute "
+                SAI_RIF_LOG_ERR ("Router Interface Type/Port/Vlan/Loopback/1D attribute "
                                  "validation failed.");
             } else {
                 sai_rc = sai_fib_rif_create_attr_set (p_rif_node, p_attr);
@@ -667,7 +683,12 @@ const sai_attribute_t *attr_list)
         }
     }
 
-    if (((!is_port_set) && (!is_vlan_set) && (type != SAI_ROUTER_INTERFACE_TYPE_LOOPBACK)) ||
+    if(type == SAI_ROUTER_INTERFACE_TYPE_BRIDGE) {
+        if(!is_vrf_set) {
+            SAI_RIF_LOG_ERR ("VRF id not provided when creating 1D bridge RIF");
+            return SAI_STATUS_MANDATORY_ATTRIBUTE_MISSING;
+        }
+    } else if (((!is_port_set) && (!is_vlan_set) && (type != SAI_ROUTER_INTERFACE_TYPE_LOOPBACK)) ||
         (!is_vrf_set) || (type == SAI_FIB_RIF_TYPE_NONE)) {
         SAI_RIF_LOG_ERR ("One or more Mandatory attributes are missing, "
                          "is_port_set: %d, is_vlan_set: %d, is_vrf_set: %d, "
@@ -820,7 +841,8 @@ static sai_status_t sai_fib_rif_routing_config_update (sai_fib_router_interface_
     sai_object_id_t     sai_oid = 0;
 
     if ((p_rif->type == SAI_ROUTER_INTERFACE_TYPE_VLAN) ||
-        (p_rif->type == SAI_ROUTER_INTERFACE_TYPE_LOOPBACK)){
+        (p_rif->type == SAI_ROUTER_INTERFACE_TYPE_LOOPBACK)||
+        (p_rif->type == SAI_ROUTER_INTERFACE_TYPE_BRIDGE)){
         return status;
     }
 
@@ -1131,7 +1153,7 @@ sai_object_id_t rif_id, const sai_attribute_t *p_attr)
             break;
         }
 
-        if (sai_fib_rif_is_attr_mandatory_for_create (p_attr->id)) {
+        if (sai_fib_rif_is_attr_create_only (p_attr->id)) {
             SAI_RIF_LOG_ERR ("create-only attribute passed in Router Interface"
                              " set.");
 

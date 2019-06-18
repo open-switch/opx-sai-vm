@@ -779,6 +779,17 @@ typedef sai_status_t (*sai_npu_pg_create_fn) (dn_sai_qos_pg_t *p_pg_node, uint_t
  */
 typedef sai_status_t (*sai_npu_pg_destroy_fn) (dn_sai_qos_pg_t *p_pg_node);
 
+ /**
+ *  @brief Get ingress priority group attributes
+ *
+ * @param[in] p_pg_node Priority group node
+ *
+ * @return SAI_STATUS_SUCCESS if operation is successful otherwise a different
+ *  error code is returned.
+ */
+typedef sai_status_t (*sai_npu_pg_attr_get_fn) (dn_sai_qos_pg_t *p_pg_node,
+                                                uint32_t attr_count,
+                                                sai_attribute_t *attr_list);
 /**
  *  @brief Get Ingress priority group stats
  *
@@ -934,6 +945,7 @@ typedef struct _sai_npu_buffer_api_t {
     sai_npu_apply_buffer_profile_fn          buffer_profile_apply;
     sai_npu_pg_create_fn                     pg_create;
     sai_npu_pg_destroy_fn                    pg_destroy;
+    sai_npu_pg_attr_get_fn                   pg_attr_get;
     sai_npu_pg_stats_get_fn                  pg_stats_get;
     sai_npu_pg_stats_clear_fn                pg_stats_clear;
     sai_npu_buffer_pool_attr_table_get_fn    buffer_pool_attr_table_get;

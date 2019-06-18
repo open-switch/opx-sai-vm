@@ -131,6 +131,7 @@ typedef struct _sai_fib_router_interface_t {
     union {
         sai_object_id_t  port_id;
         sai_object_id_t  vlan_id;
+        sai_object_id_t  bridge_id;
     } attachment;
 
     /** RIF attributes */
@@ -139,6 +140,7 @@ typedef struct _sai_fib_router_interface_t {
     bool                         v4_admin_state;
     bool                         v6_admin_state;
     uint_t                       mtu;
+    bool                         is_virtual;
 
     /** Action for Packets with IP options */
     sai_packet_action_t          ip_options_pkt_action;

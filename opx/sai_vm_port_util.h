@@ -31,6 +31,7 @@
 
 #include "saitypes.h"
 
+#define SAI_VM_MAX_LANE_PER_PORT 4
 /**
  * @brief SAI vm port initialization information.
  */
@@ -41,6 +42,9 @@ typedef struct _sai_vm_port_init_info_t {
 
     /** Port default state valid or invalid  */
     bool                         port_valid;
+
+    /** Port instance id */
+    uint_t                       port_inst_id;
 
     /** Logical/Local port id to index NPU API's */
     sai_npu_port_id_t            local_port_id;
@@ -72,6 +76,8 @@ typedef struct _sai_vm_port_init_info_t {
     uint64_t                     port_lane_bmap;
 
     bool                         eee_support;
+
+    uint_t                       default_breakout_mode;
 } sai_vm_port_init_info_t;
 
 /**
@@ -95,6 +101,10 @@ typedef struct _speed_desc_t {
  */
 const speed_desc_t* get_speed_map(size_t *sz);
 
+/**
+ * For a given logical switch port, get the max lane count of its controlling port
+ */
+sai_status_t sai_vm_control_port_max_lanes_get(sai_object_id_t sai_port_id, uint_t *max_lanes);
 /**
  * VM vendor specific switch init config handler
  */

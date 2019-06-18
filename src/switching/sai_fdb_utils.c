@@ -272,7 +272,10 @@ sai_status_t sai_insert_fdb_entry_node(const sai_fdb_entry_t* fdb_entry,
     fdb_entry_node->action = fdb_entry_node_data->action;
     fdb_entry_node->metadata = fdb_entry_node_data->metadata;
     fdb_entry_node->is_pending_entry = fdb_entry_node_data->is_pending_entry;
-    sai_bridge_port_increment_fdb_count(fdb_entry_node->bridge_port_id);
+    fdb_entry_node->end_point_ip = fdb_entry_node_data->end_point_ip;
+    if(fdb_entry_node->bridge_port_id != SAI_NULL_OBJECT_ID) {
+        sai_bridge_port_increment_fdb_count(fdb_entry_node->bridge_port_id);
+    }
     return SAI_STATUS_SUCCESS;
 }
 

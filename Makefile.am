@@ -38,7 +38,7 @@ src/port/sai_vm_port.c         src/routing/sai_vm_rif.c             src/switchin
 src/qos/sai_vm_buffer.c        src/routing/sai_vm_route.c           src/switching/sai_vm_stp.c \
 src/qos/sai_vm_policer.c       src/routing/sai_vm_vrf.c             src/switching/sai_vm_vlan.c \
 src/qos/sai_vm_qos.c           src/sai-db/sai_acl_db_api.cpp        src/switch/sai_vm_switch.c \
-src/qos/sai_vm_qos_maps.c      src/sai-db/sai_acl_db_utils.cpp      src/switch/sai_vm_cfg.c \
+src/qos/sai_vm_qos_maps.c      src/sai-db/sai_acl_db_utils.cpp \
 src/udf/sai_vm_udf.c           src/qos/sai_vm_queue.c               src/sai-db/sai_db_gen_utils.cpp \
 src/qos/sai_vm_sched_group.c   src/sai-db/sai_db_init.cpp \
 src/sai_vm_npu_api_query.c  src/sai_vm_npu_init_config.c  src/sai_vm_shell.c src/tunnel/sai_vm_tunnel.c \
@@ -99,6 +99,12 @@ src/switching/sai_vm_mcast.c \
 	src/routing/sai_l3_debug.c \
 	src/routing/sai_l3_encap_next_hop.c \
 	src/routing/sai_l3_init.c \
+	src/routing/sai_l3_ipmc.c \
+	src/routing/sai_l3_ipmc_group.c \
+	src/routing/sai_l3_ipmc_repl_group.c \
+	src/routing/sai_l3_ipmc_rpf_group.c \
+	src/routing/sai_vm_l3_ipmc.c \
+	src/routing/sai_vm_l3_mcast.c \
 	src/routing/sai_l3_mem.c \
 	src/routing/sai_l3_neighbor.c \
 	src/routing/sai_l3_next_hop.c \

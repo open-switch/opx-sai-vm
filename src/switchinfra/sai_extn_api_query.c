@@ -34,6 +34,7 @@ static struct sai_extn_api_table_t {
 } sai_extn_api_table[] = {
 {SAI_API_FC_SWITCH, "sai_fc_switch_api_query", "libsai-fc.so", NULL},
 {SAI_API_FC_PORT, "sai_fc_port_api_query", "libsai-fc.so", NULL},
+{SAI_API_EXTENSIONS_IPMC_REPL_GROUP, "sai_ipmc_repl_group_api_query", NULL, NULL},/* Part of the regular dn-sai package library so no other dynamic module to look for */
 };
 
 #define SAI_EXTN_LIB_NAME_STR_LEN_MAX 24
@@ -134,6 +135,7 @@ sai_status_t sai_extn_module_load_api_table (sai_api_t sai_api_id, void** api_me
 sai_status_t sai_extn_module_api_query (sai_api_t sai_api_id, void** api_method_table)
 {
     sai_status_t  status = SAI_STATUS_FAILURE;
+    sai_api_extensions_t sai_api_extn_id = sai_api_id;
 
     switch (sai_api_id)
     {
@@ -143,9 +145,30 @@ sai_status_t sai_extn_module_api_query (sai_api_t sai_api_id, void** api_method_
             break;
 
         default:
-            SAI_SWITCH_LOG_ERR("Method table for api-id %d",sai_api_id);
             status = SAI_STATUS_NOT_SUPPORTED;
             break;
+    }
+
+    if (status == SAI_STATUS_SUCCESS) {
+        return status;
+    }
+
+    /* Lookup in extension API */
+    switch (sai_api_extn_id)
+    {
+        case SAI_API_EXTENSIONS_IPMC_REPL_GROUP:
+            status = SAI_STATUS_SUCCESS;
+            *api_method_table = sai_ipmc_repl_group_api_query();
+            break;
+
+        default:
+            status = SAI_STATUS_NOT_SUPPORTED;
+            break;
+    }
+
+    if (status != SAI_STATUS_SUCCESS) {
+        SAI_SWITCH_LOG_ERR("Lookup for method table failed, for api-id %d (%d)",
+                           sai_api_id, status);
     }
 
     return status;

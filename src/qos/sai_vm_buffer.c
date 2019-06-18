@@ -393,6 +393,17 @@ static sai_status_t sai_vm_buffer_pool_stats_get (sai_object_id_t pool_id,
     return SAI_STATUS_SUCCESS;
 }
 
+static sai_status_t sai_vm_pg_attr_get (dn_sai_qos_pg_t *p_pg_node,
+                                                uint32_t attr_count,
+                                                sai_attribute_t *attr_list)
+{
+    STD_ASSERT (p_pg_node != NULL);
+    STD_ASSERT (attr_list != NULL);
+
+    return SAI_STATUS_SUCCESS;
+}
+
+
 static sai_status_t sai_vm_pg_stats_get (sai_object_id_t pg_id,
                                          const sai_ingress_priority_group_stat_t
                                          *counter_ids, uint32_t number_of_counters,
@@ -438,6 +449,7 @@ static sai_npu_buffer_api_t sai_vm_buffer_api_table = {
     sai_vm_apply_buffer_profile,
     sai_vm_pg_create,
     sai_vm_pg_destroy,
+    sai_vm_pg_attr_get,
     sai_vm_pg_stats_get,
     sai_vm_buffer_pg_stats_clear,
     sai_vm_buffer_pool_attr_table_get,

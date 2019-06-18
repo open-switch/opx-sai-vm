@@ -78,15 +78,15 @@ void sai_hostif_unlock()
     std_mutex_unlock (&sai_hostintf_lock);
 }
 
-bool dn_sai_hostif_is_valid_trap_id(
-                            sai_hostif_trap_type_t trap_id)
+bool dn_sai_hostif_is_valid_trap_type(
+                            sai_hostif_trap_type_t trap_type)
 {
     uint_t index = 0;
     static const uint_t max_trap_count = sizeof(valid_traps) /
                                          sizeof(valid_traps[0]);
 
     for (index = 0; index < max_trap_count; index++) {
-        if (trap_id == valid_traps[index].trapid) {
+        if (trap_type == valid_traps[index].trap_type) {
             return true;
         }
     }
@@ -94,14 +94,14 @@ bool dn_sai_hostif_is_valid_trap_id(
 }
 
 sai_packet_action_t dn_sai_hostif_get_default_action(
-                               sai_hostif_trap_type_t trap_id)
+                               sai_hostif_trap_type_t trap_type)
 {
     uint_t index = 0;
     static const uint_t max_trap_count = sizeof(valid_traps) /
                                          sizeof(valid_traps[0]);
 
     for (index = 0; index < max_trap_count; index++) {
-        if (trap_id == valid_traps[index].trapid) {
+        if (trap_type == valid_traps[index].trap_type) {
             return valid_traps[index].def_action;
         }
     }

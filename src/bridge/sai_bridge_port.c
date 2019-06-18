@@ -160,6 +160,7 @@ static sai_status_t sai_bridge_port_validate_and_fill_attachment(dn_sai_bridge_p
     sai_object_id_t tmp_bridge_port_id = SAI_NULL_OBJECT_ID;
     sai_object_id_t def_bridge_port_id = SAI_NULL_OBJECT_ID;
     sai_status_t    sai_rc = SAI_STATUS_FAILURE;
+    sai_fib_router_interface_t *p_rif_node = NULL;
 
     if(bridge_port_info == NULL) {
         SAI_BRIDGE_LOG_TRACE("NULL bridge port info passed in fill attachment");
@@ -224,6 +225,25 @@ static sai_status_t sai_bridge_port_validate_and_fill_attachment(dn_sai_bridge_p
             if(rif_id == SAI_NULL_OBJECT_ID) {
                 return SAI_STATUS_MANDATORY_ATTRIBUTE_MISSING;
             }
+
+            p_rif_node = sai_fib_router_interface_node_get (rif_id);
+            if(NULL == p_rif_node) {
+                SAI_BRIDGE_LOG_ERR("Router interface not found for "
+                                   "rif id 0x%"PRIx64" whle creating "
+                                   "1d router bridge port", rif_id);
+                return SAI_STATUS_INVALID_ATTR_VALUE_0;
+            }
+
+            if(sai_fib_rif_is_attached_to_bridge(p_rif_node)) {
+                /* RIF already has a bridge port attached to it, return
+                 * error*/
+                SAI_BRIDGE_LOG_ERR("1D router bridge port exists for rif "
+                                   "id 0x%"PRIx64" and bridge id 0x%"PRIx64,
+                                   rif_id, p_rif_node->attachment.bridge_id);
+
+                return SAI_STATUS_ITEM_ALREADY_EXISTS;
+            }
+
             bridge_port_info->attachment.router_port.rif_id = rif_id;
             break;
 

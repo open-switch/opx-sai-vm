@@ -131,17 +131,44 @@ typedef void (*sai_npu_hostif_reg_packet_rx_fn)(
 typedef void (*sai_npu_hostif_dump_trap)(const dn_sai_trap_node_t *trap_node);
 
 /**
+ * @brief Enable/Disable NPU level debug API
+ *
+ * @param[in] attr_id - Debug attribute to be set
+ * @param[in] value - Value to be set
+ */
+typedef void (*sai_npu_hostif_debug_set_fn)(sai_hostif_debug_attr_t attr_id, int value);
+
+
+typedef uint64_t (*sai_npu_hosif_rx_errors_get_fn)(void);
+/**
+ * @brief Get the SAI npu rx error count
+ *
+ * @return Number of errors in received RX packets
+ *
+ */
+
+typedef uint32_t (*sai_npu_hostif_get_max_user_def_traps)(void);
+/**
+ * @brief Get the maximum user defined traps per SAI npu
+ *
+ * @return Maximum number of user defined traps supported
+ */
+
+/**
  * @brief HOSTIF NPU API table.
  */
 typedef struct _sai_npu_hostif_api_t {
-    sai_npu_hostif_init                npu_hostif_init;
-    sai_npu_hostif_validate_trapgroup  npu_validate_trapgroup;
-    sai_npu_hostif_update_trapgroup    npu_update_trapgroup;
-    sai_npu_hostif_validate_trap       npu_validate_trap;
-    sai_npu_hostif_set_trap            npu_set_trap;
-    sai_npu_hostif_send_packet         npu_send_packet;
-    sai_npu_hostif_reg_packet_rx_fn    npu_register_packet_rx;
-    sai_npu_hostif_dump_trap           npu_dump_trap;
+    sai_npu_hostif_init                    npu_hostif_init;
+    sai_npu_hostif_validate_trapgroup      npu_validate_trapgroup;
+    sai_npu_hostif_update_trapgroup        npu_update_trapgroup;
+    sai_npu_hostif_validate_trap           npu_validate_trap;
+    sai_npu_hostif_set_trap                npu_set_trap;
+    sai_npu_hostif_send_packet             npu_send_packet;
+    sai_npu_hostif_reg_packet_rx_fn        npu_register_packet_rx;
+    sai_npu_hostif_dump_trap               npu_dump_trap;
+    sai_npu_hostif_debug_set_fn            npu_debug_set;
+    sai_npu_hosif_rx_errors_get_fn         rx_errors_get;
+    sai_npu_hostif_get_max_user_def_traps  npu_get_max_user_def_traps;
 }sai_npu_hostif_api_t;
 /**
  * @}

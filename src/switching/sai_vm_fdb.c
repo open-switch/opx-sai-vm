@@ -488,7 +488,7 @@ sai_status_t sai_get_bridge_port_for_fdb_entry (const sai_fdb_entry_t *fdb_entry
             sai_npu_get_fdb_entry_from_hardware (fdb_entry, &fdb_entry_node);
 
         if (ret_val != SAI_STATUS_SUCCESS) {
-            SAI_FDB_LOG_ERR ("FDB Entry not found for MAC: %s vlan/bridge: 0x%"PRIx64"",
+            SAI_FDB_LOG_TRACE ("FDB Entry not found for MAC: %s vlan/bridge: 0x%"PRIx64"",
                                 std_mac_to_string (&(fdb_entry->mac_address),
                                                    mac_str, sizeof (mac_str)),
                                 fdb_entry->bv_id);

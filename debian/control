@@ -7,8 +7,9 @@ Build-Depends:dh-autoreconf, debhelper (>= 9), dh-systemd, autotools-dev, libopx
 Standards-Version: 1.0.1
 
 Package: libopx-sai-vm1
-Provides: libopx-sai
-Replaces: opx-sai-api-dev
+Provides: libsai-0.9.6, libopx-sai
+Replaces: libsai-0.9.6
+Conflicts: libsai-0.9.6
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: OPX SAI VM - shared library

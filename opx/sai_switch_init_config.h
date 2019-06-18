@@ -268,6 +268,12 @@
 #define SAI_ATTR_BREAKOUT_LANE_4           "lane_4"
 
 /**
+ * @def SAI_ATTR_DEFAULT_BREAKOUT_MODE
+ * Attribute representing the default breakout mode
+ */
+#define SAI_ATTR_DEFAULT_BREAKOUT_MODE "default"
+
+/**
  * @def SAI_ATTR_SPEED
  * Attribute used for representing the speed in Gbps
  */

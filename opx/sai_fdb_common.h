@@ -142,6 +142,14 @@ typedef struct _sai_fdb_global_data_t {
 
 } sai_fdb_global_data_t;
 
+static inline bool sai_fdb_entry_is_forwarding_action(sai_packet_action_t action)
+{
+    return ((action == SAI_PACKET_ACTION_FORWARD) ||
+            (action == SAI_PACKET_ACTION_COPY)    ||
+            (action == SAI_PACKET_ACTION_LOG)     ||
+            (action == SAI_PACKET_ACTION_TRANSIT));
+}
+
 #define SAI_FDB_ENTRY_KEY_SIZE (sizeof(sai_fdb_entry_key_t)*8)
 
 #define SAI_MAX_FDB_ATTRIBUTES 5

@@ -31,6 +31,8 @@
 #include "sai_bridge_common.h"
 #include "sai_port_utils.h"
 #include "sai_lag_api.h"
+#include "sai_l3_common.h"
+#include "sai_l3_util.h"
 
 static dn_sai_id_gen_info_t bridge_obj_gen_info;
 static dn_sai_id_gen_info_t bridge_port_obj_gen_info;
@@ -137,6 +139,40 @@ static const dn_sai_attribute_entry_t sai_bridge_port_type_tunnel_attr[] =  {
                                , false, true , true , true , true , true },
 };
 
+static const dn_sai_attribute_entry_t sai_bridge_port_type_1d_router_attr[] =  {
+    /*            ID              MC     VC     VS    VG     IMP    SUP */
+    { SAI_BRIDGE_PORT_ATTR_TYPE
+                               , true , true , false, true , true, true },
+    { SAI_BRIDGE_PORT_ATTR_PORT_ID
+                               , false, false, false, false, false, false },
+    { SAI_BRIDGE_PORT_ATTR_TAGGING_MODE
+                               , false, false, false, false, false, false },
+    { SAI_BRIDGE_PORT_ATTR_VLAN_ID
+                               , false, false, false, false, false, false },
+    { SAI_BRIDGE_PORT_ATTR_RIF_ID
+                               , true,  true,  false, true,  true,  true },
+    { SAI_BRIDGE_PORT_ATTR_TUNNEL_ID
+                               , false, false, false, false, false, false },
+    { SAI_BRIDGE_PORT_ATTR_BRIDGE_ID
+                               , true,  true,  false, true,  true , true },
+    { SAI_BRIDGE_PORT_ATTR_FDB_LEARNING_MODE
+                               , false, false, false, false, false, false },
+    { SAI_BRIDGE_PORT_ATTR_MAX_LEARNED_ADDRESSES
+                               , false, false, false, false, false, false },
+    { SAI_BRIDGE_PORT_ATTR_FDB_LEARNING_LIMIT_VIOLATION_PACKET_ACTION
+                               , false, false, false, false, false, false },
+    { SAI_BRIDGE_PORT_ATTR_ADMIN_STATE
+                               , false, true,  true,  true,  true,   true },
+    { SAI_BRIDGE_PORT_ATTR_INGRESS_FILTERING
+                               , false, false, false, false, false, false },
+    { SAI_BRIDGE_PORT_ATTR_EGRESS_FILTERING
+                               , false, false, false, false, false, false },
+    { SAI_BRIDGE_PORT_ATTR_INGRESS_SPLIT_HORIZON_ID
+                               , false, false, false, false, false, false },
+    { SAI_BRIDGE_PORT_ATTR_EGRESS_SPLIT_HORIZON_ID
+                               , false, false, false, false, false, false },
+};
+
 /**
  * Vendor attribute array for bridge containing the attribute
  * values and properties for create,set and get functionality.
@@ -188,6 +224,11 @@ static sai_status_t sai_vm_bridge_port_attr_table_get (sai_bridge_port_type_t br
 
         *p_max_attr_count = sizeof(sai_bridge_port_type_tunnel_attr)/
             sizeof(sai_bridge_port_type_tunnel_attr[0]);
+    } else if(bridge_port_type == SAI_BRIDGE_PORT_TYPE_1D_ROUTER) {
+        *p_vendor = &sai_bridge_port_type_1d_router_attr[0];
+
+        *p_max_attr_count = sizeof(sai_bridge_port_type_1d_router_attr)/
+            sizeof(sai_bridge_port_type_1d_router_attr[0]);
     } else {
         return SAI_STATUS_NOT_SUPPORTED;
     }
@@ -302,10 +343,26 @@ static sai_status_t sai_vm_bridge_set_attribute (dn_sai_bridge_info_t *bridge_in
 static sai_status_t sai_vm_bridge_port_create(sai_object_id_t *bridge_port_id,
                                               dn_sai_bridge_port_info_t *bridge_port_info)
 {
+    sai_fib_router_interface_t *p_rif_node = NULL;
+    sai_object_id_t rif_id = SAI_NULL_OBJECT_ID;
+
     if((bridge_port_id == NULL) || (bridge_port_info == NULL)) {
         SAI_BRIDGE_LOG_TRACE("bridge port id is %p bridge port info is %p in bcm bridge port create",
                              bridge_port_id, bridge_port_info);
         return SAI_STATUS_INVALID_PARAMETER;
+    }
+
+    if(bridge_port_info->bridge_port_type == SAI_BRIDGE_PORT_TYPE_1D_ROUTER) {
+        rif_id = sai_bridge_port_info_get_rif_id(bridge_port_info);
+
+        p_rif_node = sai_fib_router_interface_node_get (rif_id);
+        if(NULL == p_rif_node) {
+            SAI_BRIDGE_LOG_ERR("Unable to find rif node for rif 0x%"PRIx64
+                               " while setting up RIF for 1D bridge port "
+                               " in the hardware", rif_id);
+            return SAI_STATUS_INVALID_ATTR_VALUE_0;
+        }
+        p_rif_node->attachment.bridge_id = bridge_port_info->bridge_id;
     }
 
     *bridge_port_id =  sai_vm_bridge_port_id_create();

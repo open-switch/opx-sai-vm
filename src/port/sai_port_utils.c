@@ -570,8 +570,6 @@ static sai_status_t sai_port_hw_lane_list_get(const sai_port_info_t *sai_port_in
     uint_t           cur_lane = 0;
     uint_t           count = 0;
     uint_t           serdes_port = 0;
-    bool             breakout_supported = false;
-    sai_port_info_t *tmp_port_info = NULL;
 
     if((sai_port_info == NULL) || (lane_list == NULL)) {
         SAI_PORT_LOG_TRACE("sai_port_info is %p lane_list is %p hw lane list get",
@@ -584,26 +582,8 @@ static sai_status_t sai_port_hw_lane_list_get(const sai_port_info_t *sai_port_in
     lane_list[count] = serdes_port;
     count++;
 
-    /* @todo lanes may not be sequential, it should be based on actual
-     * hardware lane list. Also, currently for non-breakout ports,
-     * physical id's of all lanes are not stored */
-
-    tmp_port_info = sai_port_info_get(sai_port_info->sai_port_id);
-    breakout_supported = sai_is_port_capb_supported(sai_port_info, SAI_PORT_CAP_BREAKOUT_MODE);
-
     for (cur_lane = 1; cur_lane < lane_count; cur_lane++) {
-        if(breakout_supported) {
-            tmp_port_info = sai_port_info_getnext(tmp_port_info);
-            if(tmp_port_info == NULL) {
-                SAI_PORT_LOG_ERR ("Port 0x%"PRIx64" does not have valid lane at index %d",
-                                  sai_port_info->sai_port_id, cur_lane);
-                return SAI_STATUS_INVALID_OBJECT_ID;
-            }
-            serdes_port = tmp_port_info->phy_port_id;
-            lane_list[count] = serdes_port;
-        } else {
-            lane_list[count] = ++serdes_port;
-        }
+        lane_list[count] = ++serdes_port;
         count++;
     }
     return SAI_STATUS_SUCCESS;

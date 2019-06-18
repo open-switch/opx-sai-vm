@@ -62,6 +62,8 @@ sai_npu_api_t* sai_npu_api_query (void)
     sai_vm_npu_api_table.bridge_api = sai_vm_bridge_api_query ();
     sai_vm_npu_api_table.l2mc_api = sai_vm_l2mc_api_query ();
     sai_vm_npu_api_table.mcast_api = sai_vm_mcast_api_query ();
+    sai_vm_npu_api_table.l3_ipmc_api = sai_vm_l3_ipmc_api_query ();
+    sai_vm_npu_api_table.l3_mcast_api = sai_vm_l3_mcast_api_query ();
     return &sai_vm_npu_api_table;
 }
 

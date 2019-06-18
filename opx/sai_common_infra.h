@@ -110,6 +110,14 @@ sai_l2mc_group_api_t* sai_l2mc_group_api_query(void);
 
 sai_l2mc_api_t* sai_l2mc_entry_api_query(void);
 
+sai_ipmc_group_api_t* sai_ipmc_group_api_query(void);
+
+sai_rpf_group_api_t* sai_ipmc_rpf_group_api_query(void);
+
+sai_ipmc_repl_group_api_t* sai_ipmc_repl_group_api_query(void);
+
+sai_ipmc_api_t* sai_ipmc_entry_api_query(void);
+
 sai_status_t sai_extn_module_api_query (sai_api_t sai_api_id, void** api_method_table);
 
 sai_status_t sai_npu_api_initialize (const char *lib_name);
@@ -267,4 +275,15 @@ static inline const sai_npu_mcast_api_t *sai_mcast_npu_api_get (void)
 {
     return ((sai_npu_api_table_get()->mcast_api));
 }
+
+static inline const sai_npu_l3_ipmc_api_t *sai_l3_ipmc_npu_api_get (void)
+{
+    return ((sai_npu_api_table_get()->l3_ipmc_api));
+}
+
+static inline const sai_npu_l3_mcast_api_t *sai_l3_mcast_npu_api_get (void)
+{
+    return ((sai_npu_api_table_get()->l3_mcast_api));
+}
+
 #endif

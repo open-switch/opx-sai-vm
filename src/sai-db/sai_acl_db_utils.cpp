@@ -129,6 +129,12 @@ static std::map<sai_acl_table_attr_t, std::string> acl_table_field_str_map =
     {SAI_ACL_TABLE_ATTR_FIELD_IPV6_NEXT_HEADER, "\"IPv6_NEXT_HEADER\""},
 };
 
+static std::map<sai_acl_table_attr_extensions_t, std::string> acl_table_extn_field_str_map =
+{
+    {SAI_ACL_TABLE_ATTR_EXTENSIONS_FIELD_LAYER3_INTERFACE_USER_META, "\"L3_INTERFACE_META_DATA\""},
+    {SAI_ACL_TABLE_ATTR_EXTENSIONS_FIELD_MCAST_ROUTE_NPU_META_DST_HIT, "\"MCAST_ROUTE_NPU_META_DATA\""},
+};
+
 static std::map<sai_acl_entry_attr_t, std::string> rule_filter_str_map =
 {
     {SAI_ACL_ENTRY_ATTR_FIELD_SRC_IPV6, "\"SRC_IPv6\""},
@@ -176,6 +182,14 @@ static std::map<sai_acl_entry_attr_t, std::string> rule_filter_str_map =
     {SAI_ACL_ENTRY_ATTR_FIELD_ROUTE_NPU_META_DST_HIT, "\"L3_ROUTE_NPU_META_DATA\""},
     {SAI_ACL_ENTRY_ATTR_FIELD_ACL_RANGE_TYPE, "\"RANGE_TYPE\""},
     {SAI_ACL_ENTRY_ATTR_FIELD_IPV6_NEXT_HEADER, "\"IPv6_NEXT_HEADER\""},
+    {SAI_ACL_ENTRY_ATTR_FIELD_DROP_MARKED, "\"DROP MARKED\""},
+    {SAI_ACL_ENTRY_ATTR_FIELD_BRIDGE_TYPE, "\"BRIDGE_TYPE\""},
+};
+
+static std::map<sai_acl_entry_attr_extensions_t, std::string> rule_filter_extn_str_map =
+{
+    {SAI_ACL_ENTRY_ATTR_EXTENSIONS_FIELD_LAYER3_INTERFACE_USER_META, "\"L3_INTERFACE_META_DATA\""},
+    {SAI_ACL_ENTRY_ATTR_EXTENSIONS_FIELD_MCAST_ROUTE_NPU_META_DST_HIT, "\"MCAST_ROUTE_NPU_META_DATA\""},
 };
 
 static std::map<sai_acl_entry_attr_t, std::string> rule_action_str_map =
@@ -253,6 +267,9 @@ std::string sai_acl_table_field_attr_str_get (sai_acl_table_attr_t field)
         return "\"" + std::string ("UDF") + "\"";
     } else if (acl_table_field_str_map.find (field) != acl_table_field_str_map.end()) {
         return (acl_table_field_str_map [field]);
+    } else if (acl_table_extn_field_str_map.find ((sai_acl_table_attr_extensions_t)field) !=
+               acl_table_extn_field_str_map.end()) {
+        return acl_table_extn_field_str_map [(sai_acl_table_attr_extensions_t)field];
     } else {
         return "\"" + std::string ("UNKNOWN") + "\"";
     }
@@ -264,6 +281,9 @@ std::string sai_acl_rule_filter_attr_str_get (sai_acl_entry_attr_t filter)
         return "\"" + std::string ("UDF Filter") + "\"";
     } else if (rule_filter_str_map.find (filter) != rule_filter_str_map.end()) {
         return (rule_filter_str_map [filter]);
+    } else if (rule_filter_extn_str_map.find ((sai_acl_entry_attr_extensions_t)filter) !=
+               rule_filter_extn_str_map.end()) {
+        return rule_filter_extn_str_map [(sai_acl_entry_attr_extensions_t)filter];
     } else {
         return "\"" + std::string ("UNKNOWN") + "\"";
     }

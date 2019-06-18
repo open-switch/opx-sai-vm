@@ -78,9 +78,6 @@ static sai_status_t sai_npu_neighbor_create (sai_fib_nh_t *p_next_hop)
     sai_status_t                status = SAI_STATUS_SUCCESS;
     sai_fib_router_interface_t *p_rif = NULL;
     sai_object_id_t             rif_obj_id = 0;
-    sai_object_id_t             port_obj_id = 0;
-    sai_object_id_t             bridge_port_id = 0;
-    sai_fdb_entry_t             fdb_entry;
 
     STD_ASSERT (p_next_hop != NULL);
 
@@ -95,34 +92,6 @@ static sai_status_t sai_npu_neighbor_create (sai_fib_nh_t *p_next_hop)
                               rif_obj_id);
 
         return SAI_STATUS_INVALID_OBJECT_ID;
-    }
-
-    /* check whether FDB table has entry for {Neighbor's MAC, VLAN} */
-    if (p_rif->type == SAI_ROUTER_INTERFACE_TYPE_VLAN) {
-        memset (&fdb_entry, 0, sizeof (fdb_entry));
-
-        memcpy (fdb_entry.mac_address, p_next_hop->mac_addr,
-                sizeof (sai_mac_t));
-
-        fdb_entry.bv_id = sai_vlan_obj_id_to_vlan_id(p_rif->attachment.vlan_id);
-
-        status = sai_get_bridge_port_for_fdb_entry (&fdb_entry, &bridge_port_id);
-
-
-        if (status != SAI_STATUS_SUCCESS) {
-            SAI_NEIGHBOR_LOG_ERR ("Failed to lookup port for Neighbor MAC "
-                                  "from L2 FDB, Err: %d.", status);
-
-            return status;
-        }
-        status = sai_bridge_port_get_port_id(bridge_port_id, &port_obj_id);
-        if (status != SAI_STATUS_SUCCESS) {
-            SAI_NEIGHBOR_LOG_ERR ("Failed to get port obj fro bridge port 0x%"PRIx64" "
-                                  "Err: %d.", bridge_port_id, status);
-
-            return status;
-        }
-
     }
 
     /* Insert Neighbor record to DB. */

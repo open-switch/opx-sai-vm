@@ -13,12 +13,11 @@
 # See the Apache Version 2.0 License for specific language governing
 # permissions and limitations under the License.
 #
-
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([sai-vm],[17.1.0+opx10])
+AC_INIT([sai-vm],[17.2.0])
 AM_INIT_AUTOMAKE([subdir-objects foreign])
 AC_CONFIG_SRCDIR([src])
 AC_CHECK_HEADERS([libxml/parser.h])

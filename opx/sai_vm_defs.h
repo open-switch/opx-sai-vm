@@ -44,6 +44,8 @@ extern "C" {
 #define SAI_VM_NH_GRP_TABLE_SIZE         (4096) /* 4 K */
 #define SAI_VM_ACL_TABLE_MAX_ENTRIES     (512)
 #define SAI_VM_ACL_TABLE_MAX_COUNTERS    (512)
+#define SAI_VM_MAX_BRIDGE_RIFS           (4096)
+#define SAI_VM_INVALID_RIF_ID            ((sai_npu_object_id_t)-1)
 
 #define SAI_VM_VLAN_ID_DEFAULT           (1)
 

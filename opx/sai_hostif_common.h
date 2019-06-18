@@ -71,7 +71,7 @@
  */
 typedef struct _dn_sai_trap_key_t {
     /** Trap id acts as the key*/
-    sai_hostif_trap_type_t trap_id;
+    sai_object_id_t trap_id;
 } dn_sai_trap_key_t;
 
 /**
@@ -126,7 +126,40 @@ typedef struct _dn_sai_trap_group_node_t {
     std_dll_head              trap_list;
     /** Count of traps associated to the trap group */
     uint_t                    trap_count;
+    /** List of traps associated to the trap group */
+    std_dll_head              user_def_trap_list;
+    /** Count of traps associated to the trap group */
+    uint_t                    user_def_trap_count;
 } dn_sai_trap_group_node_t;
+
+/**
+ * @brief User Defined Trap node key
+ *
+ * Holds the key field for user defined trap node. The information in the trap
+ * node would be used to configure NPU registers to trap packets to CPU.
+ */
+typedef struct _dn_sai_user_def_trap_key_t {
+    /** ((User defined trap type << DN_HOSTIF_USER_DEF_TRAP_TYPE_SHIFT)
+     *  | NPU trap id) acts as the key
+     */
+    sai_object_id_t user_def_trap_id;
+} dn_sai_user_def_trap_key_t;
+
+/**
+ * @brief User Defined Trap node datastructure
+ *
+ * Contains the information related to a SAI User Defined trap
+ */
+typedef struct _dn_sai_user_def_trap_node_t {
+    /** Link to the next trap having the same trap group */
+    std_dll             trap_link;
+    /** Key for the trap node */
+    dn_sai_user_def_trap_key_t   key;
+    /** Priority for the trap */
+    uint_t              trap_prio;
+    /** The trap group associated to the trap */
+    sai_object_id_t     trap_group;
+} dn_sai_user_def_trap_node_t;
 
 /**
  * @brief HostIf Operations
@@ -144,4 +177,28 @@ typedef enum _dn_sai_hostif_op_t {
     DN_SAI_HOSTIF_GET = 4
 } dn_sai_hostif_op_t;
 
+/**
+ * @brief HostIf debug direction in logging
+ *
+ * Represents the direction to log in hostif
+ */
+typedef enum _sai_hostif_debug_log_dir_t {
+    SAI_HOSTIF_DEBUG_LOG_DIR_RX,
+    SAI_HOSTIF_DEBUG_LOG_DIR_TX,
+    SAI_HOSTIF_DEBUG_LOG_DIR_BOTH,
+} sai_hostif_debug_log_dir_t;
+
+
+/**
+ * @brief HostIf debug attribute to be set
+ *
+ * Debug attributes in hostif
+ */
+typedef enum _sai_hostif_debug_attr_t {
+    SAI_HOSTIF_DEBUG_ATTR_LOG,
+    SAI_HOSTIF_DEBUG_ATTR_DIR,
+    SAI_HOSTIF_DEBUG_ATTR_PORT,
+} sai_hostif_debug_attr_t;
+
+#define SAI_HOSTIF_DEBUG_PORT_ALL  (-1)
 #endif /*_SAI_HOSTIF_COMMON_H_*/

@@ -456,6 +456,9 @@ static sai_status_t sai_l2_create_fdb_entry(const sai_fdb_entry_t *fdb_entry,
     bool port_attr_init = false;
     bool type_attr_init = false;
     bool action_attr_init = false;
+    bool endpoint_ip_attr_init = false;
+    bool is_tunnel_bridge_port = false;
+    bool is_forwarding_action = true;
     sai_status_t ret_val = SAI_STATUS_FAILURE;
     char mac_str[SAI_MAC_STR_LEN] = {0};
     sai_fdb_entry_node_t fdb_entry_node_data;
@@ -499,19 +502,42 @@ static sai_status_t sai_l2_create_fdb_entry(const sai_fdb_entry_t *fdb_entry,
             } else if(attr_list[attr_index].id ==SAI_FDB_ENTRY_ATTR_PACKET_ACTION) {
                 fdb_entry_node_data.action = (sai_packet_action_t)attr_list[attr_index].value.s32;
                 action_attr_init = true;
+                is_forwarding_action = sai_fdb_entry_is_forwarding_action(
+                                                               fdb_entry_node_data.action);
             } else if(attr_list[attr_index].id == SAI_FDB_ENTRY_ATTR_META_DATA) {
                 fdb_entry_node_data.metadata = attr_list[attr_index].value.u32;
             } else if(attr_list[attr_index].id == SAI_FDB_ENTRY_ATTR_ENDPOINT_IP) {
                 fdb_entry_node_data.end_point_ip = attr_list[attr_index].value.ipaddr;
+                endpoint_ip_attr_init = true;
             }
         }
-        if(!(port_attr_init && type_attr_init && action_attr_init)) {
-            SAI_FDB_LOG_ERR("Mandatory attr missing for MAC:%s vlan:0x%"PRIx64"",
-                            std_mac_to_string(&(fdb_entry->mac_address),
-                            mac_str, sizeof(mac_str)), fdb_entry->bv_id);
-            ret_val = SAI_STATUS_MANDATORY_ATTRIBUTE_MISSING;
+        if(!(type_attr_init && action_attr_init)) {
+            if(!port_attr_init && is_forwarding_action) {
+                SAI_FDB_LOG_ERR("Mandatory attr missing for MAC:%s vlan:0x%"PRIx64"",
+                                std_mac_to_string(&(fdb_entry->mac_address),
+                                                  mac_str, sizeof(mac_str)), fdb_entry->bv_id);
+                ret_val = SAI_STATUS_MANDATORY_ATTRIBUTE_MISSING;
+                break;
+            }
+        }
+
+        if(fdb_entry_node_data.bridge_port_id != SAI_NULL_OBJECT_ID) {
+            is_tunnel_bridge_port = sai_is_bridge_port_type_tunnel(fdb_entry_node_data.bridge_port_id);
+            if(is_tunnel_bridge_port && !endpoint_ip_attr_init) {
+                SAI_FDB_LOG_ERR("Endpoint ip address not provided for tunnel "
+                                "bridge port 0x%"PRIx64, fdb_entry_node_data.bridge_port_id);
+                ret_val = SAI_STATUS_MANDATORY_ATTRIBUTE_MISSING;
+                break;
+            }
+        }
+
+        if(endpoint_ip_attr_init && !is_tunnel_bridge_port) {
+            SAI_FDB_LOG_ERR("Endpoint ip address attribute is valid only "
+                            "for tunnel bridge port");
+            ret_val = SAI_STATUS_INVALID_PARAMETER;
             break;
         }
+
         ret_val = sai_fdb_npu_api_get()->create_fdb_entry(fdb_entry, &fdb_entry_node_data);
 
         if(ret_val == SAI_STATUS_SUCCESS) {
@@ -534,8 +560,8 @@ static sai_fdb_entry_node_t *sai_fdb_populate_node_from_hardware(
 
     if(sai_fdb_npu_api_get()->get_fdb_entry_from_hardware(fdb_entry,
                &fdb_entry_node_data)!= SAI_STATUS_SUCCESS) {
-        SAI_FDB_LOG_WARN("FDB Entry not found for MAC:%s vlan:0x%"PRIx64"",
-                        std_mac_to_string(&(fdb_entry->mac_address),
+        SAI_FDB_LOG_TRACE("FDB Entry not found for MAC:%s vlan:0x%"PRIx64"",
+                           std_mac_to_string(&(fdb_entry->mac_address),
                             mac_str, sizeof(mac_str)), fdb_entry->bv_id);
         return NULL;
     }

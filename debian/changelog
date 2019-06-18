@@ -1,3 +1,11 @@
+opx-sai-vm (17.2.0) unstable; urgency=medium
+
+  * Update: 1d Bridge RIF and 1D router bridge port support
+  * Update: Ported Latest Trap/User trap sai-bcm code into sai-vm repo
+  * Update: Added Bridge type qualifier into SAI attribute list
+
+ -- Dell EMC <ops-dev@lists.openswitch.net>  Wed, 05 Jun 2019  11:00:00 -0800
+
 opx-sai-vm (17.1.0+opx10) unstable; urgency=medium
 
   * Update: Copyright information

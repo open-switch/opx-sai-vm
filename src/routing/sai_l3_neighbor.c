@@ -421,8 +421,12 @@ static sai_status_t sai_fib_neighbor_port_id_resolve (sai_fib_nh_t *p_neighbor)
     } else {
 
         memset (&fdb_entry, 0, sizeof(fdb_entry));
+        if(p_rif->type == SAI_ROUTER_INTERFACE_TYPE_BRIDGE) {
+            fdb_entry.bv_id = p_rif->attachment.bridge_id;
+        } else {
+            fdb_entry.bv_id = sai_vlan_id_to_vlan_obj_id(p_rif->attachment.vlan_id);
+        }
 
-        fdb_entry.bv_id = sai_vlan_id_to_vlan_obj_id(p_rif->attachment.vlan_id);
         memcpy (fdb_entry.mac_address, p_neighbor->mac_addr, sizeof (sai_mac_t));
 
         fdb_port_attr.id = SAI_FDB_ENTRY_ATTR_BRIDGE_PORT_ID;
@@ -494,8 +498,9 @@ static sai_status_t sai_fib_neighbor_mac_entry_insert (
         return SAI_STATUS_ITEM_NOT_FOUND;
     }
 
-    if (p_rif_node->type != SAI_ROUTER_INTERFACE_TYPE_VLAN) {
-        SAI_NEIGHBOR_LOG_TRACE ("Neighbor is not on VLAN based RIF.");
+    if ((p_rif_node->type != SAI_ROUTER_INTERFACE_TYPE_VLAN) &&
+        (p_rif_node->type != SAI_ROUTER_INTERFACE_TYPE_BRIDGE)) {
+        SAI_NEIGHBOR_LOG_TRACE ("Neighbor is not on VLAN or Bridge based RIF.");
 
         return SAI_STATUS_SUCCESS;
     }
@@ -604,8 +609,10 @@ static sai_status_t sai_fib_neighbor_mac_entry_remove (sai_fib_nh_t *p_neighbor)
         return SAI_STATUS_ITEM_NOT_FOUND;
     }
 
-    if (p_rif_node->type != SAI_ROUTER_INTERFACE_TYPE_VLAN) {
-        SAI_NEIGHBOR_LOG_TRACE ("Neighbor is not on VLAN based RIF.");
+    if ((p_rif_node->type != SAI_ROUTER_INTERFACE_TYPE_VLAN) &&
+        (p_rif_node->type != SAI_ROUTER_INTERFACE_TYPE_BRIDGE)) {
+
+        SAI_NEIGHBOR_LOG_TRACE ("Neighbor is not on VLAN or Bridge based RIF.");
 
         return SAI_STATUS_SUCCESS;
     }

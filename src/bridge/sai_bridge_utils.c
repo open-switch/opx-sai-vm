@@ -1124,6 +1124,10 @@ sai_status_t sai_bridge_port_decrement_fdb_count(sai_object_id_t bridge_port_id)
     sai_status_t          sai_rc = SAI_STATUS_FAILURE;
     dn_sai_bridge_port_info_t *p_bridge_port_info = NULL;
 
+    if(bridge_port_id == SAI_NULL_OBJECT_ID) {
+        return SAI_STATUS_SUCCESS;
+    }
+
     sai_rc = sai_bridge_port_cache_read (bridge_port_id, &p_bridge_port_info);
     if ((sai_rc != SAI_STATUS_SUCCESS) || (p_bridge_port_info == NULL)) {
         SAI_BRIDGE_LOG_ERR("Invalid bridge port object id 0x%"PRIx64" in set attribute", bridge_port_id);
@@ -1662,6 +1666,21 @@ bool sai_is_bridge_port_type_sub_port(sai_object_id_t bridge_port_id)
         return false;
     }
     return (p_bridge_port_info->bridge_port_type == SAI_BRIDGE_PORT_TYPE_SUB_PORT);
+}
+
+bool sai_is_bridge_port_type_tunnel(sai_object_id_t bridge_port_id)
+{
+    sai_status_t sai_rc = SAI_STATUS_FAILURE;;
+    dn_sai_bridge_port_info_t *p_bridge_port_info = NULL;
+
+    sai_rc = sai_bridge_port_cache_read(bridge_port_id, &p_bridge_port_info);
+
+    if((sai_rc != SAI_STATUS_SUCCESS) || (p_bridge_port_info == NULL)) {
+        SAI_BRIDGE_LOG_ERR("Error in reading cache for bridge port id 0x%"PRIx64"",
+                           bridge_port_id);
+        return false;
+    }
+    return (p_bridge_port_info->bridge_port_type == SAI_BRIDGE_PORT_TYPE_TUNNEL);
 }
 
 bool sai_is_bridge_port_obj_lag(sai_object_id_t bridge_port_id)

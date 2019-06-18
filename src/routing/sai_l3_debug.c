@@ -141,7 +141,8 @@ void sai_fib_dump_rif_node (sai_fib_router_interface_t *p_rif_node)
     SAI_DEBUG ("RIF Id: 0x%"PRIx64", p_rif_node: %p, Type: %s, "
                "Attachment Id: 0x%"PRIx64", VR Id: 0x%"PRIx64", "
                "V4 admin state: %s, V6 admin state: %s, MTU: %d, "
-               "MAC: %s, IP Opt action: %d (%s), ref_count: %d.",
+               "MAC: %s, IP Opt action: %d (%s), ref_count: %d, "
+               "Virtual:%s.",
                p_rif_node->rif_id, p_rif_node,
                sai_fib_rif_type_to_str (p_rif_node->type),
                p_rif_node->attachment.port_id, p_rif_node->vrf_id,
@@ -151,7 +152,7 @@ void sai_fib_dump_rif_node (sai_fib_router_interface_t *p_rif_node)
                ((const hal_mac_addr_t *)&p_rif_node->src_mac, p_buf,
                 SAI_FIB_DBG_MAX_BUFSZ), p_rif_node->ip_options_pkt_action,
                sai_packet_action_str (p_rif_node->ip_options_pkt_action),
-               p_rif_node->ref_count);
+               p_rif_node->ref_count, (p_rif_node->is_virtual?"true":"false"));
 }
 
 void sai_fib_dump_all_rif_in_vr (sai_object_id_t vr_id)

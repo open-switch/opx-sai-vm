@@ -259,7 +259,9 @@ const char *sai_fib_rif_type_to_str (uint_t type)
         return "Vlan";
     } else if (type == SAI_ROUTER_INTERFACE_TYPE_LOOPBACK) {
         return "Loopback";
-    }else {
+    } else if (type == SAI_ROUTER_INTERFACE_TYPE_BRIDGE) {
+        return "Bridge";
+    } else {
         return "Invalid";
     }
 }

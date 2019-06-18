@@ -466,8 +466,8 @@ sai_status_t sai_dump_child_nodes (dn_sai_qos_sched_group_t *sg_node, char *leve
     STD_ASSERT (sg_node != NULL);
     STD_ASSERT (level_str != NULL);
 
-    safestrncpy(hierarchy_str,level_str,SAI_MAX_HIERARCHY_STRLEN);
-    strncat(hierarchy_str, SAI_HIERARCHY_LEVEL_CHAR, SAI_HIERARCHY_LEVEL_CHAR_LEN);
+    snprintf(hierarchy_str, SAI_MAX_HIERARCHY_STRLEN, "%s%s",
+             level_str, SAI_HIERARCHY_LEVEL_CHAR);
 
     for(child_sg_node = sai_qos_sched_group_get_first_child_sched_group(sg_node);
         child_sg_node != NULL;

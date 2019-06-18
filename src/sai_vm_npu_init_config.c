@@ -102,6 +102,23 @@ static void sai_vm_port_info_node_handler (std_config_node_t port_node,
                                              &port_info->breakout_modes_support,
                                              SAI_PORT_CAP_BREAKOUT_MODE_4X);
 
+            node_attr = std_config_attr_get(sai_node, SAI_ATTR_DEFAULT_BREAKOUT_MODE);
+
+            if (node_attr != NULL) {
+                if (strncmp(node_attr, SAI_ATTR_BREAKOUT_LANE_1, strlen(node_attr)) == 0) {
+                    /* Default non-breakout case */
+                   port_info->default_breakout_mode = SAI_PORT_CAP_BREAKOUT_MODE_1X;
+                } else if (strncmp(node_attr, SAI_ATTR_BREAKOUT_LANE_2,strlen(node_attr)) == 0) {
+                   port_info->default_breakout_mode = (SAI_PORT_CAP_BREAKOUT_MODE |
+                                                                 SAI_PORT_CAP_BREAKOUT_MODE_2X);
+                } else if (strncmp(node_attr, SAI_ATTR_BREAKOUT_LANE_4,strlen(node_attr)) == 0) {
+                   port_info->default_breakout_mode = (SAI_PORT_CAP_BREAKOUT_MODE |
+                                                                 SAI_PORT_CAP_BREAKOUT_MODE_4X);
+                }
+            } else {
+                port_info->default_breakout_mode = SAI_PORT_CAP_BREAKOUT_MODE_1X;
+            }
+
         } else if (strncmp (std_config_name_get (sai_node),
                             SAI_NODE_NAME_LANE, SAI_MAX_NAME_LEN) == 0) {
 
@@ -121,26 +138,41 @@ static sai_status_t sai_vm_port_info_handler (std_config_node_t port_node,
                                               uint_t max_port_instance)
 {
     uint_t port_instance = UINT_MAX;
+    uint_t port_instance_id = UINT_MAX;
+    char   *node_attr = NULL;
+    static uint_t g_port_instance_id = 0;
 
     STD_ASSERT(port_info_tbl != NULL);
     STD_ASSERT (port_node != NULL);
 
-    sai_std_config_attr_update (port_node, SAI_ATTR_INSTANCE, &port_instance, 0);
-    if (port_instance == UINT_MAX) {
-        SAI_PORT_LOG_ERR ("No valid port instance id available");
+    sai_std_config_attr_update (port_node, SAI_ATTR_INSTANCE, &port_instance_id, 0);
+    if (port_instance_id == UINT_MAX) {
+        SAI_PORT_LOG_TRACE("No valid port instance id passed from init config");
+        port_instance_id = g_port_instance_id;
+    }
+
+    if (g_port_instance_id >= max_port_instance) {
+        SAI_PORT_LOG_ERR ("Port instance %d is more than the max possible port instance %d",
+                          g_port_instance_id, max_port_instance);
         return SAI_STATUS_INVALID_PARAMETER;
     }
 
-    if (port_instance >= max_port_instance) {
-        SAI_PORT_LOG_ERR ("Port instance %d is more than the max possible port instance %d",
-                          port_instance, max_port_instance);
-        return SAI_STATUS_INVALID_PARAMETER;
-    }
+    port_instance = g_port_instance_id;
+
+    port_info_tbl [port_instance].port_inst_id = port_instance_id + 1;
 
     SAI_PORT_LOG_TRACE ("VM Port instance %d init conifg handler", port_instance);
 
-    sai_std_config_attr_bool_update (port_node, SAI_ATTR_BIT_ACTIVE,
-                                     (bool *) &((port_info_tbl + port_instance)->port_active), 1);
+    node_attr = std_config_attr_get(port_node, SAI_ATTR_BIT_ACTIVE);
+    if (node_attr == NULL) {
+       /* Port assumed to be active unless it is set to false in init config */
+        port_info_tbl [port_instance].port_active = true;
+    } else {
+        sai_std_config_attr_bool_update(port_node, SAI_ATTR_BIT_ACTIVE,
+                                        &((port_info_tbl + port_instance)->port_active), 1);
+    }
+
+    g_port_instance_id++;
 
     sai_vm_port_info_node_handler (port_node, (port_info_tbl + port_instance));
 
@@ -187,7 +219,7 @@ sai_status_t sai_vm_port_info_update (sai_vm_port_init_info_t *vm_init_info)
         port_info->fwd_mode = SAI_PORT_FWD_MODE_UNKNOWN;
         port_info->ext_phy_addr = vm_init_info[pport].ext_phy_addr;
         port_info->port_supported_capb = vm_init_info[pport].breakout_modes_support;
-        port_info->port_enabled_capb = SAI_PORT_CAP_BREAKOUT_MODE_1X;
+        port_info->port_enabled_capb = vm_init_info[pport].default_breakout_mode;
         port_info->max_lanes_per_port = vm_init_info[pport].max_lanes_per_port;
         port_info->port_lane_bmap = vm_init_info[pport].port_lane_bmap;
         port_info->port_speed = vm_init_info[pport].port_speed;

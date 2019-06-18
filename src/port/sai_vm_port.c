@@ -119,7 +119,7 @@ sai_status_t sai_port_attr_oper_status_set(const sai_npu_port_id_t npu_port_id,
 
 static sai_status_t sai_port_attr_admin_state_set(sai_object_id_t sai_port_id,
                                            const sai_port_info_t *sai_port_info,
-                                           const const sai_attribute_t *attr)
+                                           const sai_attribute_t *attr)
 {
     if (!sai_vport_set_admin_state(sai_port_info->phy_port_id, attr->value.booldata)) {
         return SAI_STATUS_FAILURE;
@@ -130,7 +130,7 @@ static sai_status_t sai_port_attr_admin_state_set(sai_object_id_t sai_port_id,
 
 static sai_status_t sai_port_attr_mtu_size_set(sai_object_id_t sai_port_id,
                                            const sai_port_info_t *sai_port_info,
-                                           const const sai_attribute_t *attr)
+                                           const sai_attribute_t *attr)
 {
     if (!sai_vport_set_mtu_size(sai_port_info->phy_port_id, attr->value.u32)) {
         return SAI_STATUS_FAILURE;
@@ -246,7 +246,11 @@ const speed_desc_t* get_speed_map(size_t *sz)
 
         { SAI_PORT_CAP_SPEED_TWENTY_FIVE_GIG, SAI_PORT_SPEED_TWENTY_FIVE_GIG, SAI_ATTR_VAL_SPEED_25G },
 
-        { SAI_PORT_CAP_SPEED_FORTY_GIG, SAI_PORT_SPEED_FORTY_GIG, SAI_ATTR_VAL_SPEED_40G }
+        { SAI_PORT_CAP_SPEED_FORTY_GIG, SAI_PORT_SPEED_FORTY_GIG, SAI_ATTR_VAL_SPEED_40G },
+
+        { SAI_PORT_CAP_SPEED_FIFTY_GIG, SAI_PORT_SPEED_FIFTY_GIG, SAI_ATTR_VAL_SPEED_50G },
+
+        { SAI_PORT_CAP_SPEED_HUNDRED_GIG, SAI_PORT_SPEED_HUNDRED_GIG, SAI_ATTR_VAL_SPEED_100G },
 
     };
 
@@ -310,7 +314,6 @@ sai_status_t sai_port_attr_eee_get(sai_object_id_t sai_port_id,  sai_attribute_v
 
     return SAI_STATUS_SUCCESS;
 }
-
 static sai_status_t sai_npu_port_get_attribute (sai_object_id_t port_id,
                                                 const sai_port_info_t *sai_port_info,
                                                 uint_t attr_count,
@@ -478,6 +481,13 @@ static void sai_npu_reg_link_state_cb (
     sai_vm_vport_event_oper_status_callback(sai_port_attr_oper_status_set);
 }
 
+/* For any given SAI port, get its control ports's max number of lanes per port */
+sai_status_t sai_vm_control_port_max_lanes_get(sai_object_id_t port, uint_t *max_lanes)
+{
+    *max_lanes = SAI_VM_MAX_LANE_PER_PORT ;
+
+    return SAI_STATUS_SUCCESS;
+}
 
 static sai_port_breakout_mode_type_t sai_vm_get_port_breakout_lane_from_count(uint_t port_count,
                                                                               uint_t max_lanes)
@@ -562,7 +572,7 @@ static sai_status_t sai_npu_port_create (sai_object_id_t *port_id,uint32_t attr_
         SAI_PORT_LOG_ERR ("Error npu port %d exists", npu_port_id);
         return SAI_STATUS_ITEM_ALREADY_EXISTS;
     }
-    max_lanes = port_info->max_lanes_per_port;
+    sai_vm_control_port_max_lanes_get(port_info->sai_port_id , &max_lanes);
 
 
     breakout_mode = sai_vm_get_port_breakout_lane_from_count (port_count, max_lanes);

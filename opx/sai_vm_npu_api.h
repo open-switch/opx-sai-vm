@@ -69,4 +69,6 @@ sai_npu_tunnel_api_t* sai_vm_tunnel_api_query (void);
 sai_npu_bridge_api_t* sai_vm_bridge_api_query (void);
 sai_npu_l2mc_api_t* sai_vm_l2mc_api_query (void);
 sai_npu_mcast_api_t* sai_vm_mcast_api_query (void);
+sai_npu_l3_ipmc_api_t* sai_vm_l3_ipmc_api_query (void);
+sai_npu_l3_mcast_api_t* sai_vm_l3_mcast_api_query (void);
 #endif /* _SAI_VM_NPU_API_H */

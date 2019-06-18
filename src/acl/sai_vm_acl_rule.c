@@ -43,7 +43,7 @@ static bool sai_is_acl_rule_fields_in_table (sai_acl_table_t *acl_table,
     uint_t filter_idx = 0;
     uint_t tbl_fld_idx = 0;
     uint_t rule_filter_map_idx = 0;
-    uint_t mapped_tbl_fld = 0;
+    uint_t loop_idx = 0;
     uint_t rule_filter_to_tbl_field_map [] = {
         SAI_ACL_TABLE_ATTR_FIELD_SRC_IPV6, SAI_ACL_TABLE_ATTR_FIELD_DST_IPV6,
         SAI_ACL_TABLE_ATTR_FIELD_INNER_SRC_IPV6, SAI_ACL_TABLE_ATTR_FIELD_INNER_DST_IPV6,
@@ -87,6 +87,10 @@ static bool sai_is_acl_rule_fields_in_table (sai_acl_table_t *acl_table,
         SAI_ACL_TABLE_ATTR_FIELD_BRIDGE_TYPE,
     };
 
+    uint_t table_size = sizeof(rule_filter_to_tbl_field_map)/
+        sizeof(rule_filter_to_tbl_field_map[0]);
+
+
     STD_ASSERT (acl_table != NULL);
     STD_ASSERT (acl_rule != NULL);
 
@@ -119,13 +123,14 @@ static bool sai_is_acl_rule_fields_in_table (sai_acl_table_t *acl_table,
 
         SAI_ACL_LOG_TRACE("rule_filter_map_idx is %d",rule_filter_map_idx);
 
-        mapped_tbl_fld = rule_filter_to_tbl_field_map [rule_filter_map_idx];
-
         for (tbl_fld_idx = 0; tbl_fld_idx < acl_table->field_count;
              tbl_fld_idx++) {
-            if (acl_table->field_list [tbl_fld_idx] == mapped_tbl_fld) {
-                is_found = true;
-                break;
+            for(loop_idx = 0; loop_idx < table_size;
+                loop_idx ++) {
+                if (acl_table->field_list [tbl_fld_idx] == rule_filter_to_tbl_field_map[loop_idx]) {
+                    is_found = true;
+                    break;
+                }
             }
         }
 

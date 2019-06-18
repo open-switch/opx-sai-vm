@@ -299,6 +299,20 @@ static void sai_vm_hostintf_dump_trap(const dn_sai_trap_node_t *trap_node)
 {
 }
 
+static void sai_vm_hostif_debug_set(sai_hostif_debug_attr_t attr_id, int value)
+{
+}
+
+static uint64_t sai_vm_hosif_rx_errors_get(void)
+{
+    return 0;
+}
+
+static uint32_t sai_vm_hostif_get_max_user_def_traps(void)
+{
+    return 256;
+}
+
 static sai_npu_hostif_api_t sai_vm_hostif_api_table = {
 
         sai_vm_hostif_init,
@@ -308,7 +322,10 @@ static sai_npu_hostif_api_t sai_vm_hostif_api_table = {
         sai_vm_hostif_set_trap,
         sai_vm_hostintf_send_packet,
         sai_vm_hostintf_reg_packet_rx_fn,
-        sai_vm_hostintf_dump_trap
+        sai_vm_hostintf_dump_trap,
+        sai_vm_hostif_debug_set,
+        sai_vm_hosif_rx_errors_get,
+        sai_vm_hostif_get_max_user_def_traps
 };
 
 sai_npu_hostif_api_t* sai_vm_hostif_api_query (void)

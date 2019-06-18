@@ -297,6 +297,28 @@ static inline bool sai_is_obj_id_hostif_trap_group (sai_object_id_t uoid)
 }
 
 /**
+ * @brief Check if the SAI object id is hostif trap object id.
+ *
+ * @param[in] uoid SAI unified object id.
+ * @return true if hostif trap object id else false is returned.
+ */
+static inline bool sai_is_obj_id_hostif_trap (sai_object_id_t uoid)
+{
+    return (sai_uoid_obj_type_get (uoid) == SAI_OBJECT_TYPE_HOSTIF_TRAP);
+}
+
+/**
+ * @brief Check if the SAI object id is hostif user defined trap object id.
+ *
+ * @param[in] uoid SAI unified object id.
+ * @return true if hostif user defined trap object id else false is returned.
+ */
+static inline bool sai_is_obj_id_hostif_user_def_trap (sai_object_id_t uoid)
+{
+    return (sai_uoid_obj_type_get (uoid) == SAI_OBJECT_TYPE_HOSTIF_USER_DEFINED_TRAP);
+}
+
+/**
  * @brief Check if the SAI object id is Queue object id.
  *
  * @param[in] uoid SAI unified object id.

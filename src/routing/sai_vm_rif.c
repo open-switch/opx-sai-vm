@@ -37,6 +37,8 @@
 #include "std_assert.h"
 #include <inttypes.h>
 
+static  dn_sai_id_gen_info_t sai_vm_rif_gen_info = {0};
+
 static void sai_vm_rif_log_trace (sai_fib_router_interface_t *p_rif_node,
                                   char *p_info_str)
 {
@@ -57,6 +59,29 @@ static void sai_vm_rif_log_trace (sai_fib_router_interface_t *p_rif_node,
                        std_mac_to_string
                        ((const hal_mac_addr_t *)&p_rif_node->src_mac, p_buf,
                         SAI_VM_MAX_BUFSZ));
+}
+
+static bool sai_vm_router_interface_in_use(uint64_t id)
+{
+    uint64_t temp_id = id + sai_vm_bridge_rif_id_start_get();
+    sai_object_id_t rif_id =
+        sai_uoid_create(SAI_OBJECT_TYPE_ROUTER_INTERFACE, temp_id);
+
+    return sai_fib_is_rif_created(rif_id);
+}
+
+static sai_npu_object_id_t sai_vm_router_interface_id_generate(void)
+{
+    sai_vm_rif_gen_info.mask = (SAI_VM_MAX_BRIDGE_RIFS - 1);
+    sai_vm_rif_gen_info.is_id_in_use = sai_vm_router_interface_in_use;
+
+    if(SAI_STATUS_SUCCESS ==
+       dn_sai_get_next_free_id(&sai_vm_rif_gen_info)) {
+
+        return (sai_vm_rif_gen_info.cur_id + sai_vm_bridge_rif_id_start_get());
+    }
+
+    return SAI_VM_INVALID_RIF_ID;
 }
 
 static sai_npu_object_id_t sai_vm_rif_node_get_rif_id (
@@ -80,6 +105,8 @@ sai_fib_router_interface_t *p_rif)
         } else if (sai_is_obj_id_port (obj_id)) {
             rif_id = sai_vm_port_rif_id_get (attach_id);
         }
+    } else if (p_rif->type == SAI_ROUTER_INTERFACE_TYPE_BRIDGE) {
+        rif_id = sai_vm_router_interface_id_generate();
     }
 
     return rif_id;
@@ -141,6 +168,11 @@ sai_fib_router_interface_t *p_rif_node, sai_npu_object_id_t *p_rif_id)
     STD_ASSERT (p_rif_id != NULL);
 
     rif_id = sai_vm_rif_node_get_rif_id (p_rif_node);
+    if(rif_id == SAI_VM_INVALID_RIF_ID) {
+
+        SAI_RIF_LOG_ERR ("Router interface table full");
+        return SAI_STATUS_TABLE_FULL;
+    }
 
     /* Check if RIF exists already. */
     rif_obj_id = sai_uoid_create (SAI_OBJECT_TYPE_ROUTER_INTERFACE, rif_id);

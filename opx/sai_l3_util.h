@@ -1081,6 +1081,17 @@ static inline bool sai_fib_is_tunnel_encap_next_hop (sai_fib_nh_t *p_next_hop)
 }
 
 /**
+ * @brief Check if the 1d bridge RIF is attached to a 1D bridge.
+ *
+ * @param[in] p_rif_node Pointer to the RIF node.
+ * @return true if 1D RIF is attached to the 1D router bridgeport, false
+ * otherwise.
+ */
+static inline bool sai_fib_rif_is_attached_to_bridge(sai_fib_router_interface_t *p_rif_node)
+{
+    return (sai_is_obj_id_bridge(p_rif_node->attachment.bridge_id));
+}
+/**
  * \}
  */
 
